@@ -41,6 +41,8 @@ function App() {
     const [gruppenAnzeigeAktiv, setGruppenAnzeigeAktiv] = useState(false);
     const [unitMeterAktiv, setUnitMeterAktiv] = useState(false);
     const [nachnameAnzeigenAktiv, setNachnameAnzeigenAktiv] = useState(false);
+    const [footerAktiv, setFooterAktiv] = useState(true);
+    const [fontSize, setFontSize] = useState(16);
     const swimmerMapRef = useRef(swimmerMap);
     const [lapLog, setLapLog] = useState([]);
     const [filter, setFilter] = useState({ gruppe: null, nurKinder: false, sortierung: "bahnanzahl" });
@@ -215,6 +217,11 @@ function App() {
         swimmerMapRef.current = swimmerMap;
     }, [swimmerMap]);
 
+    //Schriftgrößenänderung
+    useEffect(() => {
+        document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+    }, [fontSize]);
+
     useEffect(() => {
         function handleKeyDown(e) {
             if (e.shiftKey && e.key === "L") {
@@ -237,7 +244,16 @@ function App() {
             } else if (e.shiftKey && e.key === "B") {
                 console.log("Download JSON-Backup");
                 downloadJSON();
-            }
+            } else if (e.ctrlKey && e.key === '+') {
+                setFontSize(size => Math.min(size + 1, 40));
+                e.preventDefault();
+            } else if (e.ctrlKey && e.key === '-') {
+                setFontSize(size => Math.max(size - 1, 8));
+                e.preventDefault();
+            } else if (e.shiftKey && e.key === "F") {
+                console.log("Footer geändert");
+                setFooterAktiv((prev) => !prev);
+            } 
         }
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
@@ -394,7 +410,10 @@ function App() {
                     )
                 )
                 : null
-        )
+        ),
+        footerAktiv
+        ? React.createElement('div', { className: 'footer' }, 'Ein Projekt der Informatik-AG des Albert-Einstein-Gymnasiums')
+        : null
     );
 }
 

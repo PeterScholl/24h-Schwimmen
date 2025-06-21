@@ -1,91 +1,104 @@
 <!DOCTYPE html>
 <html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ergebnisse - 24h Schwimmen</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        display: flex;
+        height: 100vh;
+        background-color: #f8f8fd;
+        margin: 0;
+      }
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Ergebnisse - 24h Schwimmen</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      display: flex;
-      height: 100vh;
-      background-color: #f8f8fd;
-      margin: 0;
-    }
+      .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1.5rem;
+        padding: 0.2rem 1rem;
+        background-color: #222;
+        color: white;
+        font-size: 0.9rem;
+        text-align: center;
+        z-index: 1000;
+      }
+      body {
+        padding-bottom: 2rem; /* Platz für Footer freihalten */
+      }
 
-    #root {
-      display: flex;
-      flex: 1;
-    }
+      #root {
+        display: flex;
+        flex: 1;
+      }
 
-    .left,
-    .right {
-      padding: 1rem;
-      overflow-y: auto;
-    }
+      .left,
+      .right {
+        padding: 1rem;
+        overflow-y: auto;
+      }
 
-    .left {
-      width: 70%;
-      border-right: 1px solid #ccc;
-      font-size: var(--font-size, 16px);
-      scroll-behavior: smooth;
-    }
+      .left {
+        width: 70%;
+        border-right: 1px solid #ccc;
+        font-size: var(--font-size, 16px);
+        scroll-behavior: smooth;
+      }
 
-    .right {
-      width: 30%;
-      background: #f5f5f5;
-    }
+      .right {
+        width: 30%;
+        font-size: var(--font-size, 16px);
+        background: #f5f5f5;
+      }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
 
-    td,
-    th {
-      padding: 4px;
-      border-bottom: 1px solid #dddddd;
-      border: 1px solid #e6eaff;
-    }
+      td,
+      th {
+        padding: 4px;
+        border-bottom: 1px solid #dddddd;
+        border: 1px solid #e6eaff;
+      }
 
-    tbody tr:nth-child(odd) {
-      background-color: #c7cafa;
-    }
+      tbody tr:nth-child(odd) {
+        background-color: #c7cafa;
+      }
 
-    tbody tr:nth-child(even) {
-      background-color: #dde4ff;
-    }
+      tbody tr:nth-child(even) {
+        background-color: #dde4ff;
+      }
 
-    select {
-      margin-bottom: 1rem;
-      padding: 0.5rem 1rem;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      background-color: white;
-      font-size: 1rem;
-      appearance: none;
-      background-position: right 0.75rem center;
-      background-size: 1rem;
-      cursor: pointer;
-      transition: border-color 0.2s;
-    }
+      select {
+        margin-bottom: 1rem;
+        padding: 0.5rem 1rem;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        background-color: white;
+        font-size: 1rem;
+        appearance: none;
+        background-position: right 0.75rem center;
+        background-size: 1rem;
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
 
-    select:focus {
-      border-color: #007bff;
-      outline: none;
-      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-    }
-  </style>
-</head>
+      select:focus {
+        border-color: #007bff;
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+      }
+    </style>
+  </head>
 
-<body>
-  <div id="root"></div>
-  <script src="./react.production.min.js"></script>
-  <script src="./react-dom.production.min.js"></script>
-  <script src="./view.js"></script>
-
-  
-
-</body>
-
+  <body>
+    <div id="root"></div>
+    <script src="./react.production.min.js"></script>
+    <script src="./react-dom.production.min.js"></script>
+    <script src="./view.js"></script>
+  </body>
 </html>
