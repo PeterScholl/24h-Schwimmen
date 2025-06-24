@@ -38,8 +38,8 @@ function App() {
     const [filterAuswahl, setFilterAuswahl] = useState("");
     const [shiftLockAktiv, setShiftLockAktiv] = useState(false);
     const [zweispaltigAktiv, setZweispaltigAktiv] = useState(true);
-    const [gruppenAnzeigeAktiv, setGruppenAnzeigeAktiv] = useState(false);
-    const [unitMeterAktiv, setUnitMeterAktiv] = useState(false);
+    const [gruppenAnzeigeAktiv, setGruppenAnzeigeAktiv] = useState(true);
+    const [unitMeterAktiv, setUnitMeterAktiv] = useState(true);
     const [nachnameAnzeigenAktiv, setNachnameAnzeigenAktiv] = useState(false);
     const [footerAktiv, setFooterAktiv] = useState(true);
     const [fontSize, setFontSize] = useState(16);
@@ -270,7 +270,7 @@ function App() {
             const date = new Date(lastupdate);
             date.setHours(date.getHours() - 1); // Hole die Daten der letzten Stunde
             holeNeueDaten(date);
-        }, 5000); // alle 5 Sekunden
+        }, 10000); // alle 5 Sekunden
         return () => clearInterval(interval10); // Aufräumen bei Komponentendemontage
     }, []);
 
@@ -282,8 +282,8 @@ function App() {
             const container = leftRef.current;
             if (!container) return;
             scrollPosition.current += 8;
-            if (scrollPosition.current >= container.scrollHeight - container.clientHeight) {
-                scrollPosition.current = 0;
+            if (scrollPosition.current >= 120+ container.scrollHeight - container.clientHeight) {
+                scrollPosition.current = -120;
             }
             container.scrollTop = scrollPosition.current;
         }, 100);
