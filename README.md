@@ -13,7 +13,8 @@ Die Erfassung soll auf möglichst vielen verschiedenen Endgeräten möglich sein
 ### Windows
 
 * Release als ZIP-Datei auf einem Windows-System herunterladen, entpacken und die Exe-Datei ausführen
-* Im Gui-Menu die Admin-Webseite starten (einloggen mit ``admin`` und ``swim24``)
+* Die Webseite sollte automatisch im Standardbrowser geöffnet werden (einloggen mit ``admin`` und ``swim24``)
+* Zur Admin-Seite wechseln (unten links -> Zahnrad)
 * Auf der Schwimmer-Seite einige Schwimmer aus dem Ordner testfiles importieren
 * Benutzer anlegen
 * Zur *normalen* Webseite wechseln und ausprobieren
@@ -164,6 +165,8 @@ Im view kann man:
 * mit ``Shift+N`` die Nachnamen ein- oder ausblenden
 * mit ``Shift+U`` die Anzeige zwischen Bahnen / Strecke wechseln
 * mit ``Shift+B`` ein Backup der Actions machen, welches man im Admin-Fenster wieder importieren könnte
+* mit ``Shift+F`` den Footer ein- und ausblenden
+* mit ``Shift+'+'`` bzw. ``Shift+'-'``  die Schriftgröße verändern
 
 Wenn man die URL mit ``?dbgfkt=true`` lädt, kann durch anklicken der Überschrift *24h-Schwimmen* eine automatisches Klicken der vorhandenen DIVs simuliert werden.
 
