@@ -278,7 +278,9 @@ def index():
 @app.route("/main.js")
 def send_mainjs():
     params = {
-        'schwimmerNrLen': config["laenge_schwimmerNr"]
+        'schwimmerNrLen': config["laenge_schwimmerNr"],
+        'fade_timeout_ms': config["fade_timeout_ms"],
+        'fade_to_endOfList': config["fade_to_endOfList"]
     }
     return render_template("main.js", **params), 200, {'Content-Type': 'application/javascript'}
 

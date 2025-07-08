@@ -29,6 +29,19 @@ Die Erfassung soll auf möglichst vielen verschiedenen Endgeräten möglich sein
 
 Eine Basisdatenbank mit dem Benutzer ``admin`` und dem Passwort ``swim24`` wird automatisch angelegt.
 
+## Konfiguration
+
+Die Datei ``config.json`` enthält die folgenden Einstellungen:
+
+```text
+    "flask_secret_key": "Lang&Umständlich",         # zur Verschlüsselung der Cookies
+    "default_admin_pass": "swim24",                 # Standard-Admin-Passwort
+    "laenge_schwimmerNr": 3,                        # Länge einer Schwimmernummer, z.B. 872
+    "laenge_bahn_m": 100,                           # Länge einer Bahn in Metern
+    "fade_timeout_ms": 50,                          # Timout für das Fade eines Divs 50ms - verschwindet sofort
+    "fade_to_endOfList": false                      # Nach dem Fade an das Ende der Liste
+```
+
 ## Wichtiges für den Live-Betrieb
 
 * Der Rechner auf dem der Server läuft, sollte angepasste Energiesparmodi haben, d.h. nicht in den Standby-Wechseln und auch die Festplatte soll nicht abgeschaltet werden. Dazu z.B. unter Windows ``Energiesparplaneinstellungen ändern`` -> ``Erweiterte Einstellungen ändern`` und dort enstprechende Einstellungen vornehmen

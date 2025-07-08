@@ -1,7 +1,14 @@
 import { schwimmerNummerErfragen, showStatusMessage } from './mymodals.js'
 
 const schwimmerNrLength = parseInt("{{schwimmerNrLen}}");
+const fade_timeout_ms = parseInt("{{fade_timeout_ms}}");
+const fade_to_endOfList = parseBoolean("{{fade_to_endOfList}}");
 const DEBUG = false;
+
+function parseBoolean(value) {
+    console.log("parseBoolean", value);
+  return value === 'true' || value === 'True' || value === true;
+}
 
 function logMessage(text, isSuccess = true) {
     statMessages.push({
@@ -227,7 +234,7 @@ const container = document.getElementById('container');
 const fadeControllers = new Map();
 
 // Fading-Funktion blendet ein Div langsam aus
-async function fadeOut(div, duration = 3000) {
+async function fadeOut(div, duration = fade_timeout_ms) {
     return new Promise((resolve, reject) => {
         let opacity = 1;
         const interval = 50;
@@ -313,7 +320,8 @@ container.addEventListener('click', async (event) => {
                     console.log(`Bahn des Schwimmers ${nummer} auf ${verwaltete_bahnen[0]} gesetzt`);
                     s_data.aufBahn = verwaltete_bahnen[0];
                 }
-                s_data.prio = 0;
+                if (fade_to_endOfList) s_data.prio = 0;
+                
                 //Evtl. genauere Daten in alleSchwimmer
                 s_data.bahnen = Math.max(s_data.bahnen, alleSchwimmer[nummer] ? alleSchwimmer[nummer].bahnanzahl : 0);
                 s_data.bahnen += 1;
@@ -382,6 +390,7 @@ function showSchwimmerContextMenu(x, y) {
     } else {
         bahnAbziehen.style.display = "block";
     }
+
     // Erst anzeigen, damit offsetWidth/Height korrekt bestimmt werden können
     // dann so platzieren das das Menü nicht über den Rand hinaus ragt.
     contextMenu.style.display = "block";
@@ -775,6 +784,18 @@ function parseUpdates(resp) {
 function debugLog(...args) {
     if (DEBUG) console.log(...args);
 }
+
+// Option: Ans Ende der Liste aus dem Kontextmenü des Schwimmers
+document.getElementById("swimmerToEnd").addEventListener("click", function () {
+    if (clickedDiv) {
+        const nummer = parseInt(clickedDiv.dataset.nummer);
+        const s_data = schwimmer.find(s => s.nummer == nummer);
+        s_data.prio=0;
+        render();
+    }
+    clickedDiv = null;
+    contextMenu.style.display = "none";
+});
 
 // Option: Runde abziehen - aus dem Kontextmenü des Schwimmers
 document.getElementById("rundeAbziehenOption").addEventListener("click", function () {
