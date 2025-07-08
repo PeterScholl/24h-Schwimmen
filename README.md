@@ -18,6 +18,7 @@ Die Erfassung soll auf möglichst vielen verschiedenen Endgeräten möglich sein
 * Auf der Schwimmer-Seite einige Schwimmer aus dem Ordner testfiles importieren
 * Benutzer anlegen
 * Zur *normalen* Webseite wechseln und ausprobieren
+* Den Server mit Strg-C in der Console beenden
 
 ### Linux bzw. Source
 
