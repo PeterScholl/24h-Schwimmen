@@ -560,7 +560,7 @@ function render() {
                 </div>
             `;
             if (!verwaltete_bahnen.includes(s.aufBahn)) {
-                div.style.backgroundColor = "lightgreen";
+                div.style.backgroundColor = "#b8d4ea";
             } else {
                 div.style.removeProperty("background-color");
             }

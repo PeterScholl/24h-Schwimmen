@@ -238,7 +238,7 @@ container.addEventListener('click', (event) => {
         // Hintergrundfarbe wiederherstellen
         const s_data = schwimmer.find(s => s.nummer == nummer);
         if (s_data && !verwaltete_bahnen.includes(s_data.aufBahn)) {
-            clicked_schwimmer.style.backgroundColor = "lightgreen";
+            clicked_schwimmer.style.backgroundColor = "#b8d4ea";
         } else {
             clicked_schwimmer.style.removeProperty("background-color");
         }
@@ -306,18 +306,24 @@ function showSchwimmerContextMenu(x, y) {
 
 function addSwipeHandler(div) {
     let startX = 0;
-    let currentX = 0;
     let swipedleft = false;
     let swipedright = false;
+    const threshold = 70; // px bis Aktion ausgelöst wird
 
-    const threshold = div.offsetWidth / 4;
-    const maxmovedist = 1.5 * threshold;
+    function resetDiv() {
+        div.style.transition = 'transform 0.2s ease, background-color 0.2s ease';
+        div.style.transform = 'translateX(0)';
+        div.style.backgroundColor = '';
+        div.style.zIndex = '';
+    }
 
     div.addEventListener('touchstart', e => {
         longPressTimer = setTimeout(() => {
             showSchwimmerContextMenu(e.touches[0].clientX, e.touches[0].clientY);
         }, 600);
 
+        swipedleft = false;
+        swipedright = false;
         div.dataset.swiping = "true";
         startX = e.touches[0].clientX;
         div.style.zIndex = '1000';
@@ -329,19 +335,19 @@ function addSwipeHandler(div) {
         e.preventDefault();
         if (div.dataset.swiping != "true") return;
 
-        currentX = e.touches[0].clientX;
-        const deltaX = Math.max(-maxmovedist, Math.min(maxmovedist, currentX - startX));
+        const deltaX = e.touches[0].clientX - startX;
+        // Horizontale Bewegung begrenzen
+        const clamped = Math.max(-220, Math.min(220, deltaX));
+        div.style.transform = `translateX(${clamped}px)`;
 
-        div.style.transform = `translateX(${deltaX}px)`;
-
-        if (deltaX > threshold) {
-            div.style.backgroundColor = 'lightgreen';
-            div.style.transform = `translate(${deltaX}px,${3 * (deltaX - threshold)}px)`;
-            swipedright = true;
-        } else if (deltaX < -threshold) {
-            div.style.backgroundColor = 'red';
-            div.style.transform = `translateX(${2 * deltaX + threshold}px) scale(${(deltaX + 1.2 * maxmovedist) / (1.2 * maxmovedist - threshold)})`;
+        if (clamped < -threshold) {
+            div.style.backgroundColor = '#ef9a9a'; // helles Rot
             swipedleft = true;
+            swipedright = false;
+        } else if (clamped > threshold) {
+            div.style.backgroundColor = '#a5d6a7'; // helles Grün
+            swipedright = true;
+            swipedleft = false;
         } else {
             div.style.backgroundColor = '';
             swipedleft = false;
@@ -352,23 +358,23 @@ function addSwipeHandler(div) {
     div.addEventListener('touchend', () => {
         clearTimeout(longPressTimer);
         if (div.dataset.swiping != "true") return;
-
         delete div.dataset.swiping;
+
         if (swipedleft) {
             swipedleft = false;
-            removeSchwimmerDiv(div);
+            // Karte nach links herausschieben, dann entfernen
+            div.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+            div.style.transform = 'translateX(-130%)';
+            div.style.opacity = '0';
+            setTimeout(() => removeSchwimmerDiv(div), 260);
         } else if (swipedright) {
-            schwimmer.forEach(s => { if (s.nummer === parseInt(div.dataset.nummer)) s.prio = 0; });
             swipedright = false;
-            div.style.transform = 'translateX(0)';
-            div.style.backgroundColor = '';
-            div.style.zIndex = '';
-            render();
+            schwimmer.forEach(s => { if (s.nummer === parseInt(div.dataset.nummer)) s.prio = 0; });
+            // Karte zurückfedern, dann Neuordnung via FLIP-Animation in render()
+            resetDiv();
+            setTimeout(() => render(), 220);
         } else {
-            div.style.transition = 'transform 0.2s ease';
-            div.style.transform = 'translateX(0)';
-            div.style.backgroundColor = '';
-            div.style.zIndex = '';
+            resetDiv();
         }
     });
 }
@@ -449,7 +455,7 @@ function render() {
             if (isSelected) {
                 div.style.removeProperty("background-color"); // CSS-Klasse übernimmt Farbe
             } else if (!verwaltete_bahnen.includes(s.aufBahn)) {
-                div.style.backgroundColor = "lightgreen";
+                div.style.backgroundColor = "#b8d4ea";
             } else {
                 div.style.removeProperty("background-color");
             }
@@ -702,3 +708,15 @@ fetchSchwimmer().then(() => {
     fillSchwimmerAusMeinenBahnen();
     render();
 });
+
+// Debug-Hooks: aufgerufen aus index_v2.html (Modul-Grenze)
+window.debugSchwimmerHinzufuegen = function(nummer) {
+    schwimmerHinzufuegen(String(nummer));
+    render();
+};
+window.debugSchwimmerEntfernen = function() {
+    if (schwimmer.length === 0) return;
+    const zufaelliger = schwimmer[Math.floor(Math.random() * schwimmer.length)];
+    const div = document.querySelector(`div[data-nummer="${zufaelliger.nummer}"]`);
+    if (div) removeSchwimmerDiv(div);
+};

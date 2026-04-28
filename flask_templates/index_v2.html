@@ -100,15 +100,62 @@
 
   {% if debugfunktion %}
   <script>
-    let debugTimer = null;
+    // ================================================================
+    //  DEBUG-KONFIGURATION
+    //  Auslösen: Klick auf "24h Schwimmen" im Header oder Strg+D
+    // ================================================================
+    const DEBUG_CONFIG = {
+      // Takt-Intervall in Millisekunden (Basis aller Zeitangaben unten)
+      tickMs: 1000,
 
-    function simulateRandomClick() {
+      // Wahrscheinlichkeit (0.0–1.0), dass pro Tick ein zufälliger
+      // Schwimmer angeklickt (ausgewählt/abgewählt) wird
+      klickWahrscheinlichkeit: 0.6,
+
+      // Alle N Ticks wird der Senden-Button ausgelöst
+      sendenIntervallTicks: 15,
+
+      // Alle N Ticks wird ein neuer Zufalls-Schwimmer hinzugefügt
+      hinzufuegenIntervallTicks: 8,
+
+      // Zufallsnummern für neue Schwimmer: von 0 bis (max - 1)
+      schwimmerNrMax: 1000,
+
+      // Ab dieser Anzahl an Schwimmern wird pro Tick zufällig
+      // einer entfernt, bis die Anzahl wieder darunter liegt
+      maxSchwimmer: 25,
+    };
+    // ================================================================
+
+    let debugTimer = null;
+    let debugTick = 0;
+
+    function debugStep() {
+      debugTick++;
       const container = document.getElementById('container');
-      const children = container.querySelectorAll('div');
-      if (children.length === 0) return;
-      if (Math.random() < 0.33) {
-        const randomChild = children[Math.floor(Math.random() * children.length)];
-        randomChild.click();
+      const schwimmerDivs = container.querySelectorAll('.schwimmer');
+
+      // Zufälligen Schwimmer auswählen / abwählen
+      if (schwimmerDivs.length > 0 && Math.random() < DEBUG_CONFIG.klickWahrscheinlichkeit) {
+        const randomDiv = schwimmerDivs[Math.floor(Math.random() * schwimmerDivs.length)];
+        randomDiv.click();
+      }
+
+      // Senden-Button auslösen
+      if (debugTick % DEBUG_CONFIG.sendenIntervallTicks === 0) {
+        document.getElementById('sendenBtn').click();
+      }
+
+      // Neuen Zufalls-Schwimmer hinzufügen
+      if (debugTick % DEBUG_CONFIG.hinzufuegenIntervallTicks === 0 && window.debugSchwimmerHinzufuegen) {
+        const nr = Math.floor(Math.random() * DEBUG_CONFIG.schwimmerNrMax);
+        window.debugSchwimmerHinzufuegen(nr);
+        console.log('Debug: Schwimmer', nr, 'hinzugefügt');
+      }
+
+      // Obergrenze: zufälligen Schwimmer entfernen wenn Liste zu lang
+      if (schwimmerDivs.length > DEBUG_CONFIG.maxSchwimmer && window.debugSchwimmerEntfernen) {
+        window.debugSchwimmerEntfernen();
       }
     }
 
@@ -119,7 +166,8 @@
         document.getElementById("mainHeading").style.color = "";
         console.log('Debug timer stopped');
       } else {
-        debugTimer = setInterval(simulateRandomClick, 1000);
+        debugTick = 0;
+        debugTimer = setInterval(debugStep, DEBUG_CONFIG.tickMs);
         document.getElementById("mainHeading").style.color = "green";
         console.log('Debug timer started');
       }
