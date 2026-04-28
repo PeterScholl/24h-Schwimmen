@@ -161,6 +161,11 @@ td.truncated:hover {
   font-size: 10cqi;
 }
 
+.schwimmer.selected {
+  background-color: aqua;
+  box-shadow: 0 0 0 3px #0097a7;
+}
+
 .schwimmer .prio {
   display: none;
   font-size: 0.8rem;

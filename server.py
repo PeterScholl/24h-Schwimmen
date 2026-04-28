@@ -276,12 +276,31 @@ def index():
     }
     return render_template("index.html", **params)
 
+@app.route("/v2")
+def index_v2():
+    params = {
+        'user_role': session.get('user_role',""),
+        'userrealname': session.get('realname',"Unbekannt"),
+        'username': session.get('user',"unknown"),
+        'clientID': session.get('clientID',"--"),
+        'debugfunktion': request.args.get('dbgfkt') == 'true',
+        'card_font_size': request.args.get('size', '5')
+    }
+    return render_template("index_v2.html", **params)
+
 @app.route("/main.js")
 def send_mainjs():
     params = {
         'schwimmerNrLen': config["laenge_schwimmerNr"]
     }
     return render_template("main.js", **params), 200, {'Content-Type': 'application/javascript'}
+
+@app.route("/main_v2.js")
+def send_mainjs_v2():
+    params = {
+        'schwimmerNrLen': config["laenge_schwimmerNr"]
+    }
+    return render_template("main_v2.js", **params), 200, {'Content-Type': 'application/javascript'}
 
 @app.route("/view.js")
 def send_viewjs():
