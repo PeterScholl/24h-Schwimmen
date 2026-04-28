@@ -192,7 +192,7 @@ const container = document.getElementById('container');
 function updateSendenButton() {
     const count = selectedNummern.size;
     document.getElementById('sendenCount').textContent = count;
-    document.getElementById('sendenBtn').style.opacity = count > 0 ? '1' : '0.45';
+    document.getElementById('sendenBtn').style.opacity = count > 0 ? '1' : '0.4';
 }
 
 // Alle ausgewählten Schwimmer verarbeiten und zum Server senden
