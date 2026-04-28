@@ -271,7 +271,8 @@ def index():
         'userrealname': session.get('realname',"Unbekannt"),
         'username': session.get('user',"unknown"),
         'clientID': session.get('clientID',"--"),
-        'debugfunktion': request.args.get('dbgfkt') == 'true'
+        'debugfunktion': request.args.get('dbgfkt') == 'true',
+        'card_font_size': request.args.get('size', '5')
     }
     return render_template("index.html", **params)
 

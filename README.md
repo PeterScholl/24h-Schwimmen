@@ -4,7 +4,7 @@ Erfassung von geleisteten Bahnen bei einem 24 Stunden schwimmen
 
 ## Szenario
 
-Bei einem 24 Stundenschwimmen sollen digital die geleisteten Bahnen verschiedener Schiwmmer innerhalb dieser 24 Stunden auf digitalen Endgeräten erfasst und auf einem zentralen Rechner gesammelt werden.
+Bei einem 24 Stundenschwimmen sollen digital die geleisteten Bahnen verschiedener Schwimmer innerhalb dieser 24 Stunden auf digitalen Endgeräten erfasst und auf einem zentralen Rechner gesammelt werden.
 Dabei soll die Bedienung möglichst intuitiv sein und die Datensicherheit besonders hoch, so dass selbst bei einem Ausfall des Servers oder eines Endgerätes die Informationen auf mehreren Stellen verteilt gespeichert sind.
 Die Erfassung soll auf möglichst vielen verschiedenen Endgeräten möglich sein (verschiedene Bildschirmgrößen, responsive Design)
 

@@ -552,8 +552,12 @@ function render() {
             const snummer = schwimmerNrLength > 0 ? String(s.nummer).padStart(schwimmerNrLength, '0') : s.nummer;
 
             div.innerHTML = `
-                <div class="nummer">${snummer} <span class="bahnen">(${s.bahnen})</span></div>
-                <div class="name">${s.vorname}  ${DEBUG ? `<span class="prio">Prio: ${s.prio}</span>` : ""}</div>
+                <div class="nummer">${snummer}</div>
+                <div class="info">
+                    <span class="name">${s.vorname}</span>
+                    <span class="bahnen">(${s.bahnen})</span>
+                    ${DEBUG ? `<span class="prio">Prio: ${s.prio}</span>` : ""}
+                </div>
             `;
             if (!verwaltete_bahnen.includes(s.aufBahn)) {
                 div.style.backgroundColor = "lightgreen";
