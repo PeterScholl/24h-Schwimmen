@@ -35,6 +35,9 @@ let alleSchwimmer = {};
 // Ausgewählte Schwimmer (warten auf Senden)
 const selectedNummern = new Set();
 
+// Sortierung: 'zeit' (nach Priorität/Aktivität) oder 'nummer' (aufsteigend nach Schwimmernummer)
+let sortModus = 'zeit';
+
 let longPressTimer;
 
 document.getElementById('schwimmerHinzufuegen').addEventListener('click', promptSchwimmerHinzufuegen);
@@ -412,7 +415,11 @@ function render() {
         existingDivs.set(Number(div.dataset.nummer), div);
     });
 
-    const sortedSchwimmer = [...schwimmer].sort((a, b) => a.prio - b.prio);
+    // insertBefore(div, firstChild) kehrt die Reihenfolge um →
+    // für 'nummer' absteigend sortieren, damit DOM aufsteigend (000 zuerst) erscheint
+    const sortedSchwimmer = sortModus === 'nummer'
+        ? [...schwimmer].sort((a, b) => b.nummer - a.nummer)
+        : [...schwimmer].sort((a, b) => a.prio - b.prio);
     const aktuelleSNummern = new Set(sortedSchwimmer.map(s => s.nummer));
 
     existingDivs.forEach((div, nummer) => {
@@ -692,6 +699,11 @@ document.getElementById("nurEigene").addEventListener("click", function () {
 });
 
 document.getElementById("toggleInfoBar").addEventListener("click", toggleInfoBar);
+document.getElementById("sortModusBtn").addEventListener("click", () => {
+    sortModus = sortModus === 'zeit' ? 'nummer' : 'zeit';
+    document.getElementById("sortModusBtn").textContent = sortModus === 'zeit' ? 'Zeit' : 'Nummer';
+    render();
+});
 document.getElementById("bahnen").addEventListener("input", checkBahnenInput);
 document.getElementById("bahnen").addEventListener("blur", () => { parseBahnenInput(); });
 document.getElementById("bahnen").addEventListener("keydown", (event) => {
