@@ -362,7 +362,7 @@ def action():
                 # ADD - Action muss dokumentiert werden
                 # Prrüfung, ob diese schon vorhanden war!!!
                 anz = db.erstelle_action(user, client_id=clientid, zeitstempel=str(timestamp), kommando=str(kommando), parameter=json.dumps(parameter))
-                logging.info(f"Aktion ist eingetragen: {"NEW" if anz>0 else "EXISTED"}")
+                logging.debug(f"Aktion ist eingetragen: {"NEW" if anz>0 else "EXISTED"}")
                 if (anz>0):
                     try:
                         nummer = int(parameter[0])
@@ -370,7 +370,7 @@ def action():
                         bahnnr = int(parameter[2]) if len(parameter) > 2 else 0
                         logging.info(f"ADD wird ausgeführt: Schwimmer {nummer}, Anzahl {anzahl}, BahnNr {bahnnr}")
                         db.aendere_bahnanzahl_um(nummer,anzahl,clientid,bahnnr=bahnnr)
-                        logging.info("ADD ist ausgeführt")
+                        logging.debug("ADD ist ausgeführt")
                         results.append({"kommando": kommando, "status": "erfolgreich", "nummer": nummer, "anzahl": anzahl})
                         #updates.append(db.lies_schwimmer(nummer))
                     except (ValueError, IndexError) as e:

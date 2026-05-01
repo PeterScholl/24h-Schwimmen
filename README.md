@@ -164,6 +164,21 @@ Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einst
 
 Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
 
+## Logging
+
+Die Logging-Konfiguration befindet sich in `logging_config.py`.
+
+**Logdatei:** `data/serverlog.log` (relativ zum Projektverzeichnis, wird automatisch angelegt)
+
+Es gibt zwei Handler mit unabhängigen Leveln:
+
+| Handler | Standard-Level | Beschreibung |
+| --- | --- | --- |
+| `file_handler` | `DEBUG` | Schreibt alle Meldungen in die Logdatei |
+| `console_handler` | `INFO` | Gibt Meldungen auf der Konsole aus (sichtbar im Gunicorn-Log) |
+
+Um den Gunicorn-Output zu reduzieren, `console_handler.setLevel(logging.WARNING)` setzen. Einzelne häufige Meldungen können im Code von `logging.info(...)` auf `logging.debug(...)` umgestellt werden — sie erscheinen dann nur noch in der Datei, nicht mehr in der Konsole.
+
 ## Windows-Firewall
 
 Gegebenenfalls muss die Windows-Firewall angepasst werden. Windows-Defender-Firewall -> Erweiterete Einstellungen -> Eingehende Regel -> Neue Regel anlegen -> Port 8080 freigeben

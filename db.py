@@ -405,7 +405,7 @@ def aendere_bahnanzahl_um(nummer, anzahl, client_id, bahnnr=0):
     Falls der Schwimmer nicht existiert, wird er mit Standardwerten angelegt.
     """
     bahnanzahl = get_bahnanzahl(int(nummer))
-    logging.info(f"Schwimmer Ändern mit Nummer {nummer}")
+    logging.debug(f"Schwimmer Ändern mit Nummer {nummer}")
     #print(schwimmer if (schwimmer) else f"Schwimmer {nummer} Nicht gefunden")
     
     if bahnanzahl is None:
