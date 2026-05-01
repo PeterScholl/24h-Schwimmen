@@ -1,6 +1,6 @@
 const { useState, useEffect, useRef } = React;
 
-const pageIntervalMs = {{page_interval}} * 1000;
+const PAGE_INTERVAL_DEFAULT_MS = {{page_interval}} * 1000;
 const bahnLaenge = parseInt("{{bahnlaenge}}");
 
 let lastupdate = new Date("2000-01-01T00:00:00Z").toISOString();
@@ -32,6 +32,8 @@ function App() {
     const [nachnameAnzeigenAktiv, setNachnameAnzeigenAktiv] = useState(false);
     const [footerAktiv, setFooterAktiv] = useState(true);
     const [ohneRangAktiv, setOhneRangAktiv] = useState(false);
+    const [pageIntervalMs, setPageIntervalMs] = useState(PAGE_INTERVAL_DEFAULT_MS);
+    const [maxLapRows, setMaxLapRows] = useState(10);
     const [fontSize, setFontSize] = useState(16);
     const swimmerMapRef = useRef(swimmerMap);
     const [lapLog, setLapLog] = useState([]);
@@ -193,6 +195,14 @@ function App() {
                 setFooterAktiv((prev) => !prev);
             } else if (e.shiftKey && e.key === "P") {
                 setOhneRangAktiv((prev) => !prev);
+            } else if (e.shiftKey && e.code === "Digit1") {
+                setPageIntervalMs(ms => Math.max(1000, ms - 1000));
+            } else if (e.shiftKey && e.code === "Digit2") {
+                setPageIntervalMs(ms => Math.min(60000, ms + 1000));
+            } else if (e.shiftKey && e.code === "Digit3") {
+                setMaxLapRows(n => Math.max(1, n - 1));
+            } else if (e.shiftKey && e.code === "Digit4") {
+                setMaxLapRows(n => Math.min(50, n + 1));
             } else if (e.key === "ArrowRight") {
                 setCurrentPage(p => Math.min(p + 1, totalPagesRef.current - 1));
             } else if (e.key === "ArrowLeft") {
@@ -349,7 +359,8 @@ function App() {
                 }, '▶'),
                 shiftLockAktiv
                     ? null
-                    : React.createElement('span', { className: 'auto-status' }, '⏸ Auto: Aus')
+                    : React.createElement('span', { className: 'auto-status' }, '⏸ Auto: Aus'),
+                React.createElement('span', { className: 'auto-status' }, `${pageIntervalMs / 1000}s`)
             ),
 
             // Countdown-Balken (nur im Auto-Modus)
@@ -405,10 +416,10 @@ function App() {
             )
         ),
 
-        // Rechte Spalte: Letzte Bahnen + Gruppen (unverändert)
+        // Rechte Spalte: Letzte Bahnen + Gruppen
         React.createElement('div', { className: 'right' },
-            React.createElement('h2', null, 'Letzte Bahnen'),
-            lapLog.map((l, i) =>
+            React.createElement('h2', null, `Letzte Bahnen (${maxLapRows})`),
+            lapLog.slice(0, maxLapRows).map((l, i) =>
                 React.createElement('div', { key: i },
                     `${l.zeit.split("T")[1].split(".")[0]} – ${l.vorname} (${l.schwimmer}) hat angeschlagen: ${l.laps} Bahnen`
                 )
