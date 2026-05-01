@@ -1,6 +1,7 @@
 import { schwimmerNummerErfragen, showStatusMessage } from './mymodals.js'
 
 const schwimmerNrLength = parseInt("{{schwimmerNrLen}}");
+const fadeTime = parseInt("{{fadeTime}}") || 0; // Sekunden bis Schwimmer als abgelaufen gilt (0 = deaktiviert)
 const DEBUG = false;
 
 function logMessage(text, isSuccess = true) {
@@ -200,8 +201,20 @@ function updateSendenButton() {
 
 // Alle ausgewählten Schwimmer verarbeiten und zum Server senden
 function senden() {
-    if (selectedNummern.size === 0) return;
+    // Abgelaufene Schwimmer: prio >= fadeTime und nicht manuell ausgewählt
+    const expiredNummern = (fadeTime > 0)
+        ? schwimmer.filter(s => s.prio >= fadeTime && !selectedNummern.has(s.nummer)).map(s => s.nummer)
+        : [];
 
+    if (selectedNummern.size === 0 && expiredNummern.length === 0) return;
+
+    // Abgelaufene Schwimmer automatisch entfernen (wie Wischen nach links)
+    expiredNummern.forEach(nummer => {
+        const div = container.querySelector(`.schwimmer[data-nummer="${nummer}"]`);
+        if (div) removeSchwimmerDiv(div, true, false);
+    });
+
+    // Ausgewählte Schwimmer verarbeiten
     selectedNummern.forEach(nummer => {
         const s_data = schwimmer.find(s => s.nummer == nummer);
         if (s_data) {
@@ -400,6 +413,8 @@ function removeSchwimmerDiv(div, setinactive = true, dorender = true) {
                 timestamp: new Date().toISOString(),
                 transmitted: false
             });
+            updateFormIsDirty(true);
+            transmitActions();
         }
     }
     if (dorender) render();
@@ -458,9 +473,13 @@ function render() {
 
             // Auswahlzustand und Hintergrundfarbe setzen
             const isSelected = selectedNummern.has(s.nummer);
+            const isExpired = fadeTime > 0 && s.prio >= fadeTime;
             div.classList.toggle('selected', isSelected);
+            div.classList.toggle('expired', isExpired && !isSelected);
             if (isSelected) {
                 div.style.removeProperty("background-color"); // CSS-Klasse übernimmt Farbe
+            } else if (isExpired) {
+                div.style.removeProperty("background-color"); // .expired CSS-Klasse übernimmt Farbe
             } else if (!verwaltete_bahnen.includes(s.aufBahn)) {
                 div.style.backgroundColor = "#b8d4ea";
             } else {
@@ -668,6 +687,7 @@ document.getElementById("rundeAbziehenOption").addEventListener("click", functio
                     transmitted: false
                 });
                 updateFormIsDirty(true);
+                transmitActions();
             }
         }
     }

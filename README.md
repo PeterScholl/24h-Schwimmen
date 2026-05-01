@@ -150,6 +150,20 @@ Hier ist eine Übersicht über die Verzeichnisstruktur des Projektes:
 └── requirements.txt    Für die Nutzung zu installierende Python-Module
 ```
 
+## Konfiguration (config.json)
+
+Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einstellungen:
+
+| Schlüssel | Beispielwert | Beschreibung |
+| --- | --- | --- |
+| `flask_secret_key` | `"Lang&Umständlich"` | Geheimer Schlüssel für Flask-Sessions – vor dem Live-Betrieb ändern |
+| `default_admin_pass` | `"swim24"` | Initiales Passwort für den Admin-Benutzer |
+| `laenge_schwimmerNr` | `3` | Anzahl Stellen der Schwimmernummer (z. B. 3 → 001–999) |
+| `laenge_bahn_m` | `100` | Länge einer Bahn in Metern (für Streckenberechnung) |
+| `fade_time` | `360` | **Nur v2-Oberfläche** (`/v2`): Sekunden seit dem letzten Klick, nach denen eine Schwimmerkarte blass dargestellt wird. Beim nächsten Betätigen von „Senden" wird der Schwimmer automatisch von der Bahn entfernt. `0` oder `-1` deaktiviert das Feature. |
+
+Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
+
 ## Windows-Firewall
 
 Gegebenenfalls muss die Windows-Firewall angepasst werden. Windows-Defender-Firewall -> Erweiterete Einstellungen -> Eingehende Regel -> Neue Regel anlegen -> Port 8080 freigeben

@@ -306,7 +306,8 @@ def send_mainjs():
 @app.route("/main_v2.js")
 def send_mainjs_v2():
     params = {
-        'schwimmerNrLen': config["laenge_schwimmerNr"]
+        'schwimmerNrLen': config["laenge_schwimmerNr"],
+        'fadeTime': config.get("fade_time", 0)
     }
     return render_template("main_v2.js", **params), 200, {'Content-Type': 'application/javascript'}
 

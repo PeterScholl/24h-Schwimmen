@@ -166,6 +166,11 @@ td.truncated:hover {
   box-shadow: 0 0 0 3px #0097a7;
 }
 
+.schwimmer.expired {
+  background-color: #f0f0f0;
+  color: #aaa;
+}
+
 .schwimmer .prio {
   display: none;
   font-size: 0.8rem;
