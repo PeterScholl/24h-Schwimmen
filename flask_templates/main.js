@@ -277,7 +277,7 @@ container.addEventListener('click', async (event) => {
         return; // Klick war außerhalb eines Box-Elements
     }
 
-    const nummer = clicked_schwimmer.dataset.nummer; // oder eine andere Info
+    const nummer = parseInt(clicked_schwimmer.dataset.nummer);
     clicked_schwimmer.style.backgroundColor = "aqua";
     console.log(`Schwimmer ${nummer} wurde geklickt.`);
     // Falls schon ein Fade läuft: abbrechen
