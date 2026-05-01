@@ -89,7 +89,7 @@ function initAdminMenu() {
     adminMenuUL.appendChild(li);
     li = document.createElement('li');
     li.innerText = "QR - Code";
-    li.addEventListener('click', () => window.open('/show_qr', '_blank'));
+    li.addEventListener('click', () => showQRSection());
     adminMenuUL.appendChild(li);
 }
 
@@ -749,6 +749,59 @@ function showViewSection() {
     wrapper.appendChild(buildTable(shortcuts.slice(0, half)));
     wrapper.appendChild(buildTable(shortcuts.slice(half)));
     section.appendChild(wrapper);
+}
+
+function showQRSection() {
+    showSection('qr');
+    const section = document.getElementById('qr');
+    section.innerHTML = '';
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'QR-Code';
+    section.appendChild(heading);
+
+    // Checkbox + Zahlenfeld für size-Parameter
+    const row = document.createElement('div');
+    row.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 16px;';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = 'qrSizeCheck';
+
+    const label = document.createElement('label');
+    label.htmlFor = 'qrSizeCheck';
+    label.textContent = 'size-Parameter setzen:';
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.id = 'qrSizeInput';
+    input.value = '5';
+    input.min = '1';
+    input.max = '20';
+    input.style.cssText = 'width: 4em; padding: 4px;';
+    input.disabled = true;
+
+    checkbox.addEventListener('change', () => { input.disabled = !checkbox.checked; });
+
+    row.appendChild(checkbox);
+    row.appendChild(label);
+    row.appendChild(input);
+    section.appendChild(row);
+
+    const btn = document.createElement('button');
+    btn.textContent = 'QR-Code öffnen';
+    btn.style.cssText = 'font-size: 1rem; padding: 8px 16px; cursor: pointer;';
+    btn.addEventListener('click', () => {
+        const base = window.location.origin;
+        let url;
+        if (checkbox.checked && input.value) {
+            url = base + '/v2?size=' + encodeURIComponent(input.value);
+        } else {
+            url = base;
+        }
+        window.open('/show_qr?ip=' + encodeURIComponent(url), '_blank');
+    });
+    section.appendChild(btn);
 }
 
 function fetchAndFillTable(sectionId, tableId, actionName, titleName) {
