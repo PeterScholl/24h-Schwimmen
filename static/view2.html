@@ -149,6 +149,24 @@
         outline: none;
         box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
       }
+
+      .progress-bar-track {
+        height: 5px;
+        background: #e0e0e0;
+        flex-shrink: 0;
+        margin-bottom: 2px;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        background: #4a90e2;
+        animation: page-countdown linear forwards;
+      }
+
+      @keyframes page-countdown {
+        from { width: 100%; }
+        to   { width: 0%; }
+      }
     </style>
   </head>
 

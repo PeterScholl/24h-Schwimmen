@@ -219,14 +219,16 @@ function App() {
         return () => clearInterval(interval10);
     }, []);
 
-    // Automatischer Seitenwechsel bei aktivem Shift-Lock
+    // Automatischer Seitenwechsel bei aktivem Shift-Lock.
+    // Abhängigkeit von currentPage: Timer startet nach jeder Seitenänderung neu,
+    // damit manuelle Pfeiltasten-Navigation den Countdown zurücksetzt.
     useEffect(() => {
         if (!shiftLockAktiv) return;
-        const timer = setInterval(() => {
+        const timer = setTimeout(() => {
             setCurrentPage(p => (p + 1) % Math.max(1, totalPagesRef.current));
         }, pageIntervalMs);
-        return () => clearInterval(timer);
-    }, [shiftLockAktiv]);
+        return () => clearTimeout(timer);
+    }, [shiftLockAktiv, currentPage]);
 
     // Höhenmessung → itemsPerPage berechnen
     useEffect(() => {
@@ -345,16 +347,31 @@ function App() {
                     onClick: () => setCurrentPage(p => Math.min(totalPages - 1, p + 1)),
                     disabled: safeCurrentPage >= totalPages - 1
                 }, '▶'),
-                React.createElement('span', { className: 'auto-status' },
-                    shiftLockAktiv ? '🔄 Auto: Ein' : '⏸ Auto: Aus'
-                )
+                shiftLockAktiv
+                    ? null
+                    : React.createElement('span', { className: 'auto-status' }, '⏸ Auto: Aus')
             ),
+
+            // Countdown-Balken (nur im Auto-Modus)
+            shiftLockAktiv
+                ? React.createElement('div', { className: 'progress-bar-track' },
+                    React.createElement('div', {
+                        className: 'progress-bar-fill',
+                        key: safeCurrentPage,
+                        style: { animationDuration: pageIntervalMs + 'ms' }
+                    })
+                )
+                : null,
 
             // Überschrift + Filter
             React.createElement('div', {
                 style: { display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }
             },
-                React.createElement('h2', { style: { margin: '0 0 4px' } }, 'Ranking'),
+                React.createElement('h2', { style: { margin: '0 0 4px' } },
+                    ohneRangAktiv && pageSchwimmer.length > 0
+                        ? `Ranking (${pageOffset + 1}–${pageOffset + pageSchwimmer.length})`
+                        : 'Ranking'
+                ),
                 React.createElement('select', {
                     value: filterAuswahl,
                     onChange: (e) => setFilterAuswahl(e.target.value)
