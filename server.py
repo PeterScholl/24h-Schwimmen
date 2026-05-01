@@ -222,6 +222,11 @@ def admin():
             rows  = db.liste_tabelle_paged('actions', limit, offset)
             total = db.count_tabelle('actions')
             return jsonify({'data': rows, 'total': total, 'page': page, 'limit': limit}), 200
+        elif action == 'get_swimmer_log':
+            nummer = int(data.get('nummer', 0))
+            schwimmer = db.lies_schwimmer(nummer)
+            actions  = db.finde_actions_by_schwimmer_nummer(nummer)
+            return jsonify({'schwimmer': schwimmer, 'actions': actions}), 200
         elif action == 'get_checkAnzahlTable':
             logging.info("Tabelle checkAnzahlen wird abgerufen")
             return jsonify(db.checkBahnenAnzahlen()), 200
@@ -445,9 +450,10 @@ def action():
                     nummer = int(parameter[0])
                     value = int(parameter[1])
                     logging.info(f"ACT ausgeführt: Schwimmer {nummer} erhält Activitätswert {value}")
+                    db.erstelle_action(user, client_id=clientid, zeitstempel=str(timestamp), kommando=str(kommando), parameter=json.dumps(parameter))
                     if (db.update_schwimmer(nummer,aktiv = value)):
                         results.append({"kommando": kommando, "status": "erfolgreich", "nummer": nummer, "value": value})
-                    else: 
+                    else:
                         results.append({"kommando": kommando, "status": "FEHLER", "nummer": nummer, "value": value})
                 except (ValueError, IndexError) as e:
                     logging.info(f"Fehler bei ACT-Parametern: {e}")

@@ -71,6 +71,10 @@ function initNav() {
     button.innerText = "View";
     button.addEventListener('click', () => showViewSection());
     navbar.appendChild(button);
+    button = document.createElement('button');
+    button.innerText = "SchwimmerLog";
+    button.addEventListener('click', () => showSchwimmerLog());
+    navbar.appendChild(button);
 }
 
 function initAdminMenu() {
@@ -315,9 +319,18 @@ function renderTable(data, table_id, header = ['nummer', 'name', 'bahnanzahl', '
         // Zellen erstellen
         header.forEach(key => {
             const td = document.createElement('td');
-            //const key_tl = key.toLowerCase();
-            td.textContent = (entry[key] ? entry[key] : (entry[key] == 0 ? '0' : ''));
+            const val = entry[key] ? entry[key] : (entry[key] == 0 ? '0' : '');
             td.style.whiteSpace = 'nowrap';
+            if (table_id === 'swimmerTable' && key === 'nummer') {
+                const link = document.createElement('a');
+                link.textContent = val;
+                link.href = '#';
+                link.style.cssText = 'cursor:pointer;color:#0066cc;';
+                link.addEventListener('click', e => { e.preventDefault(); showSchwimmerLog(val); });
+                td.appendChild(link);
+            } else {
+                td.textContent = val;
+            }
             row.appendChild(td);
         });
 
@@ -909,6 +922,164 @@ function createUser(event) {
     })
         .then((res) => res.text())
         .then((msg) => alert(msg));
+}
+
+// ── SchwimmerLog ──────────────────────────────────────────────────────────────
+
+function showSchwimmerLog(nummer) {
+    showSection('swimmerlog');
+    const section = document.getElementById('swimmerlog');
+    section.innerHTML = '';
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'Schwimmer-Protokoll';
+    section.appendChild(heading);
+
+    const form = document.createElement('div');
+    form.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 16px;';
+
+    const label = document.createElement('label');
+    label.textContent = 'Schwimmernummer:';
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = '1';
+    input.style.cssText = 'width: 6em; padding: 4px;';
+    input.placeholder = 'Nummer';
+    if (nummer) input.value = nummer;
+
+    const btn = document.createElement('button');
+    btn.textContent = 'Protokoll laden';
+    btn.style.cssText = 'padding: 4px 14px; cursor: pointer;';
+
+    const resultDiv = document.createElement('div');
+    resultDiv.id = 'swimmerLogResult';
+
+    btn.addEventListener('click', () => loadSchwimmerLog(parseInt(input.value), resultDiv));
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
+
+    form.appendChild(label);
+    form.appendChild(input);
+    form.appendChild(btn);
+    section.appendChild(form);
+    section.appendChild(resultDiv);
+
+    if (nummer) loadSchwimmerLog(parseInt(nummer), resultDiv);
+}
+
+function loadSchwimmerLog(nummer, resultDiv) {
+    if (!nummer) return;
+    resultDiv.innerHTML = '<em>Lade…</em>';
+    fetch('/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'get_swimmer_log', nummer })
+    })
+        .then(r => r.json())
+        .then(data => renderSchwimmerLog(data, resultDiv))
+        .catch(() => { resultDiv.innerHTML = '<em>Fehler beim Laden.</em>'; });
+}
+
+function renderSchwimmerLog(data, resultDiv) {
+    resultDiv.innerHTML = '';
+    const s = data.schwimmer;
+    if (!s || !s.nummer) {
+        resultDiv.innerHTML = '<em>Schwimmer nicht gefunden.</em>';
+        return;
+    }
+
+    const numStr = String(s.nummer).padStart(3, '0');
+    const info = document.createElement('div');
+    info.style.cssText = 'background:#e8eaf0;padding:10px 14px;border-radius:6px;margin-bottom:14px;line-height:1.7;';
+    info.innerHTML =
+        `<strong>#${numStr} – ${s.vorname || ''} ${s.nachname || ''}</strong>` +
+        ` &nbsp;|&nbsp; Gruppe: <strong>${s.gruppe || '–'}</strong>` +
+        ` &nbsp;|&nbsp; ${s.istKind ? 'Kind' : 'Erwachsener'}` +
+        ` &nbsp;|&nbsp; Bahnen gesamt: <strong>${s.bahnanzahl ?? 0}</strong>`;
+    resultDiv.appendChild(info);
+
+    const actions = data.actions || [];
+    if (actions.length === 0) {
+        resultDiv.appendChild(document.createTextNode('Keine Einträge vorhanden.'));
+        return;
+    }
+
+    const thStyle = 'padding:5px 10px;border:1px solid #bbb;background:#e8eaf0;text-align:left;white-space:nowrap;';
+    const tdStyle = 'padding:5px 10px;border:1px solid #ddd;white-space:nowrap;';
+    const tdDeltaStyle = tdStyle + 'color:#555;font-style:italic;';
+    const tdActStyle  = tdStyle + 'color:#c07000;';
+
+    const table = document.createElement('table');
+    table.style.cssText = 'border-collapse:collapse;width:100%;';
+
+    const thead = document.createElement('thead');
+    const hr = document.createElement('tr');
+    ['Zeit (lokal)', 'Kommando', 'Bahn-Nr', 'Wert / Aktion', 'Δt zum Vorherigen'].forEach(h => {
+        const th = document.createElement('th');
+        th.textContent = h;
+        th.style.cssText = thStyle;
+        hr.appendChild(th);
+    });
+    thead.appendChild(hr);
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    let lastAddTime = null;
+
+    actions.forEach((a, i) => {
+        const row = document.createElement('tr');
+        row.style.background = i % 2 === 0 ? '#fff' : '#f5f7ff';
+
+        const ts = new Date(a.zeitstempel);
+        const timeStr = ts.toLocaleString('de-DE', {
+            weekday: 'short', day: '2-digit', month: '2-digit',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+
+        let params = [];
+        try { params = JSON.parse(a.parameter); } catch (_) {}
+
+        let bahnNr = '';
+        let wert = '';
+        let isAct = false;
+
+        if (a.kommando === 'ADD') {
+            const n = params[1] ?? 1;
+            bahnNr = params[2] ? String(params[2]) : '';
+            wert = (n >= 0 ? `+${n}` : `${n}`) + ` Bahn${Math.abs(n) !== 1 ? 'en' : ''}`;
+        } else if (a.kommando === 'ACT') {
+            const aktiv = (params[1] === 1 || params[1] === '1');
+            wert = `Aktiv: ${aktiv ? 'ja ✓' : 'nein ✗'}`;
+            isAct = true;
+        } else {
+            wert = params.slice(1).join(', ');
+        }
+
+        let delta = '';
+        if (a.kommando === 'ADD') {
+            if (lastAddTime !== null) {
+                const diffSec = Math.round((ts - lastAddTime) / 1000);
+                const min = Math.floor(diffSec / 60);
+                const sec = diffSec % 60;
+                delta = min > 0 ? `${min} min ${sec} s` : `${sec} s`;
+            }
+            lastAddTime = ts;
+        }
+
+        [timeStr, a.kommando, bahnNr, wert, delta].forEach((val, ci) => {
+            const td = document.createElement('td');
+            td.textContent = val;
+            if (ci === 4) td.style.cssText = tdDeltaStyle;
+            else if (ci === 3 && isAct) td.style.cssText = tdActStyle;
+            else td.style.cssText = tdStyle;
+            row.appendChild(td);
+        });
+
+        tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    resultDiv.appendChild(table);
 }
 
 //Navigationsleiste initialisieren

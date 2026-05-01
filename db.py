@@ -647,6 +647,25 @@ def finde_actions_after_timestamp(timestamp):
     rows = db.fetchall(query, params)
     return [dict_from_table_row(row, 'actions') for row in rows]
 
+def finde_actions_by_schwimmer_nummer(nummer):
+    """
+    Gibt alle Actions zurück, bei denen parameter[0] der Schwimmernummer entspricht
+    (ADD, ACT, GET-Kommandos), sortiert nach Zeitstempel aufsteigend.
+    """
+    query = '''
+        SELECT * FROM actions
+        WHERE CAST(json_extract(parameter, '$[0]') AS INTEGER) = ?
+        ORDER BY zeitstempel ASC
+    '''
+    try:
+        cursor = db.execute(query, (int(nummer),))
+        columns = [desc[0] for desc in cursor.description]
+        rows = cursor.fetchall()
+        return [dict(zip(columns, row)) for row in rows]
+    except Exception as e:
+        print(f"Fehler beim Abrufen der Actions für Schwimmer {nummer}: {e}")
+        return []
+
 
 #========================
 #    Testabschnitt
