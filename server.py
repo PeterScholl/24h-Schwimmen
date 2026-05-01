@@ -185,6 +185,22 @@ def admin():
                 return "Erfolg", 200
             else:
                 return "Keine Schwimmernummer angegeben", 400
+        elif action == 'edit_swimmer':
+            # Gesamter /admin-Endpunkt ist bereits auf user_role == 'admin' beschränkt
+            nummer = data.get('nummer')
+            if not nummer:
+                return "Keine Schwimmernummer angegeben", 400
+            felder = {}
+            if 'vorname'  in data: felder['vorname']  = data.get('vorname', '').strip()
+            if 'nachname' in data: felder['nachname'] = data.get('nachname', '').strip()
+            if 'gruppe'   in data: felder['gruppe']   = data.get('gruppe', '').strip()
+            if 'istKind'  in data: felder['istKind']  = 1 if data.get('istKind') in (True, 1, '1', 'true', 'True') else 0
+            if not felder:
+                return "Keine Felder zum Ändern angegeben", 400
+            logging.info(f"Schwimmer {nummer} wird bearbeitet: {felder}")
+            if not db.update_schwimmer(int(nummer), **felder):
+                return "DB - Fehler", 400
+            return "Erfolg", 200
         elif action == 'get_table_benutzer':
             return jsonify(db.liste_tabelle('benutzer'))
         elif action == 'get_table_clients':

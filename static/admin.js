@@ -220,6 +220,7 @@ function showSwimmerTable() {
             filterLabel.textContent = 'Filter: ';
             const filterInput = document.createElement('input');
             filterInput.type = 'text';
+            filterInput.id = 'swimmerFilter';
             filterInput.placeholder = 'Vorname, Nachname oder Gruppe…';
             filterInput.style.width = '220px';
             filterWrap.appendChild(filterLabel);
@@ -377,8 +378,76 @@ function renderPaginationControls(data, table_id, header, aktionen = {}) {
     controls.appendChild(next);
 }
 
-function editSwimmer(nummer) { //TODO
-    alert(`Bearbeiten: ${nummer}`); // Placeholder
+function editSwimmer(nummer) {
+    const s = swimmerData.find(s => parseInt(s.nummer) === parseInt(nummer));
+    if (!s) return;
+
+    // Dialog einmalig anlegen oder wiederverwenden
+    let dlg = document.getElementById('editSwimmerDialog');
+    if (!dlg) {
+        dlg = document.createElement('dialog');
+        dlg.id = 'editSwimmerDialog';
+        dlg.style.cssText = 'padding:1.5rem; min-width:280px; border-radius:6px;';
+        document.body.appendChild(dlg);
+    }
+
+    dlg.innerHTML = `
+        <h3 style="margin-top:0">Schwimmer ${String(s.nummer).padStart(3,'0')} bearbeiten</h3>
+        <label style="display:block;margin-bottom:6px">Vorname<br>
+            <input id="esVorname" type="text" value="${s.vorname ?? ''}" style="width:100%;box-sizing:border-box">
+        </label>
+        <label style="display:block;margin-bottom:6px">Nachname<br>
+            <input id="esNachname" type="text" value="${s.nachname ?? ''}" style="width:100%;box-sizing:border-box">
+        </label>
+        <label style="display:block;margin-bottom:6px">Gruppe<br>
+            <input id="esGruppe" type="text" value="${s.gruppe ?? ''}" style="width:100%;box-sizing:border-box">
+        </label>
+        <label style="display:block;margin-bottom:12px">
+            <input id="esIstKind" type="checkbox" ${s.istKind ? 'checked' : ''}> Kind
+        </label>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button id="esSave">Speichern</button>
+            <button id="esCancel">Abbrechen</button>
+        </div>
+    `;
+
+    dlg.querySelector('#esCancel').onclick = () => dlg.close();
+    dlg.querySelector('#esSave').onclick = () => {
+        const payload = {
+            action: 'edit_swimmer',
+            nummer: nummer,
+            vorname:  dlg.querySelector('#esVorname').value.trim(),
+            nachname: dlg.querySelector('#esNachname').value.trim(),
+            gruppe:   dlg.querySelector('#esGruppe').value.trim(),
+            istKind:  dlg.querySelector('#esIstKind').checked ? 1 : 0,
+        };
+        fetch('/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        }).then(r => r.text().then(text => {
+            if (r.ok) {
+                // Lokale Daten aktualisieren
+                Object.assign(s, { vorname: payload.vorname, nachname: payload.nachname,
+                                   gruppe: payload.gruppe, istKind: payload.istKind });
+                showStatusMessage(`Schwimmer ${nummer} gespeichert`, true);
+                dlg.close();
+                // Tabelle neu rendern mit aktuellem Filter
+                const filterInput = document.getElementById('swimmerFilter');
+                const term = filterInput ? filterInput.value.trim().toLowerCase() : '';
+                const filtered = term
+                    ? swimmerData.filter(s => ['vorname','nachname','gruppe'].some(f => (s[f]??'').toLowerCase().includes(term)))
+                    : swimmerData;
+                renderTable(filtered, 'swimmerTable',
+                    ['nummer','vorname','nachname','istKind','gruppe','bahnanzahl','auf_bahn','aktiv'],
+                    { 'Del': deleteSwimmer, 'Edit': editSwimmer });
+            } else {
+                showStatusMessage(`Fehler: ${text}`, false);
+            }
+        }));
+    };
+
+    dlg.showModal();
 }
 
 function deleteSwimmer(nummer) {
