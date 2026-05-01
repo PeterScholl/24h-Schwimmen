@@ -308,7 +308,8 @@ def index_v2():
         'username': session.get('user',"unknown"),
         'clientID': session.get('clientID',"--"),
         'debugfunktion': request.args.get('dbgfkt') == 'true',
-        'card_font_size': request.args.get('size', '5')
+        'card_font_size': request.args.get('size', '5'),
+        'mobile_cards': config.get('mobile_cards', 2)
     }
     return render_template("index_v2.html", **params)
 
