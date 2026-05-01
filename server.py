@@ -412,7 +412,7 @@ def action():
                 try:
                     nummer = int(parameter[0])
                     value = int(parameter[1])
-                    logging.info(f"ACT ausgeführt: Schwimmer {nummer} wird {value}")
+                    logging.info(f"ACT ausgeführt: Schwimmer {nummer} erhält Activitätswert {value}")
                     if (db.update_schwimmer(nummer,aktiv = value)):
                         results.append({"kommando": kommando, "status": "erfolgreich", "nummer": nummer, "value": value})
                     else: 

@@ -14,7 +14,7 @@ function logMessage(text, isSuccess = true) {
 
 let formIsDirty = false;
 window.addEventListener('beforeunload', function (event) {
-    if (formIsDirty) {
+    if (formIsDirty || selectedNummern.size > 0) {
         event.preventDefault();
         const message = "Es gibt ungespeicherte Änderungen. Möchten Sie die Seite wirklich verlassen?";
         return message;
