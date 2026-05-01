@@ -31,6 +31,7 @@ function App() {
     const [unitMeterAktiv, setUnitMeterAktiv] = useState(true);
     const [nachnameAnzeigenAktiv, setNachnameAnzeigenAktiv] = useState(false);
     const [footerAktiv, setFooterAktiv] = useState(true);
+    const [ohneRangAktiv, setOhneRangAktiv] = useState(false);
     const [fontSize, setFontSize] = useState(16);
     const swimmerMapRef = useRef(swimmerMap);
     const [lapLog, setLapLog] = useState([]);
@@ -41,10 +42,8 @@ function App() {
     const [itemsPerPage, setItemsPerPage] = useState(20);
     const totalPagesRef = useRef(1);
 
-    // DOM-Refs für Höhenmessung
-    const leftRef = useRef();
-    const paginationRef = useRef();
-    const headingAreaRef = useRef();
+    // DOM-Ref für Höhenmessung
+    const tableAreaRef = useRef();
 
     let spezialzeiten = [];
 
@@ -192,6 +191,8 @@ function App() {
                 e.preventDefault();
             } else if (e.shiftKey && e.key === "F") {
                 setFooterAktiv((prev) => !prev);
+            } else if (e.shiftKey && e.key === "P") {
+                setOhneRangAktiv((prev) => !prev);
             } else if (e.key === "ArrowRight") {
                 setCurrentPage(p => Math.min(p + 1, totalPagesRef.current - 1));
             } else if (e.key === "ArrowLeft") {
@@ -230,11 +231,7 @@ function App() {
     // Höhenmessung → itemsPerPage berechnen
     useEffect(() => {
         function measure() {
-            if (!leftRef.current || !paginationRef.current || !headingAreaRef.current) return;
-            const available = leftRef.current.clientHeight
-                - paginationRef.current.offsetHeight
-                - headingAreaRef.current.offsetHeight
-                - 8; // Puffer
+            if (!tableAreaRef.current) return;
 
             // Probe-Zeile einfügen, Höhe messen, sofort entfernen
             const probeTable = document.createElement('table');
@@ -247,11 +244,13 @@ function App() {
                 probeRow.appendChild(td);
             });
             probeTable.appendChild(probeRow);
-            leftRef.current.appendChild(probeTable);
+            tableAreaRef.current.appendChild(probeTable);
             const rowH = probeRow.getBoundingClientRect().height;
-            leftRef.current.removeChild(probeTable);
+            tableAreaRef.current.removeChild(probeTable);
 
             if (rowH > 0) {
+                // 1 Thead-Zeile abziehen; rest durch Zeilenhöhe ergibt Anzahl Datenzeilen
+                const available = tableAreaRef.current.clientHeight - rowH;
                 // In zweispaltiger Darstellung passen doppelt so viele Einträge
                 const cols = zweispaltigAktiv ? 2 : 1;
                 const neu = Math.max(1, Math.floor(available / rowH) * cols);
@@ -301,21 +300,27 @@ function App() {
     // ── Hilfsfunktion: Tabellenzeile rendern ─────────────────────────────────
 
     function renderRow(s, rang) {
+        const nameInhalt = ohneRangAktiv
+            ? React.createElement('td', { className: 'col-name' },
+                React.createElement('strong', null, formatNummer(s.nummer)),
+                ` ${s.vorname}${nachnameAnzeigenAktiv ? ' ' + s.nachname : ''}`)
+            : React.createElement('td', { className: 'col-name' },
+                `(${formatNummer(s.nummer)}) ${s.vorname}${nachnameAnzeigenAktiv ? ' ' + s.nachname : ''}`);
         return React.createElement('tr', { key: s.nummer },
-            React.createElement('td', null, rang),
-            React.createElement('td', null, `(${formatNummer(s.nummer)}) ${s.vorname} ${nachnameAnzeigenAktiv ? s.nachname : ""}`),
-            React.createElement('td', null, s.gruppe),
-            React.createElement('td', null, unitMeterAktiv ? s.bahnanzahl * bahnLaenge : s.bahnanzahl)
+            ohneRangAktiv ? null : React.createElement('td', { className: 'col-rang' }, rang),
+            nameInhalt,
+            React.createElement('td', { className: 'col-gruppe' }, s.gruppe),
+            React.createElement('td', { className: 'col-wert' }, unitMeterAktiv ? s.bahnanzahl * bahnLaenge : s.bahnanzahl)
         );
     }
 
     function renderThead() {
         return React.createElement('thead', null,
             React.createElement('tr', null,
-                React.createElement('th', null, '#'),
-                React.createElement('th', null, 'Name'),
-                React.createElement('th', null, 'Gruppe'),
-                React.createElement('th', null, unitMeterAktiv ? 'Strecke(m)' : 'Bahnen')
+                ohneRangAktiv ? null : React.createElement('th', { className: 'col-rang' }, '#'),
+                React.createElement('th', { className: 'col-name' }, 'Name'),
+                React.createElement('th', { className: 'col-gruppe' }, 'Gruppe'),
+                React.createElement('th', { className: 'col-wert' }, unitMeterAktiv ? 'Strecke(m)' : 'Bahnen')
             )
         );
     }
@@ -325,10 +330,10 @@ function App() {
     return React.createElement('div', { id: 'root' },
 
         // Linke Spalte: Ranking mit Pagination
-        React.createElement('div', { className: 'left', ref: leftRef },
+        React.createElement('div', { className: 'left' },
 
             // Paginierungsleiste
-            React.createElement('div', { className: 'pagination-bar', ref: paginationRef },
+            React.createElement('div', { className: 'pagination-bar' },
                 React.createElement('button', {
                     onClick: () => setCurrentPage(p => Math.max(0, p - 1)),
                     disabled: safeCurrentPage === 0
@@ -347,7 +352,6 @@ function App() {
 
             // Überschrift + Filter
             React.createElement('div', {
-                ref: headingAreaRef,
                 style: { display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }
             },
                 React.createElement('h2', { style: { margin: '0 0 4px' } }, 'Ranking'),
@@ -361,14 +365,16 @@ function App() {
             ),
 
             // Tabelle(n)
-            React.createElement('div', { className: 'table-area' },
+            React.createElement('div', { className: 'table-area', ref: tableAreaRef },
                 zweispaltigAktiv
-                    ? React.createElement('div', { style: { display: 'flex', gap: '2rem' } },
+                    ? React.createElement('div', { style: { display: 'flex', gap: '1rem' } },
                         [pageErsteHaelfte, pageZweiteHaelfte].map((liste, spaltenIndex) =>
-                            React.createElement('table', { key: spaltenIndex },
-                                renderThead(),
-                                React.createElement('tbody', null,
-                                    liste.map((s, i) => renderRow(s, pageOffset + (spaltenIndex === 0 ? i : pageHalf + i) + 1))
+                            React.createElement('div', { key: spaltenIndex, style: { flex: 1, minWidth: 0 } },
+                                React.createElement('table', null,
+                                    renderThead(),
+                                    React.createElement('tbody', null,
+                                        liste.map((s, i) => renderRow(s, pageOffset + (spaltenIndex === 0 ? i : pageHalf + i) + 1))
+                                    )
                                 )
                             )
                         )

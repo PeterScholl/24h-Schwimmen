@@ -703,6 +703,7 @@ function showViewSection() {
         ['Shift + N', 'Nachnamen ein-/ausblenden'],
         ['Shift + U', 'Anzeige Bahnen ↔ Strecke (Meter)'],
         ['Shift + F', 'Footer ein-/ausblenden'],
+        ['Shift + P', 'Platzierung ausblenden / Nummer fett (nur View2)'],
         ['Shift + L', 'Shift-Lock (Kürzel ohne Shift-Taste)'],
         ['Strg + +', 'Schriftgröße vergrößern'],
         ['Strg + −', 'Schriftgröße verkleinern'],
