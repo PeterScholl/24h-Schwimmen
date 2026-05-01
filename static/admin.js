@@ -67,6 +67,10 @@ function initNav() {
     button.innerText = "Checks";
     button.addEventListener('click', () => showChecksSection());
     navbar.appendChild(button);
+    button = document.createElement('button');
+    button.innerText = "View";
+    button.addEventListener('click', () => showViewSection());
+    navbar.appendChild(button);
 }
 
 function initAdminMenu() {
@@ -664,6 +668,74 @@ function showChecksSection() {
     checkSection.appendChild(button);
     initJSONImport('#jsonInput', '#jsonPreviewContainer', '#jsonSend', { url: '/action'});
 
+}
+
+function showViewSection() {
+    showSection('view');
+    const section = document.getElementById('view');
+    section.innerHTML = '';
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'View-Seite';
+    section.appendChild(heading);
+
+    // Button: View in neuem Fenster öffnen
+    const openBtn = document.createElement('button');
+    openBtn.textContent = 'View in neuem Fenster öffnen';
+    openBtn.style.cssText = 'font-size: 1rem; padding: 8px 16px; margin-bottom: 20px; cursor: pointer;';
+    openBtn.addEventListener('click', () => window.open('/view', '_blank'));
+    section.appendChild(openBtn);
+
+    // Tastenkombinationen – aufgeteilt auf zwei Tabellen nebeneinander
+    const shortcuts = [
+        ['Shift + D', 'CSV-Datei herunterladen'],
+        ['Shift + B', 'JSON-Backup der Actions herunterladen'],
+        ['Shift + Z', 'Ein-/zweispaltige Darstellung wechseln'],
+        ['Shift + G', 'Gruppentabelle ein-/ausblenden'],
+        ['Shift + N', 'Nachnamen ein-/ausblenden'],
+        ['Shift + U', 'Anzeige Bahnen ↔ Strecke (Meter)'],
+        ['Shift + F', 'Footer ein-/ausblenden'],
+        ['Shift + L', 'Shift-Lock (Kürzel ohne Shift-Taste)'],
+        ['Strg + +', 'Schriftgröße vergrößern'],
+        ['Strg + −', 'Schriftgröße verkleinern'],
+    ];
+
+    const cellStyle = 'padding: 5px 10px; border: 1px solid #bbb;';
+    const thStyle   = cellStyle + 'background: #e8eaf0; font-weight: bold; white-space: nowrap;';
+    const keyStyle  = cellStyle + 'font-family: monospace; white-space: nowrap;';
+
+    function buildTable(rows) {
+        const t = document.createElement('table');
+        t.style.cssText = 'border-collapse: collapse; margin: 8px;';
+        const hr = document.createElement('tr');
+        ['Tastenkombination', 'Funktion'].forEach(label => {
+            const th = document.createElement('th');
+            th.textContent = label;
+            th.style.cssText = thStyle;
+            hr.appendChild(th);
+        });
+        t.appendChild(hr);
+        rows.forEach(([key, desc]) => {
+            const row = document.createElement('tr');
+            const tdKey = document.createElement('td');
+            tdKey.textContent = key;
+            tdKey.style.cssText = keyStyle;
+            const tdDesc = document.createElement('td');
+            tdDesc.textContent = desc;
+            tdDesc.style.cssText = cellStyle;
+            row.appendChild(tdKey);
+            row.appendChild(tdDesc);
+            t.appendChild(row);
+        });
+        return t;
+    }
+
+    const half = Math.ceil(shortcuts.length / 2);
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px;';
+    wrapper.appendChild(buildTable(shortcuts.slice(0, half)));
+    wrapper.appendChild(buildTable(shortcuts.slice(half)));
+    section.appendChild(wrapper);
 }
 
 function fetchAndFillTable(sectionId, tableId, actionName, titleName) {
