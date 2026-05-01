@@ -343,6 +343,18 @@ def static_files(filename):
 def view():
     return send_from_directory("static", "view.html")
 
+@app.route("/view2")
+def view2():
+    return send_from_directory("static", "view2.html")
+
+@app.route("/view2.js")
+def send_view2js():
+    params = {
+        'bahnlaenge': config["laenge_bahn_m"],
+        'page_interval': config.get('view2_page_interval', 5)
+    }
+    return render_template("view2.js", **params), 200, {'Content-Type': 'application/javascript'}
+
 @app.route("/show_qr")
 def show_qr():
     '''Erzeugt eine Webseite mit dem QR-Code zu einer IP
