@@ -34,7 +34,7 @@ let statMessages = [];
 let alleSchwimmer = {};
 
 // Ausgewählte Schwimmer (warten auf Senden)
-const selectedNummern = new Set();
+const selectedNummern = new Map(); // nummer → ISO-Timestamp des Klickzeitpunkts
 
 // Sortierung: 'zeit' (nach Priorität/Aktivität) oder 'nummer' (aufsteigend nach Schwimmernummer)
 let sortModus = 'zeit';
@@ -215,7 +215,7 @@ function senden() {
     });
 
     // Ausgewählte Schwimmer verarbeiten
-    selectedNummern.forEach(nummer => {
+    selectedNummern.forEach((clickTimestamp, nummer) => {
         const s_data = schwimmer.find(s => s.nummer == nummer);
         if (s_data) {
             if (!s_data.aufBahn || !verwaltete_bahnen.includes(s_data.aufBahn)) {
@@ -227,7 +227,7 @@ function senden() {
             actions.push({
                 kommando: "ADD",
                 parameter: [nummer, 1, s_data.aufBahn],
-                timestamp: new Date().toISOString(),
+                timestamp: clickTimestamp,
                 transmitted: false
             });
         }
@@ -260,7 +260,7 @@ container.addEventListener('click', (event) => {
         }
     } else {
         // Auswählen
-        selectedNummern.add(nummer);
+        selectedNummern.set(nummer, new Date().toISOString());
         clicked_schwimmer.classList.add('selected');
         clicked_schwimmer.style.removeProperty("background-color"); // CSS-Klasse übernimmt Farbe
     }

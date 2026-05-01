@@ -426,7 +426,7 @@ function App() {
             React.createElement('h2', null, `Letzte Bahnen (${maxLapRows})`),
             lapLog.slice(0, maxLapRows).map((l, i) =>
                 React.createElement('div', { key: i },
-                    `${l.zeit.split("T")[1].split(".")[0].slice(0, 5)} – ${l.vorname} (${l.schwimmer}) hat angeschlagen: ${l.laps} Bahnen`
+                    `${l.zeit.split("T")[1].split(".")[0]} – ${l.vorname} (${l.schwimmer}) hat angeschlagen: ${l.laps} Bahnen`
                 )
             ),
             gruppenAnzeigeAktiv
