@@ -494,9 +494,11 @@ function removeSchwimmerDiv(div, setinactive = true, dorender = true) {
         schwimmer.splice(index, 1); //lösche einen Eintrag an Stelle index
         // Aktualisiere die Daten in alleSchwimmer - Bahnen reicht
         // console.log(`entfernter Schwimmer ${entfernterSchwimmer.nummer} hat bisher ${alleSchwimmer[entfernterSchwimmer.nummer].bahnanzahl} Bahnen`);
-        alleSchwimmer[entfernterSchwimmer.nummer].bahnanzahl = Math.max(alleSchwimmer[entfernterSchwimmer.nummer].bahnanzahl, entfernterSchwimmer.bahnen);
+        if (alleSchwimmer[entfernterSchwimmer.nummer]) {
+            alleSchwimmer[entfernterSchwimmer.nummer].bahnanzahl = Math.max(alleSchwimmer[entfernterSchwimmer.nummer].bahnanzahl, entfernterSchwimmer.bahnen);
+        }
         if (setinactive) {
-            alleSchwimmer[entfernterSchwimmer.nummer].aktiv = 0;
+            if (alleSchwimmer[entfernterSchwimmer.nummer]) alleSchwimmer[entfernterSchwimmer.nummer].aktiv = 0;
             actions.push({
                 kommando: "ACT",
                 parameter: [entfernterSchwimmer.nummer, 0],

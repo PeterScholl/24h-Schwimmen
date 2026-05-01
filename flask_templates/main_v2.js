@@ -404,9 +404,11 @@ function removeSchwimmerDiv(div, setinactive = true, dorender = true) {
     if (index !== -1) {
         let entfernterSchwimmer = schwimmer[index];
         schwimmer.splice(index, 1);
-        alleSchwimmer[entfernterSchwimmer.nummer].bahnanzahl = Math.max(alleSchwimmer[entfernterSchwimmer.nummer].bahnanzahl, entfernterSchwimmer.bahnen);
+        if (alleSchwimmer[entfernterSchwimmer.nummer]) {
+            alleSchwimmer[entfernterSchwimmer.nummer].bahnanzahl = Math.max(alleSchwimmer[entfernterSchwimmer.nummer].bahnanzahl, entfernterSchwimmer.bahnen);
+        }
         if (setinactive) {
-            alleSchwimmer[entfernterSchwimmer.nummer].aktiv = 0;
+            if (alleSchwimmer[entfernterSchwimmer.nummer]) alleSchwimmer[entfernterSchwimmer.nummer].aktiv = 0;
             actions.push({
                 kommando: "ACT",
                 parameter: [entfernterSchwimmer.nummer, 0],
