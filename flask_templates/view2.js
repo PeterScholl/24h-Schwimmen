@@ -288,9 +288,10 @@ function App() {
     // Nur mit von 0 verschiedener Bahnanzahl
     gefiltert = gefiltert.filter((s) => s.bahnanzahl > 0);
 
-    // Sortieren - Rangliste
-    gefiltert.sort((a, b) => b.bahnanzahl - a.bahnanzahl);
-
+    // Sortieren - primär Rangliste, dann Schwimmernummer
+    gefiltert.sort((a, b) => 
+        b.bahnanzahl - a.bahnanzahl || a.nummer - b.nummer
+    );
     const totalPages = Math.max(1, Math.ceil(gefiltert.length / itemsPerPage));
     totalPagesRef.current = totalPages;
     const safeCurrentPage = Math.min(currentPage, totalPages - 1);
