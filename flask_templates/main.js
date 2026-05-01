@@ -225,6 +225,7 @@ const container = document.getElementById('container');
 
 // Map für laufende Fade-Operationen - soll auf ein DIV nach einem Klick angewandt werden
 const fadeControllers = new Map();
+window.__fadeControllers = fadeControllers; // Fürs debuggen sichtbar machen
 
 // Fading-Funktion blendet ein Div langsam aus
 async function fadeOut(div, duration = 3000) {
@@ -233,17 +234,17 @@ async function fadeOut(div, duration = 3000) {
         const interval = 50;
         const decrement = interval / duration;
 
-        const controller = fadeControllers.get(div.dataset.nummer);
+        const controller = fadeControllers.get(Number(div.dataset.nummer));
 
         if (!controller || controller.signal.aborted) {
-            return reject('Fade abgebrochen');
+            return reject('Fade abgebrochen 1');
         }
 
         const fade = setInterval(() => {
             if (!controller || controller.signal.aborted) {
                 clearInterval(fade);
                 div.style.opacity = 1;
-                return reject('Fade abgebrochen');
+                return reject('Fade abgebrochen 2');
             }
             opacity -= decrement;
             div.style.opacity = opacity;
@@ -417,7 +418,7 @@ function addSwipeHandler(div) {
         longPressTimer = setTimeout(() => {
             showSchwimmerContextMenu(e.touches[0].clientX, e.touches[0].clientY);
         }, 600); // Dauer in mx
-        if (fadeControllers.has(div.dataset.nummer)) {
+        if (fadeControllers.has(Number(div.dataset.nummer))) {
             return;             // bricht die weitere Verarbeitung ab, wenn das Objekt gerade fadet
         }
 
@@ -519,7 +520,7 @@ function render() {
     // 2. Vorhandene Schwimmernummern sammeln
     const existingDivs = new Map();
     container.querySelectorAll(".schwimmer").forEach(div => {
-        firstRects.set(div.dataset.nummer, div.getBoundingClientRect());
+        firstRects.set(Number(div.dataset.nummer), div.getBoundingClientRect());
         existingDivs.set(Number(div.dataset.nummer), div);
     });
 
@@ -550,7 +551,7 @@ function render() {
         }
 
         div.dataset.prio = s.prio ?? 0;
-        if (!fadeControllers.has(div.dataset.nummer) && div.dataset.swiping !== "true") {
+        if (!fadeControllers.has(Number(div.dataset.nummer)) && div.dataset.swiping !== "true") {
             const snummer = schwimmerNrLength > 0 ? String(s.nummer).padStart(schwimmerNrLength, '0') : s.nummer;
 
             div.innerHTML = `
@@ -574,7 +575,7 @@ function render() {
 
     // 3. Nach dem Umordnen: neue Positionen messen (Last) + bewegung dorthin Animate
     container.querySelectorAll(".schwimmer").forEach(div => {
-        const nummer = div.dataset.nummer;
+        const nummer = Number(div.dataset.nummer);
         const first = firstRects.get(nummer);
         const last = div.getBoundingClientRect();
 
