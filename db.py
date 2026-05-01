@@ -655,25 +655,27 @@ def finde_actions_after_timestamp(timestamp):
 def checkBahnenAnzahlen():
     """
     Prüft ob die Bahnanzahlen in der Actionstabelle mit denen in der Schwimmer DB
-    übereinstimen und gibt die Unterschiede zurück
+    übereinstimmen und gibt die Unterschiede zurück.
+    Summiert parameter[1] aller ADD-Actions pro Schwimmer (inkl. negativer Werte für
+    gelöschte Bahnen) und klemmt das Ergebnis auf 0 – analog zur Server-Logik.
     """
-    query = """select 
-    a.schwimmerID,
-    s.vorname,
-    s.bahnanzahl as Anz,
-    a.anzahl as ActionAnz,
-    a.kommando
-    FROM (
+    query = """
     SELECT
-        kommando,
-        CAST(json_extract(parameter, '$[0]') AS INTEGER) AS schwimmerID, 
-        count(json_extract(parameter, '$[1]')) AS anzahl 
-    FROM actions 
-    WHERE kommando = "ADD" 
-    GROUP BY schwimmerID 
+        a.schwimmerID,
+        s.vorname,
+        s.bahnanzahl AS Anz,
+        a.anzahl AS ActionAnz,
+        MAX(a.anzahl, 0) AS ActionAnzErwartet
+    FROM (
+        SELECT
+            CAST(json_extract(parameter, '$[0]') AS INTEGER) AS schwimmerID,
+            SUM(CAST(json_extract(parameter, '$[1]') AS INTEGER)) AS anzahl
+        FROM actions
+        WHERE kommando = 'ADD'
+        GROUP BY schwimmerID
     ) a
-    JOIN schwimmer s ON s.nummer = a.schwimmerID 
-    WHERE Anz <> ActionAnz
+    JOIN schwimmer s ON s.nummer = a.schwimmerID
+    WHERE s.bahnanzahl <> MAX(a.anzahl, 0)
     ORDER BY schwimmerID ASC;
     """
     try:
