@@ -213,6 +213,19 @@ function showSwimmerTable() {
             csvbutton.style.margin = "0px 20px";
             csvbutton.addEventListener("click", () => downloadCSV(swimmerData, ["nummer", "vorname", "nachname", "istKind", "gruppe", "bahnanzahl"]));
             section.appendChild(csvbutton);
+            // Filter
+            const filterWrap = document.createElement('div');
+            filterWrap.style.margin = '8px 0';
+            const filterLabel = document.createElement('label');
+            filterLabel.textContent = 'Filter: ';
+            const filterInput = document.createElement('input');
+            filterInput.type = 'text';
+            filterInput.placeholder = 'Vorname, Nachname oder Gruppe…';
+            filterInput.style.width = '220px';
+            filterWrap.appendChild(filterLabel);
+            filterWrap.appendChild(filterInput);
+            section.appendChild(filterWrap);
+
             // Seitendarstellungskontrolle
             // Alle alten Divs paginationcontrol löschen - sollte maximal eins sein
             document.querySelectorAll('div#paginationControls').forEach(el => el.remove());
@@ -239,7 +252,22 @@ function showSwimmerTable() {
             initCSVImport('#csvInput', '#csvPreviewContainer', '#csvSend', { url: '/admin',
                 knownHeaders: ['', 'nummer', 'vorname', 'nachname', 'istKind', 'istErw', 'gruppe']
              });
-            renderTable(swimmerData, 'swimmerTable', ['nummer', 'vorname', 'nachname', 'istKind', 'gruppe', 'bahnanzahl', 'auf_bahn', 'aktiv'], { 'Del': deleteSwimmer, 'Edit': editSwimmer });
+
+            const swimmerHeader = ['nummer', 'vorname', 'nachname', 'istKind', 'gruppe', 'bahnanzahl', 'auf_bahn', 'aktiv'];
+            const swimmerAktionen = { 'Del': deleteSwimmer, 'Edit': editSwimmer };
+
+            function applySwimmerFilter() {
+                const term = filterInput.value.trim().toLowerCase();
+                const filtered = term
+                    ? swimmerData.filter(s =>
+                        ['vorname', 'nachname', 'gruppe'].some(f => (s[f] ?? '').toLowerCase().includes(term)))
+                    : swimmerData;
+                tableCurrentPage = 1;
+                renderTable(filtered, 'swimmerTable', swimmerHeader, swimmerAktionen);
+            }
+
+            filterInput.addEventListener('input', applySwimmerFilter);
+            renderTable(swimmerData, 'swimmerTable', swimmerHeader, swimmerAktionen);
         })
         .catch(error => {
             console.error('Fehler beim Abrufen der Schwimmer-Daten:', error);
@@ -305,11 +333,11 @@ function renderTable(data, table_id, header = ['nummer', 'name', 'bahnanzahl', '
         table.appendChild(row);
     });
 
-    renderPaginationControls(data, table_id, header);
+    renderPaginationControls(data, table_id, header, aktionen);
 }
 
 
-function renderPaginationControls(data, table_id, header) {
+function renderPaginationControls(data, table_id, header, aktionen = {}) {
     const controls = document.getElementById('paginationControls');
     controls.innerHTML = '';
     const totalPages = tableRowsPerPage === 0 ? 1 : Math.ceil(data.length / tableRowsPerPage);
@@ -317,12 +345,12 @@ function renderPaginationControls(data, table_id, header) {
     const back = document.createElement('button');
     back.textContent = 'Zurück';
     back.disabled = tableCurrentPage === 1;
-    back.onclick = () => { tableCurrentPage--; renderTable(data, table_id, header); };
+    back.onclick = () => { tableCurrentPage--; renderTable(data, table_id, header, aktionen); };
 
     const next = document.createElement('button');
     next.textContent = 'Weiter';
     next.disabled = tableCurrentPage === totalPages;
-    next.onclick = () => { tableCurrentPage++; renderTable(data, table_id, header); };
+    next.onclick = () => { tableCurrentPage++; renderTable(data, table_id, header, aktionen); };
 
     const label = document.createElement('span');
     label.innerText = 'Einträge pro Seite:';
@@ -340,12 +368,11 @@ function renderPaginationControls(data, table_id, header) {
     select.onchange = (e) => {
         tableRowsPerPage = parseInt(e.target.value);
         tableCurrentPage = 1;
-        renderTable(data, table_id, header);
+        renderTable(data, table_id, header, aktionen);
     };
 
-
     controls.appendChild(back);
-    controls.appendChild(label)
+    controls.appendChild(label);
     controls.appendChild(select);
     controls.appendChild(next);
 }
