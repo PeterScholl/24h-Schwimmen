@@ -683,13 +683,13 @@ function showViewSection() {
     const btnRow = document.createElement('div');
     btnRow.style.cssText = 'display: flex; gap: 10px; margin-bottom: 20px;';
     const openBtn = document.createElement('button');
-    openBtn.textContent = 'View in neuem Fenster öffnen';
+    openBtn.textContent = 'View2 in neuem Fenster öffnen';
     openBtn.style.cssText = 'font-size: 1rem; padding: 8px 16px; cursor: pointer;';
-    openBtn.addEventListener('click', () => window.open('/view', '_blank'));
+    openBtn.addEventListener('click', () => window.open('/view2', '_blank'));
     const openBtn2 = document.createElement('button');
-    openBtn2.textContent = 'View2 in neuem Fenster öffnen';
+    openBtn2.textContent = 'View (alt) in neuem Fenster öffnen';
     openBtn2.style.cssText = 'font-size: 1rem; padding: 8px 16px; cursor: pointer;';
-    openBtn2.addEventListener('click', () => window.open('/view2', '_blank'));
+    openBtn2.addEventListener('click', () => window.open('/view', '_blank'));
     btnRow.appendChild(openBtn);
     btnRow.appendChild(openBtn2);
     section.appendChild(btnRow);

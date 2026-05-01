@@ -289,7 +289,10 @@ def admin():
 
 @app.route("/")
 def index():
-    #return send_from_directory("static", "index.html")
+    return redirect(url_for('index_v2'))
+
+@app.route("/v1")
+def index_v1():
     params = {
         'user_role': session.get('user_role',""),
         'userrealname': session.get('realname',"Unbekannt"),
