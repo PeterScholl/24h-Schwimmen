@@ -225,7 +225,7 @@ const container = document.getElementById('container');
 
 // Map für laufende Fade-Operationen - soll auf ein DIV nach einem Klick angewandt werden
 const fadeControllers = new Map();
-window.__fadeControllers = fadeControllers; // Fürs debuggen sichtbar machen
+//window.__fadeControllers = fadeControllers; // Fürs debuggen sichtbar machen
 
 // Fading-Funktion blendet ein Div langsam aus
 async function fadeOut(div, duration = 3000) {

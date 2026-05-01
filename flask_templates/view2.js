@@ -285,6 +285,10 @@ function App() {
     } else if (filterAuswahl.startsWith("gruppe-")) {
         gefiltert = gefiltert.filter((s) => s.gruppe === filterAuswahl.split("-")[1]);
     }
+    // Nur mit von 0 verschiedener Bahnanzahl
+    gefiltert = gefiltert.filter((s) => s.bahnanzahl > 0);
+
+    // Sortieren - Rangliste
     gefiltert.sort((a, b) => b.bahnanzahl - a.bahnanzahl);
 
     const totalPages = Math.max(1, Math.ceil(gefiltert.length / itemsPerPage));
