@@ -406,6 +406,19 @@ function fetchActionsPage() {
     .catch(err => console.error('Fehler beim Laden der Actions:', err));
 }
 
+const WOCHENTAGE = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+function formatZeitstempel(isoString) {
+    try {
+        const d = new Date(isoString);
+        if (isNaN(d)) return isoString;
+        const tag = WOCHENTAGE[d.getDay()];
+        const zeit = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        return `${tag} ${zeit}`;
+    } catch {
+        return isoString ?? '';
+    }
+}
+
 function renderActionsTable({ data, total, page, limit }) {
     const section = document.getElementById('actions');
     section.innerHTML = '';
@@ -457,6 +470,39 @@ function renderActionsTable({ data, total, page, limit }) {
     btnNext.onclick = () => { actionsPage++; fetchActionsPage(); };
     controls.appendChild(btnNext);
 
+    const jumpLabel = document.createElement('span');
+    jumpLabel.textContent = '  Seite: ';
+    jumpLabel.style.marginLeft = '16px';
+    controls.appendChild(jumpLabel);
+
+    const jumpInput = document.createElement('input');
+    jumpInput.type = 'number';
+    jumpInput.min = 1;
+    jumpInput.max = totalPages;
+    jumpInput.value = page;
+    jumpInput.style.cssText = 'width: 60px; margin-right: 4px;';
+    jumpInput.onkeydown = e => {
+        if (e.key === 'Enter') {
+            const target = parseInt(jumpInput.value);
+            if (target >= 1 && target <= totalPages) {
+                actionsPage = target;
+                fetchActionsPage();
+            }
+        }
+    };
+    controls.appendChild(jumpInput);
+
+    const btnJump = document.createElement('button');
+    btnJump.textContent = 'Gehe zu';
+    btnJump.onclick = () => {
+        const target = parseInt(jumpInput.value);
+        if (target >= 1 && target <= totalPages) {
+            actionsPage = target;
+            fetchActionsPage();
+        }
+    };
+    controls.appendChild(btnJump);
+
     section.appendChild(controls);
 
     // Tabelle
@@ -474,10 +520,10 @@ function renderActionsTable({ data, total, page, limit }) {
         table.appendChild(headerRow);
         data.forEach(entry => {
             const row = document.createElement('tr');
-            Object.values(entry).forEach(value => {
+            Object.entries(entry).forEach(([key, value]) => {
                 const td = document.createElement('td');
                 td.classList.add('truncated');
-                td.textContent = value ?? '';
+                td.textContent = key === 'zeitstempel' ? formatZeitstempel(value) : (value ?? '');
                 row.appendChild(td);
             });
             table.appendChild(row);
