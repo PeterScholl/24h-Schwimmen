@@ -254,6 +254,34 @@ def liste_tabelle(table_name):
         return []
 
 
+def count_tabelle(table_name):
+    """Gibt die Gesamtanzahl der Zeilen in der angegebenen Tabelle zurück."""
+    try:
+        cursor = db.execute(f"SELECT COUNT(*) FROM {table_name}")
+        return cursor.fetchone()[0]
+    except Exception as e:
+        print(f"Fehler beim Zählen in Tabelle {table_name}: {e}")
+        return 0
+
+def liste_tabelle_paged(table_name, limit, offset):
+    """
+    Gibt einen Ausschnitt der Tabelle zurück, neueste Einträge zuerst (rowid DESC).
+    limit:  Anzahl Zeilen pro Seite
+    offset: Übersprungene Zeilen (= (Seite-1) * limit)
+    """
+    try:
+        cursor = db.execute(
+            f"SELECT * FROM {table_name} ORDER BY rowid DESC LIMIT ? OFFSET ?",
+            (limit, offset)
+        )
+        columns = [desc[0] for desc in cursor.description]
+        rows = cursor.fetchall()
+        return [dict_from_row(row, columns) for row in rows]
+    except Exception as e:
+        print(f"Fehler beim paginierten Zugriff auf Tabelle {table_name}: {e}")
+        return []
+
+
 def dump():
     """
     gibt einen Dump der Datenbank zurück, der per Flask zum Download angeboten werden kann

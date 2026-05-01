@@ -198,6 +198,14 @@ def admin():
         elif action == 'get_table_actions':
             logging.info("Tabelle actions wird abgerufen")
             return jsonify(db.liste_tabelle('actions')), 200
+        elif action == 'get_table_actions_paged':
+            limit = int(data.get('limit', 50))
+            page  = int(data.get('page',  1))
+            offset = (page - 1) * limit
+            logging.info(f"Tabelle actions paginiert: Seite {page}, Limit {limit}, Offset {offset}")
+            rows  = db.liste_tabelle_paged('actions', limit, offset)
+            total = db.count_tabelle('actions')
+            return jsonify({'data': rows, 'total': total, 'page': page, 'limit': limit}), 200
         elif action == 'get_checkAnzahlTable':
             logging.info("Tabelle checkAnzahlen wird abgerufen")
             return jsonify(db.checkBahnenAnzahlen()), 200

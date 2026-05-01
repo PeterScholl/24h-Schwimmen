@@ -49,23 +49,23 @@ function initNav() {
     const navbar = document.getElementById('navbar');
     let button = document.createElement('button');
     button.innerText = "Benutzer";
-    button.addEventListener('click', (e) => showUserTable());
+    button.addEventListener('click', () => showUserTable());
     navbar.appendChild(button);
     button = document.createElement('button');
     button.innerText = "Clients";
-    button.addEventListener('click', (e) => showClientTable());
+    button.addEventListener('click', () => showClientTable());
     navbar.appendChild(button);
     button = document.createElement('button');
     button.innerText = "Schwimmer";
-    button.addEventListener('click', (e) => showSwimmerTable());
+    button.addEventListener('click', () => showSwimmerTable());
     navbar.appendChild(button);
     button = document.createElement('button');
     button.innerText = "Aktionen";
-    button.addEventListener('click', (e) => showActionsTable());
+    button.addEventListener('click', () => showActionsTable());
     navbar.appendChild(button);
     button = document.createElement('button');
     button.innerText = "Checks";
-    button.addEventListener('click', (e) => showChecksSection());
+    button.addEventListener('click', () => showChecksSection());
     navbar.appendChild(button);
 }
 
@@ -73,19 +73,19 @@ function initAdminMenu() {
     const adminMenuUL = document.getElementById('adminMenu').querySelector('ul');
     let li = document.createElement('li');
     li.innerText = "Benutzer anlegen";
-    li.addEventListener('click', (e) => showSection('adduser'));
+    li.addEventListener('click', () => showSection('adduser'));
     adminMenuUL.appendChild(li);
     li = document.createElement('li');
     li.innerText = "Schwimmer verwalten";
-    li.addEventListener('click', (e) => showSection('swimmer'));
+    li.addEventListener('click', () => showSection('swimmer'));
     adminMenuUL.appendChild(li);
     li = document.createElement('li');
     li.innerText = "Aktionen ansehen";
-    li.addEventListener('click', (e) => showSection('actions'));
+    li.addEventListener('click', () => showSection('actions'));
     adminMenuUL.appendChild(li);
     li = document.createElement('li');
     li.innerText = "QR - Code";
-    li.addEventListener('click', (e) => window.open('/show_qr', '_blank'));
+    li.addEventListener('click', () => window.open('/show_qr', '_blank'));
     adminMenuUL.appendChild(li);
 }
 
@@ -381,8 +381,109 @@ function deleteSwimmer(nummer) {
 
 // *****************Ende Swimmer-Tabelle **************
 
+// --- Paginierter State für die Actions-Tabelle ---
+let actionsPage  = 1;
+let actionsLimit = 50; // Einträge pro Seite
+
 function showActionsTable() {
-    fetchAndFillTable('actions', 'actionsTable', 'get_table_actions', 'Actions');
+    actionsPage = 1; // beim Öffnen immer auf Seite 1 (= neueste Einträge)
+    showSection('actions');
+    fetchActionsPage();
+}
+
+function fetchActionsPage() {
+    fetch('/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'get_table_actions_paged',
+            page:   actionsPage,
+            limit:  actionsLimit
+        })
+    })
+    .then(r => r.json())
+    .then(resp => renderActionsTable(resp))
+    .catch(err => console.error('Fehler beim Laden der Actions:', err));
+}
+
+function renderActionsTable({ data, total, page, limit }) {
+    const section = document.getElementById('actions');
+    section.innerHTML = '';
+
+    // Überschrift mit Gesamtanzahl
+    const heading = document.createElement('h2');
+    const totalPages = Math.ceil(total / limit);
+    heading.textContent = `Aktionen (${total} gesamt) – Seite ${page} / ${totalPages}`;
+    section.appendChild(heading);
+
+    // Steuerleiste: Einträge pro Seite + Navigation
+    const controls = document.createElement('div');
+    controls.style.margin = '8px 0';
+
+    const selectLabel = document.createElement('span');
+    selectLabel.textContent = 'Einträge pro Seite: ';
+    controls.appendChild(selectLabel);
+
+    const select = document.createElement('select');
+    select.style.marginRight = '16px';
+    [25, 50, 100, 250].forEach(n => {
+        const opt = document.createElement('option');
+        opt.value = n;
+        opt.textContent = n;
+        if (n === actionsLimit) opt.selected = true;
+        select.appendChild(opt);
+    });
+    select.onchange = e => {
+        actionsLimit = parseInt(e.target.value);
+        actionsPage  = 1;
+        fetchActionsPage();
+    };
+    controls.appendChild(select);
+
+    const btnPrev = document.createElement('button');
+    btnPrev.textContent = '← Neuer';
+    btnPrev.disabled = page <= 1;
+    btnPrev.onclick = () => { actionsPage--; fetchActionsPage(); };
+    controls.appendChild(btnPrev);
+
+    const pageInfo = document.createElement('span');
+    pageInfo.textContent = ` Seite ${page} / ${totalPages} `;
+    pageInfo.style.margin = '0 8px';
+    controls.appendChild(pageInfo);
+
+    const btnNext = document.createElement('button');
+    btnNext.textContent = 'Älter →';
+    btnNext.disabled = page >= totalPages;
+    btnNext.onclick = () => { actionsPage++; fetchActionsPage(); };
+    controls.appendChild(btnNext);
+
+    section.appendChild(controls);
+
+    // Tabelle
+    const table = document.createElement('table');
+    table.style.margin = '5px auto';
+    if (data.length === 0) {
+        table.innerHTML = '<tr><th>Keine Einträge</th></tr>';
+    } else {
+        const headerRow = document.createElement('tr');
+        Object.keys(data[0]).forEach(key => {
+            const th = document.createElement('th');
+            th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+            headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+        data.forEach(entry => {
+            const row = document.createElement('tr');
+            Object.values(entry).forEach(value => {
+                const td = document.createElement('td');
+                td.classList.add('truncated');
+                td.textContent = value ?? '';
+                row.appendChild(td);
+            });
+            table.appendChild(row);
+        });
+    }
+    section.appendChild(table);
 }
 
 function showChecksSection() {
