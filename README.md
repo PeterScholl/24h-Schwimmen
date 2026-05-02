@@ -313,8 +313,10 @@ Dazu im Repository auf **"Pull requests" → "New pull request"** klicken, den e
 
 ```bash
 pip install pipreqs
-pipreqs /path/to/project
+pipreqs --force /path/to/project
 ```
+
+ggf. mit ``pip freeze`` die Liste der aktuell installierten Versionen anzeigen lassen.
 
 Exe-Datei für Windows erzeugen
 
@@ -323,6 +325,6 @@ pip install pyinstaller
 pyinstaller --onefile gui.py
 ```
 
-bzw. noch besser, die Datei ``make_release.py`` anpassen (release-name) und ausführen. Dadurch wird eine ZIP-Datei erstellt, die hochgeladen werden kann.
+bzw. noch besser, die Datei ``make_release.py`` anpassen (release-name) und (unter Windows) ausführen. Dadurch wird eine ZIP-Datei erstellt, die hochgeladen werden kann.
 
 Auf github als Release veröffentlichen
