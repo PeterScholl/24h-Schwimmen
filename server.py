@@ -327,7 +327,7 @@ def admin():
         'userrealname': session.get('realname',"Unbekannt"),
         'username': session.get('user',"unknown"),
         'clientID': session.get('clientID',"--"),
-        'schwimmerNrLen': config["laenge_schwimmerNr"]
+        'schwimmerNrLen': config["laenge_schwimmerNr_digits"]
     }
     return render_template('admin.html',**params)
 
@@ -361,22 +361,22 @@ def index_v2():
         'clientID': session.get('clientID',"--"),
         'debugfunktion': request.args.get('dbgfkt') == 'true',
         'card_font_size': request.args.get('size', '5'),
-        'mobile_cards': config.get('mobile_cards', 2)
+        'mobile_cards_col': config.get('mobile_cards_col', 2)
     }
     return render_template("index_v2.html", **params)
 
 @app.route("/main.js")
 def send_mainjs():
     params = {
-        'schwimmerNrLen': config["laenge_schwimmerNr"]
+        'schwimmerNrLen': config["laenge_schwimmerNr_digits"]
     }
     return render_template("main.js", **params), 200, {'Content-Type': 'application/javascript'}
 
 @app.route("/main_v2.js")
 def send_mainjs_v2():
     params = {
-        'schwimmerNrLen': config["laenge_schwimmerNr"],
-        'fadeTime': config.get("fade_time", 0)
+        'schwimmerNrLen': config["laenge_schwimmerNr_digits"],
+        'fadeTime': config.get("fade_time_s", 0)
     }
     return render_template("main_v2.js", **params), 200, {'Content-Type': 'application/javascript'}
 
@@ -404,7 +404,7 @@ def view2():
 def send_view2js():
     params = {
         'bahnlaenge': config["laenge_bahn_m"],
-        'page_interval': config.get('view2_page_interval', 5),
+        'page_interval': config.get('view2_page_interval_s', 10),
         'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z')
     }
     return render_template("view2.js", **params), 200, {'Content-Type': 'application/javascript'}

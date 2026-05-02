@@ -40,11 +40,11 @@ Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einst
 | --- | --- | --- |
 | `flask_secret_key` | `"Lang&Umständlich"` | Geheimer Schlüssel für Flask-Sessions – vor dem Live-Betrieb ändern |
 | `default_admin_pass` | `"swim24"` | Initiales Passwort für den Admin-Benutzer |
-| `laenge_schwimmerNr` | `3` | Anzahl Stellen der Schwimmernummer (z. B. 3 → 001–999) |
+| `laenge_schwimmerNr_digits` | `3` | Anzahl Stellen der Schwimmernummer (z. B. 3 → 001–999) |
 | `laenge_bahn_m` | `100` | Länge einer Bahn in Metern (für Streckenberechnung) |
-| `fade_time` | `600` | **Nur v2-Oberfläche** (`/v2`): Sekunden seit dem letzten Klick, nach denen eine Schwimmerkarte blass dargestellt wird. Beim nächsten Betätigen von „Senden" wird der Schwimmer automatisch von der Bahn entfernt. `0` oder `-1` deaktiviert das Feature. |
-| `mobile_cards` | `2` | **Nur v2-Oberfläche**: Anzahl Schwimmerkarten pro Zeile auf kleinen Bildschirmen (≤ 600 px Breite). |
-| `view2_page_interval` | `5` | **View2-Seite** (`/view2`): Sekunden pro Seite bei aktiviertem Auto-Weiterblättern (Shift-Lock-Modus). |
+| `fade_time_s` | `600` | **Nur v2-Oberfläche** (`/v2`): Sekunden seit dem letzten Klick, nach denen eine Schwimmerkarte blass dargestellt wird. Beim nächsten Betätigen von „Senden" wird der Schwimmer automatisch von der Bahn entfernt. `0` oder `-1` deaktiviert das Feature. |
+| `mobile_cards_col` | `2` | **Nur v2-Oberfläche**: Anzahl Schwimmerkarten pro Zeile auf kleinen Bildschirmen (≤ 600 px Breite). |
+| `view2_page_interval_s` | `10` | **View2-Seite** (`/view2`): Sekunden pro Seite bei aktiviertem Auto-Weiterblättern (Shift-Lock-Modus). |
 | `startzeit` | `"2025-06-14T08:00:00Z"` | **View- und View2-Seite**: Startzeitpunkt des Schwimmens als UTC-ISO-Timestamp. Legt den Beginn der Spezialzeiten (Tag1, Geisterstunde, Gute Nacht, Frühaufsteher, Tag2) fest. |
 
 Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
