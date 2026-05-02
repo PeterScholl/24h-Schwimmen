@@ -162,10 +162,14 @@ function App() {
                     neueElemente.forEach(element => {
                         curActions.push(element);
                         const parameter = JSON.parse(element.parameter);
-                        if (curSwimmerMap[parameter[0]]) {
-                            if (lastupdate < element.zeitstempel) lastupdate = element.zeitstempel;
-                            updateBahnen(parseInt(parameter[0]), parseInt(parameter[1]), element.zeitstempel);
+                        const nummer = parseInt(parameter[0]);
+                        if (!curSwimmerMap[nummer]) {
+                            const placeholder = { nummer, vorname: `Schwimmer ${nummer}`, nachname: '', gruppe: '', bahnanzahl: 0, aktiv: 1 };
+                            spezialzeiten.forEach(szeit => placeholder[szeit.name] = 0);
+                            curSwimmerMap[nummer] = placeholder;
                         }
+                        if (lastupdate < element.zeitstempel) lastupdate = element.zeitstempel;
+                        updateBahnen(nummer, parseInt(parameter[1]), element.zeitstempel);
                     });
                 }
                 if (data.filter) setFilter(data.filter);

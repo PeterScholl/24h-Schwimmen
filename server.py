@@ -411,6 +411,10 @@ def send_view2js():
     }
     return render_template("view2.js", **params), 200, {'Content-Type': 'application/javascript'}
 
+@app.route("/api/ips")
+def api_ips():
+    return jsonify(get_all_ips())
+
 @app.route("/show_qr")
 def show_qr():
     '''Erzeugt eine Webseite mit dem QR-Code zu einer IP

@@ -201,15 +201,18 @@ function App() {
                     neueElemente.forEach(element => {
                         // Wenn noch nicht in curActions vorhanden, einfügen
                         curActions.push(element);
-                        // und Bahnazahl aktualisieren
+                        // Bahnanzahl aktualisieren; unbekannte Schwimmer als Platzhalter anlegen
                         const parameter = JSON.parse(element.parameter);
-                        if (curSwimmerMap[parameter[0]]) {
-                            if (lastupdate < element.zeitstempel) lastupdate = element.zeitstempel
-                            //console.log(`Update ${parameter[0]} - ${parameter[1]}, ${element.zeitstempel}`);
-                            updateBahnen(parseInt(parameter[0]), parseInt(parameter[1]), element.zeitstempel);
-                        } else {
-                            console.log(`Schwimmer ${parameter[0]} gibt es noch nicht`);
+                        const nummer = parseInt(parameter[0]);
+                        if (!curSwimmerMap[nummer]) {
+                            //console.log(`Schwimmer ${nummer} unbekannt – Platzhalter angelegt`);
+                            const placeholder = { nummer, vorname: `Schwimmer ${nummer}`, nachname: '', gruppe: '', bahnanzahl: 0, aktiv: 1 };
+                            spezialzeiten.forEach(szeit => placeholder[szeit.name] = 0);
+                            curSwimmerMap[nummer] = placeholder;
                         }
+                        if (lastupdate < element.zeitstempel) lastupdate = element.zeitstempel;
+                        //console.log(`Update ${nummer} - ${parameter[1]}, ${element.zeitstempel}`);
+                        updateBahnen(nummer, parseInt(parameter[1]), element.zeitstempel);
                     });
                 }
                 if (data.filter) setFilter(data.filter);

@@ -972,13 +972,19 @@ function showQRSection() {
     btn.textContent = 'QR-Code öffnen';
     btn.style.cssText = 'font-size: 1rem; padding: 8px 16px; cursor: pointer;';
     btn.addEventListener('click', () => {
-        const base = window.location.origin;
         const params = new URLSearchParams();
         if (checkbox.checked && input.value) params.set('size', input.value);
         if (checkboxDbg.checked) params.set('dbgfkt', 'true');
         const query = params.toString();
-        const url = base + '/v2' + (query ? '?' + query : '');
-        window.open('/show_qr?ip=' + encodeURIComponent(url), '_blank');
+        fetch('/api/ips')
+            .then(r => r.json())
+            .then(ips => {
+                const host = (ips && ips.length > 0) ? ips[0] : window.location.hostname;
+                const port = window.location.port ? ':' + window.location.port : '';
+                const base = window.location.protocol + '//' + host + port;
+                const url = base + '/v2' + (query ? '?' + query : '');
+                window.open('/show_qr?ip=' + encodeURIComponent(url), '_blank');
+            });
     });
     section.appendChild(btn);
 }
