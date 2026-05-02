@@ -332,7 +332,7 @@ function renderTable(data, table_id, header = ['nummer', 'name', 'bahnanzahl', '
             td.style.whiteSpace = 'nowrap';
             if (table_id === 'swimmerTable' && key === 'nummer') {
                 const link = document.createElement('a');
-                link.textContent = val;
+                link.textContent = schwimmerNrLen > 0 ? String(val).padStart(schwimmerNrLen, '0') : val;
                 link.href = '#';
                 link.style.cssText = 'cursor:pointer;color:#0066cc;';
                 link.addEventListener('click', e => { e.preventDefault(); showSchwimmerLog(val); });
@@ -418,7 +418,7 @@ function editSwimmer(nummer) {
     }
 
     dlg.innerHTML = `
-        <h3 style="margin-top:0">Schwimmer ${String(s.nummer).padStart(3,'0')} bearbeiten</h3>
+        <h3 style="margin-top:0">Schwimmer ${String(s.nummer).padStart(schwimmerNrLen, '0')} bearbeiten</h3>
         <label style="display:block;margin-bottom:6px">Vorname<br>
             <input id="esVorname" type="text" value="${s.vorname ?? ''}" style="width:100%;box-sizing:border-box">
         </label>
@@ -997,7 +997,7 @@ function renderSchwimmerLog(data, resultDiv) {
         return;
     }
 
-    const numStr = String(s.nummer).padStart(3, '0');
+    const numStr = String(s.nummer).padStart(schwimmerNrLen, '0');
     const info = document.createElement('div');
     info.style.cssText = 'background:#e8eaf0;padding:10px 14px;border-radius:6px;margin-bottom:14px;line-height:1.7;';
     info.innerHTML =

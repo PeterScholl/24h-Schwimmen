@@ -283,7 +283,8 @@ def admin():
         'user_role': session.get('user_role',""),
         'userrealname': session.get('realname',"Unbekannt"),
         'username': session.get('user',"unknown"),
-        'clientID': session.get('clientID',"--")
+        'clientID': session.get('clientID',"--"),
+        'schwimmerNrLen': config["laenge_schwimmerNr"]
     }
     return render_template('admin.html',**params)
 

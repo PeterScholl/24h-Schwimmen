@@ -275,6 +275,12 @@ Im view kann man:
 * mit ``Shift+U`` die Anzeige zwischen Bahnen / Strecke wechseln
 * mit ``Shift+B`` ein Backup der Actions machen, welches man im Admin-Fenster wieder importieren könnte
 
+Auf der **Erfassungsseite** (`/v2`) gibt es außerdem den URL-Parameter `size`, der die Breite der Schwimmerkarten steuert (Standardwert: `5`, entspricht ca. 200 px pro Karte). Ein kleinerer Wert ist auf Smartphones hilfreich, damit zwei Karten nebeneinander in eine Zeile passen:
+
+```
+http://<server>:8080/v2?size=3
+```
+
 Wenn man die URL mit ``?dbgfkt=true`` lädt, kann durch anklicken der Überschrift *24h-Schwimmen* eine automatisches Klicken der vorhandenen DIVs simuliert werden.
 
 ## Git-Workflow
