@@ -125,10 +125,16 @@ function showUserTable() {
             section.appendChild(heading);
             // Button um CSV herunterzuladen
             const csvbutton = document.createElement('Button');
-            csvbutton.textContent = "CSV";
-            csvbutton.style.margin = "0px 20px";
+            csvbutton.textContent = "CSV-Download";
+            csvbutton.style.margin = "0px 5px 0px 20px"; // oben-rechts-unten-links
             csvbutton.addEventListener("click", () => downloadCSV(userData));
             section.appendChild(csvbutton);
+            // Button um neuen User anzulegen
+            const newbutton = document.createElement('Button');
+            newbutton.textContent = "Neuer Nutzer";
+            newbutton.style.margin = "0px 0px"; //oben/unten - links/rechts
+            newbutton.addEventListener("click", () => showSection('adduser'));
+            section.appendChild(newbutton);
             // Seitendarstellungskontrolle
             // Alle alten Divs paginationcontrol löschen - sollte maximal eins sein
             document.querySelectorAll('div#paginationControls').forEach(el => el.remove());
