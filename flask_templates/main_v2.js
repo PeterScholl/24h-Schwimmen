@@ -555,6 +555,7 @@ async function transmitActions() {
             pending.forEach(a => a.transmitted = true);
             const resp = await response.json();
             if (resp["updates"]) parseUpdates(resp);
+            if (resp["results"]) showResultErrors(resp["results"]);
             updateFormIsDirty(false);
             updateServerStatus(true);
         } else {
@@ -657,11 +658,29 @@ async function fetchSchwimmerVonBahnen() {
     }
 }
 
+function showResultErrors(results) {
+    const errors = results.filter(r => r.status !== "erfolgreich" && r.status !== "existierte bereits");
+    if (errors.length === 0) return;
+    const msg = errors.map(r => {
+        const nr = r.nummer != null ? `Schwimmer ${r.nummer}: ` : '';
+        return `${nr}${r.status}`;
+    }).join('\n');
+    showStatusMessage(msg, false, 6000);
+}
+
 function parseUpdates(resp) {
     if (resp["updates"] && Array.isArray(resp["updates"])) {
         resp["updates"].forEach((eintrag) => {
-            alleSchwimmer[parseInt(eintrag["nummer"])] = { ...eintrag };
+            const nummer = parseInt(eintrag["nummer"]);
+            alleSchwimmer[nummer] = { ...eintrag };
             debugLog(`Schwimmer Nummer ${eintrag["nummer"]} aktualisiert`);
+
+            const aktiv = schwimmer.find(s => s.nummer === nummer);
+            if (aktiv) {
+                if (eintrag.bahnanzahl != null) aktiv.bahnen = eintrag.bahnanzahl;
+                if (eintrag.vorname)  aktiv.vorname  = eintrag.vorname;
+                if (eintrag.nachname) aktiv.nachname = eintrag.nachname;
+            }
         });
     }
 }

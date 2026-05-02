@@ -406,10 +406,14 @@ def action():
                         anzahl = int(parameter[1])
                         bahnnr = int(parameter[2]) if len(parameter) > 2 else 0
                         logging.info(f"ADD wird ausgeführt: Schwimmer {nummer}, Anzahl {anzahl}, BahnNr {bahnnr}")
-                        db.aendere_bahnanzahl_um(nummer,anzahl,clientid,bahnnr=bahnnr)
-                        logging.debug("ADD ist ausgeführt")
-                        results.append({"kommando": kommando, "status": "erfolgreich", "nummer": nummer, "anzahl": anzahl})
-                        #updates.append(db.lies_schwimmer(nummer))
+                        if (nummer > 0):
+                            db.aendere_bahnanzahl_um(nummer,anzahl,clientid,bahnnr=bahnnr)
+                            logging.debug("ADD ist ausgeführt")
+                            results.append({"kommando": kommando, "status": "erfolgreich", "nummer": nummer, "anzahl": anzahl})
+                        else:
+                            logging.error(f"ADD nicht ausgeführt für ungültige Schwimmernummer {nummer}")
+                            results.append({"kommando": kommando, "status": f"ungültige Schwimmernummer: {nummer}", "nummer": nummer, "anzahl": anzahl})
+                        updates.append(db.lies_schwimmer(nummer))
                     except (ValueError, IndexError) as e:
                         logging.info(f"Fehler bei ADD-Parametern: {e}")
                         results.append({"kommando": kommando, "status": f"ungültige Parameter: {str(e)}"})
