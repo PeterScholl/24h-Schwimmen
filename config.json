@@ -6,6 +6,7 @@
     "fade_time_s": 600,
     "mobile_cards_col": 2,
     "view2_page_interval_s": 10,
-    "startzeit": "2025-06-14T08:00:00Z"
+    "startzeit": "2025-06-14T08:00:00Z",
+    "swimmer_list_update_interval_s": 600
  }
   

@@ -22,7 +22,7 @@ Die Erfassung soll auf möglichst vielen verschiedenen Endgeräten möglich sein
 
 * Repository clonen.
 * Dann mit ``pip install -r requirements.txt`` die benötigten Pakete installieren und
-* die Datei ``server.py`` ausführen.
+* die Datei ``wsgiserverwin.py`` oder ``wsgiserver.py`` bzw ausführen.
 * Dies startet einen Web-Server auf dem Port 8080, der in der Regel unter ``http://localhost:8080`` mit dem Browser zu erreichen ist.
 
 Eine Basisdatenbank mit dem Benutzer ``admin`` und dem Passwort ``swim24`` wird automatisch angelegt.
@@ -46,6 +46,7 @@ Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einst
 | `mobile_cards_col` | `2` | **Nur v2-Oberfläche**: Anzahl Schwimmerkarten pro Zeile auf kleinen Bildschirmen (≤ 600 px Breite). |
 | `view2_page_interval_s` | `10` | **View2-Seite** (`/view2`): Sekunden pro Seite bei aktiviertem Auto-Weiterblättern (Shift-Lock-Modus). |
 | `startzeit` | `"2025-06-14T08:00:00Z"` | **View- und View2-Seite**: Startzeitpunkt des Schwimmens als UTC-ISO-Timestamp. Legt den Beginn der Spezialzeiten (Tag1, Geisterstunde, Gute Nacht, Frühaufsteher, Tag2) fest. |
+| `swimmer_list_update_interval_s` | `600` | **View- und View2-Seite**: Intervall in Sekunden, in dem die Schwimmerliste neu vom Server abgefragt wird. Stellt sicher, dass während des Wettkampfs neu angelegte Schwimmer automatisch in der Anzeige erscheinen, ohne manuellen Reload. `0` deaktiviert das automatische Neuladen; ein manuelles Laden der Schwimmerliste ist jederzeit per `Shift+S` möglich. |
 
 Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
 
@@ -207,6 +208,7 @@ Im view kann man:
 * mit ``Shift+Z`` zwischen ein- und zweispaltiger Darstellung wechseln
 * mit ``Shift+N`` die Nachnamen ein- oder ausblenden
 * mit ``Shift+U`` die Anzeige zwischen Bahnen / Strecke wechseln
+* mit ``Shift+S`` die Schwimmerliste manuell neu vom Server laden (nützlich wenn `swimmer_list_update_interval_s` auf `0` gesetzt ist oder ein neuer Schwimmer sofort erscheinen soll)
 * mit ``Shift+B`` ein Backup der Actions machen, welches man im Admin-Fenster wieder importieren könnte
 
 Auf der **Erfassungsseite** (`/v2`) gibt es außerdem den URL-Parameter `size`, der die Breite der Schwimmerkarten steuert (Standardwert: `5`, entspricht ca. 200 px pro Karte). Ein kleinerer Wert ist auf Smartphones hilfreich, damit zwei Karten nebeneinander in eine Zeile passen:
@@ -312,27 +314,38 @@ timestamps werden in UTC-Strings gespeichert, müssen also für die Darstellung 
 Hier ist eine Übersicht über die Verzeichnisstruktur des Projektes:
 
 ```text
-24H-Schwimmen/ 
-├── data/               Verzeichnis für LOG-Dateien
-├── flask_templates/    Vorlagen für dynmaisch generierte Webseiten
-│ └── admin.html        Administrationsseite
-│ └── index.html        Standardseite
-│ └── login.html        Anmeldeseite 
-│ └── main.js           Javascript der Webseite
-├── static/             Dateien, die statisch ausgeliefert werden sollen
-│ └── admin.js          Javascript für die Administrationsseite 
-│ └── favicon.ico        
-│ └── main.css          Standard-Style
-│ └── mymodals.js       Javascript um Modals einzublenden
-├── testfiles           Unterordner mit Testdaten 
-├── db.py               Alles was mit Datenbankzugriffen zu tun hat
-├── logging_config.py   Konfiguration des Loggings
-├── config.json         Konfigurationsdatei
-├── server.py           Die Hauptdatei mit der Serverfunktionalität
-├── utils.py            Kleine Funktionen (Hilfsfunktionen)
-├── data.sqlite         Datenbank des Servers
-├── README.md           dieser Text
-└── requirements.txt    Für die Nutzung zu installierende Python-Module
+24H-Schwimmen/
+├── data/                   Verzeichnis für LOG-Dateien
+├── flask_templates/        Vorlagen für dynamisch generierte Webseiten
+│   ├── admin.html          Administrationsseite
+│   ├── index.html          Erfassungsseite v1
+│   ├── index_v2.html       Erfassungsseite v2
+│   ├── login.html          Anmeldeseite
+│   ├── main.js             Javascript Erfassungsseite v1
+│   ├── main_v2.js          Javascript Erfassungsseite v2
+│   ├── qr.html             QR-Code-Anzeige
+│   ├── view.js             Javascript Ergebnisseite v1
+│   └── view2.js            Javascript Ergebnisseite v2
+├── static/                 Dateien, die statisch ausgeliefert werden sollen
+│   ├── admin.js            Javascript für die Administrationsseite
+│   ├── csvImport.js        CSV- und JSON-Import-Hilfsfunktionen
+│   ├── favicon.ico
+│   ├── main.css            Standard-Style
+│   ├── mymodals.js         Javascript für Modals und Statusmeldungen
+│   ├── view.html           Ergebnisseite v1 (statisch)
+│   └── view2.html          Ergebnisseite v2 (statisch)
+├── testfiles/              Unterordner mit Testdaten
+├── config.json             Konfigurationsdatei
+├── data.sqlite             Datenbank des Servers
+├── db.py                   Alles was mit Datenbankzugriffen zu tun hat
+├── logging_config.py       Konfiguration des Loggings
+├── make_release.py         Skript zum Erstellen von Releases (ZIP/EXE)
+├── README.md               dieser Text
+├── requirements.txt        Für die Nutzung zu installierende Python-Module
+├── server.py               Flask-Anwendung mit allen Routen und Logik
+├── utils.py                Hilfsfunktionen (Passwortgenerator, IP-Ermittlung)
+├── wsgiserver.py           Startskript für Linux/Mac (Gunicorn/WSGI)
+└── wsgiserverwin.py        Startskript für Windows (WSGI)
 ```
 
 ## Git-Workflow

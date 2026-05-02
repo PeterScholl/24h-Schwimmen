@@ -384,7 +384,8 @@ def send_mainjs_v2():
 def send_viewjs():
     params = {
         'bahnlaenge': config["laenge_bahn_m"],
-        'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z')
+        'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z'),
+        'swimmer_list_interval': config.get('swimmer_list_update_interval_s', 60)
     }
     return render_template("view.js", **params), 200, {'Content-Type': 'application/javascript'}
 
@@ -405,7 +406,8 @@ def send_view2js():
     params = {
         'bahnlaenge': config["laenge_bahn_m"],
         'page_interval': config.get('view2_page_interval_s', 10),
-        'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z')
+        'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z'),
+        'swimmer_list_interval': config.get('swimmer_list_update_interval_s', 60)
     }
     return render_template("view2.js", **params), 200, {'Content-Type': 'application/javascript'}
 
@@ -484,17 +486,19 @@ def action():
                     nummer = int(parameter[0])
                     updates = [db.lies_schwimmer(nummer)]
             elif kommando == "VIEW": # Update des Viewbildschirms angefordert
-                if (len(parameter)>0): #nur begrenzter Zeitraum
+                if "update_swimmer" in parameter: # Nur Schwimmerliste
+                    data = {'swimmerMap': db.liste_tabelle('schwimmer')}
+                    return jsonify(data), 200
+                elif len(parameter) > 0: # Begrenzter Zeitraum
                     sinceTimestamp = parameter[0]
-                    data = {}
-                    data['actions'] = db.finde_actions_after_timestamp(sinceTimestamp)
+                    data = {'actions': db.finde_actions_after_timestamp(sinceTimestamp)}
                     return jsonify(data), 200
-                else: #Volständige übermittlung
-                    data = {}
-                    data['swimmerMap'] = db.liste_tabelle('schwimmer')
-                    data['actions'] = db.liste_tabelle('actions')
+                else: # Vollständige Übermittlung
+                    data = {
+                        'swimmerMap': db.liste_tabelle('schwimmer'),
+                        'actions': db.liste_tabelle('actions')
+                    }
                     return jsonify(data), 200
-                pass
             elif kommando == "ACT": # Status Aktiv ändern
                 try:
                     nummer = int(parameter[0])

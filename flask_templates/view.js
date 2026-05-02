@@ -12,7 +12,8 @@ let lastupdate = new Date("2000-01-01T00:00:00Z").toISOString();
 const offsetInMinutes = new Date().getTimezoneOffset();
 const offsetInMillis = -offsetInMinutes * 60 * 1000;
 
-const bahnLaenge = parseInt("{{bahnlaenge}}");;
+const bahnLaenge = parseInt("{{bahnlaenge}}");
+const SWIMMER_LIST_INTERVAL_MS = {{swimmer_list_interval}} * 1000;
 
 function gibNeueEintraege(neueListe, vorhandeneListe) {
     return neueListe.filter(neu =>
@@ -168,24 +169,28 @@ function App() {
         }
     }
 
-    function holeNeueDaten(since) {
+    function holeNeueDaten(since, nurSchwimmer = false) {
+        const parameter = nurSchwimmer ? ["update_swimmer"] : (since ? [since] : []);
         fetch('/action', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify([{ 'kommando': "VIEW", 'parameter': (since ? [since] : []), 'timestamp': new Date().toISOString() }])
+            body: JSON.stringify([{ 'kommando': "VIEW", 'parameter': parameter, 'timestamp': new Date().toISOString() }])
         })
             .then((res) => res.json())
             .then((data) => {
                 if (data.swimmerMap) {
+                    const isInitialLoad = curActions.length === 0;
                     data.swimmerMap.forEach(s => {
-                        s.bahnanzahl = 0;
-                        spezialzeiten.forEach(szeit => s[szeit.name] = 0);
-                        curSwimmerMap[s.nummer] = s;
-                    })
-                    //console.log(`curSwimmerMap ist ein Array ${Array.isArray(curSwimmerMap)}`);
-                    //console.log("curSwimmerMap", JSON.stringify(curSwimmerMap));
-
-                    setSwimmerMap({ ...curSwimmerMap })
+                        if (isInitialLoad || !curSwimmerMap[s.nummer]) {
+                            s.bahnanzahl = 0;
+                            spezialzeiten.forEach(szeit => s[szeit.name] = 0);
+                            curSwimmerMap[s.nummer] = s;
+                        } else {
+                            const existing = curSwimmerMap[s.nummer];
+                            curSwimmerMap[s.nummer] = { ...existing, vorname: s.vorname, nachname: s.nachname, gruppe: s.gruppe, aktiv: s.aktiv };
+                        }
+                    });
+                    setSwimmerMap({ ...curSwimmerMap });
                 }
                 if (data.lapLog) setLapLog(data.lapLog);
                 if (data.actions) {
@@ -241,6 +246,8 @@ function App() {
             } else if (e.shiftKey && e.key === "U") {
                 console.log("Einheiten geändert");
                 setUnitMeterAktiv((prev) => !prev);
+            } else if (e.shiftKey && e.key === "S") {
+                holeNeueDaten(null, true);
             } else if (e.shiftKey && e.key === "B") {
                 console.log("Download JSON-Backup");
                 downloadJSON();
@@ -272,6 +279,14 @@ function App() {
             holeNeueDaten(date);
         }, 10000); // alle 5 Sekunden
         return () => clearInterval(interval10); // Aufräumen bei Komponentendemontage
+    }, []);
+
+    // Periodische Schwimmerlistenaktualisierung (neue Schwimmer integrieren)
+    useEffect(() => {
+        const intervalSwimmer = setInterval(() => {
+            holeNeueDaten(null, true);
+        }, SWIMMER_LIST_INTERVAL_MS);
+        return () => clearInterval(intervalSwimmer);
     }, []);
 
     // Der Timer wird in Use-Effect gepackt, damit er erst nach dem ersten Rendern ausgeführt wird
