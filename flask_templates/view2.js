@@ -127,7 +127,7 @@ function App() {
             curSwimmerMap[schwimmerID] = s;
             setSwimmerMap({ ...curSwimmerMap });
             const lzeit = new Date((new Date(zeit)).getTime() + offsetInMillis);
-            setLapLog((prev) => [{ schwimmer: schwimmerID, zeit: lzeit.toISOString(), laps: s.bahnanzahl, vorname: s.vorname }, ...prev.slice(0, 19)]);
+            setLapLog((prev) => [{ schwimmer: schwimmerID, zeit: lzeit.toISOString(), laps: s.bahnanzahl, vorname: s.vorname }, ...prev.slice(0, 49)]);
         }
     }
 
