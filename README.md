@@ -163,6 +163,7 @@ Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einst
 | `fade_time` | `600` | **Nur v2-Oberfläche** (`/v2`): Sekunden seit dem letzten Klick, nach denen eine Schwimmerkarte blass dargestellt wird. Beim nächsten Betätigen von „Senden" wird der Schwimmer automatisch von der Bahn entfernt. `0` oder `-1` deaktiviert das Feature. |
 | `mobile_cards` | `2` | **Nur v2-Oberfläche**: Anzahl Schwimmerkarten pro Zeile auf kleinen Bildschirmen (≤ 600 px Breite). |
 | `view2_page_interval` | `5` | **View2-Seite** (`/view2`): Sekunden pro Seite bei aktiviertem Auto-Weiterblättern (Shift-Lock-Modus). |
+| `startzeit` | `"2025-06-14T08:00:00Z"` | **View- und View2-Seite**: Startzeitpunkt des Schwimmens als UTC-ISO-Timestamp. Legt den Beginn der Spezialzeiten (Tag1, Geisterstunde, Gute Nacht, Frühaufsteher, Tag2) fest. |
 
 Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
 
@@ -196,6 +197,53 @@ Existiert ein Schwimmer mit der importierten Nummer bereits in der Datenbank, wi
 - **Unverändert bleiben:** `bahnanzahl` (geschwommene Bahnen), `aktiv`-Status, Bahneinteilung
 
 So können Stammdaten (z. B. nach einer Namenskorrektur) gefahrlos neu importiert werden, ohne Bahndaten zu verlieren.
+
+## Datenexport am Ende des Wettkampfes
+
+Es gibt vier Möglichkeiten, die erfassten Daten zu exportieren. Für die Auswertung nach dem Wettkampf empfiehlt sich der CSV-Export.
+
+### CSV-Export der Schwimmerdaten (empfohlen)
+
+**Wo:** View-Seite (`/view`) oder View2-Seite (`/view2`)  
+**Auslöser:** Tastenkombination `Shift+D`
+
+Erzeugt die Datei `schwimmerdaten.csv` mit einer Zeile pro Schwimmer. Die Werte in den Spalten sind Meter (Bahnanzahl × Bahnlänge).
+
+| Spalte | Inhalt |
+| --- | --- |
+| `nummer` | Schwimmernummer |
+| `vorname` | Vorname |
+| `nachname` | Nachname |
+| `gruppe` | Gruppe / Team |
+| `bahnanzahl` | Gesamtstrecke in Metern |
+| `Tag1` | Strecke (m) im ersten Zeitabschnitt |
+| `Geisterstunde` | Strecke (m) in der Geisterstunde |
+| `Gute Nacht` | Strecke (m) im Nacht-Abschnitt |
+| `Frühaufsteher` | Strecke (m) im Frühaufsteher-Abschnitt |
+| `Tag2` | Strecke (m) im zweiten Tag-Abschnitt |
+
+Die Zeitgrenzen der Spezialzeiten werden relativ zur konfigurierten `startzeit` berechnet (siehe Konfiguration).
+
+### Aktions-Backup als JSON
+
+**Wo:** View-Seite (`/view`) oder View2-Seite (`/view2`)  
+**Auslöser:** Tastenkombination `Shift+B`
+
+Erzeugt die Datei `view_backup.json` mit allen bisher empfangenen Aktionen und dem aktuellen Schwimmerstand. Diese Datei kann im Admin-Bereich unter **Aktionen → JSON-Import** wieder eingespielt werden, um Daten von einem ausgefallenen Endgerät nachzuladen.
+
+### Lokaler JSON-Download (Erfassungsgerät)
+
+**Wo:** Haupt-Erfassungsseite (`/`)  
+**Auslöser:** Schaltfläche „Download JSON"
+
+Speichert den lokalen Zustand des Erfassungsgeräts (aktive Schwimmer, zwischengespeicherte Aktionen, Statusmeldungen) als `24hschwimmen.json`. Nützlich zur Fehlerdiagnose oder als Sicherungskopie, falls Aktionen noch nicht übertragen wurden.
+
+### SQL-Datenbank-Backup
+
+**Wo:** Admin-Bereich  
+**Auslöser:** Schaltfläche „Backup SQL"
+
+Lädt die vollständige SQLite-Datenbank als `backup.sql` herunter (nur für Admin-Benutzer). Enthält alle Schwimmer, Aktionen und Clients. Geeignet als Vollsicherung vor dem Abschalten des Servers.
 
 ## Logging
 

@@ -339,7 +339,8 @@ def send_mainjs_v2():
 @app.route("/view.js")
 def send_viewjs():
     params = {
-        'bahnlaenge': config["laenge_bahn_m"]
+        'bahnlaenge': config["laenge_bahn_m"],
+        'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z')
     }
     return render_template("view.js", **params), 200, {'Content-Type': 'application/javascript'}
 
@@ -359,7 +360,8 @@ def view2():
 def send_view2js():
     params = {
         'bahnlaenge': config["laenge_bahn_m"],
-        'page_interval': config.get('view2_page_interval', 5)
+        'page_interval': config.get('view2_page_interval', 5),
+        'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z')
     }
     return render_template("view2.js", **params), 200, {'Content-Type': 'application/javascript'}
 

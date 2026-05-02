@@ -216,7 +216,7 @@ function App() {
     // Initialer Datenladeaufruf
     useEffect(() => {
         holeNeueDaten();
-        initSpezialzeiten(new Date("2025-06-14T08:00:00Z"));
+        initSpezialzeiten(new Date("{{startzeit}}"));
     }, []);
 
     // Periodische Aktualisierung
