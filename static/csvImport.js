@@ -42,7 +42,7 @@ export function initCSVImport(fileInputSelector, previewContainerSelector, sendB
                     return entry;
                 });
                 renderPreview(Object.values(mapping).filter(k => k), parsedData, previewContainer);
-            }, options.knownHeaders);
+            }, options.knownHeaders, () => { fileInput.value = ''; previewContainer.innerHTML = ''; parsedData = []; });
         } else {
 
             parsedData = lines.slice(1).map(line => {
@@ -202,7 +202,7 @@ function renderPreview(headers, data, container) {
     document.getElementById("pageInfo").textContent = `Seite ${currentPage + 1} / ${totalPages}`;
 }
 
-function showHeaderMappingModal(headers, onConfirm, knownHeaders) {
+function showHeaderMappingModal(headers, onConfirm, knownHeaders, onCancel) {
     const modal = document.createElement('div');
     console.log("in showHeaderMappingModal");
     modal.innerHTML = `
@@ -250,5 +250,5 @@ function showHeaderMappingModal(headers, onConfirm, knownHeaders) {
         onConfirm(mapping);
     };
 
-    document.getElementById('headerMappingCancel').onclick = () => modal.remove();
+    document.getElementById('headerMappingCancel').onclick = () => { modal.remove(); if (onCancel) onCancel(); };
 }
