@@ -141,6 +141,16 @@ function showUserTable() {
             section.appendChild(stable);
             // Bereich für den Datenimport
             section.appendChild(document.createElement('hr'));
+            const importInfo = document.createElement('p');
+            importInfo.style.cssText = 'font-size:0.9rem;color:#555;max-width:600px;';
+            importInfo.innerHTML = `
+                <strong>CSV-Import:</strong> Pflichtfeld ist <code>benutzername</code>.
+                Optional: <code>name</code>, <code>passwort</code>, <code>admin</code> (0 oder 1).<br>
+                Existiert ein Benutzer mit dem Benutzernamen bereits, werden <em>Name</em> und <em>Admin-Status</em> aktualisiert.
+                Das Passwort wird nur geändert, wenn es in der CSV angegeben ist.
+                Fehlt das Passwort bei einem neuen Benutzer, wird ein Zufallspasswort vergeben – bitte anschließend ändern.
+            `;
+            section.appendChild(importInfo);
             const input = document.createElement('input');
             input.type = 'file';
             input.id = 'csvInput';
@@ -152,7 +162,12 @@ function showUserTable() {
             button.id = "csvSend";
             button.innerText = 'Importieren';
             section.appendChild(button);
-            initCSVImport('#csvInput', '#csvPreviewContainer', '#csvSend', { url: '/admin' });
+            initCSVImport('#csvInput', '#csvPreviewContainer', '#csvSend', {
+                url: '/admin',
+                action: 'import_benutzer',
+                knownHeaders: ['', 'benutzername', 'name', 'passwort', 'admin'],
+                importLabel: 'Benutzer'
+            });
             renderTable(userData, 'userTable', ['id', 'name', 'benutzername', 'admin'], { 'Del': delUser, 'Edit': editUser });
         })
         .catch(error => {
@@ -160,8 +175,63 @@ function showUserTable() {
         });
 }
 
-function editUser(nummer) { //TODO
-    alert(`Bearbeite Nutzer: ${nummer}`); // Placeholder
+function editUser(id) {
+    const u = userData.find(u => parseInt(u.id) === parseInt(id));
+    if (!u) return;
+
+    let dlg = document.getElementById('editUserDialog');
+    if (!dlg) {
+        dlg = document.createElement('dialog');
+        dlg.id = 'editUserDialog';
+        dlg.style.cssText = 'padding:1.5rem; min-width:280px; border-radius:6px;';
+        document.body.appendChild(dlg);
+    }
+
+    dlg.innerHTML = `
+        <h3 style="margin-top:0">Benutzer „${u.benutzername}" bearbeiten</h3>
+        <label style="display:block;margin-bottom:6px">Anzeigename<br>
+            <input id="euName" type="text" value="${u.name ?? ''}" style="width:100%;box-sizing:border-box">
+        </label>
+        <label style="display:block;margin-bottom:6px">Neues Passwort <span style="color:#888;font-size:0.85em">(leer lassen = unverändert)</span><br>
+            <input id="euPasswort" type="password" style="width:100%;box-sizing:border-box">
+        </label>
+        <label style="display:block;margin-bottom:12px">
+            <input id="euAdmin" type="checkbox" ${u.admin ? 'checked' : ''}> Admin-Rechte
+        </label>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button id="euSave">Speichern</button>
+            <button id="euCancel">Abbrechen</button>
+        </div>
+    `;
+
+    dlg.querySelector('#euCancel').onclick = () => dlg.close();
+    dlg.querySelector('#euSave').onclick = () => {
+        const payload = {
+            action: 'edit_user',
+            id: id,
+            name:   dlg.querySelector('#euName').value.trim(),
+            admin:  dlg.querySelector('#euAdmin').checked ? 1 : 0,
+        };
+        const pw = dlg.querySelector('#euPasswort').value;
+        if (pw) payload.passwort = pw;
+
+        fetch('/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        }).then(r => r.text().then(text => {
+            if (r.ok) {
+                Object.assign(u, { name: payload.name, admin: payload.admin });
+                showStatusMessage(`Benutzer ${u.benutzername} gespeichert`, true);
+                dlg.close();
+                renderTable(userData, 'userTable', ['id', 'name', 'benutzername', 'admin'], { 'Del': delUser, 'Edit': editUser });
+            } else {
+                showStatusMessage(`Fehler: ${text}`, false);
+            }
+        }));
+    };
+
+    dlg.showModal();
 }
 
 function delUser(nummer) {
@@ -268,8 +338,9 @@ function showSwimmerTable() {
             button.innerText = 'Importieren';
             section.appendChild(button);
             initCSVImport('#csvInput', '#csvPreviewContainer', '#csvSend', { url: '/admin',
-                knownHeaders: ['', 'nummer', 'vorname', 'nachname', 'istKind', 'istErw', 'gruppe']
-             });
+                knownHeaders: ['', 'nummer', 'vorname', 'nachname', 'istKind', 'istErw', 'gruppe'],
+                importLabel: 'Schwimmer'
+            });
 
             const swimmerHeader = ['nummer', 'vorname', 'nachname', 'istKind', 'gruppe', 'bahnanzahl', 'auf_bahn', 'aktiv'];
             const swimmerAktionen = { 'Del': deleteSwimmer, 'Edit': editSwimmer };
@@ -783,8 +854,8 @@ function showQRSection() {
     section.appendChild(heading);
 
     // Checkbox + Zahlenfeld für size-Parameter
-    const row = document.createElement('div');
-    row.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 16px;';
+    const rowSize = document.createElement('div');
+    rowSize.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 10px;';
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -805,22 +876,37 @@ function showQRSection() {
 
     checkbox.addEventListener('change', () => { input.disabled = !checkbox.checked; });
 
-    row.appendChild(checkbox);
-    row.appendChild(label);
-    row.appendChild(input);
-    section.appendChild(row);
+    rowSize.appendChild(checkbox);
+    rowSize.appendChild(label);
+    rowSize.appendChild(input);
+    section.appendChild(rowSize);
+
+    // Checkbox für dbgfkt-Parameter
+    const rowDbg = document.createElement('div');
+    rowDbg.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 16px;';
+
+    const checkboxDbg = document.createElement('input');
+    checkboxDbg.type = 'checkbox';
+    checkboxDbg.id = 'qrDbgCheck';
+
+    const labelDbg = document.createElement('label');
+    labelDbg.htmlFor = 'qrDbgCheck';
+    labelDbg.textContent = 'Debug-Funktion aktivieren (dbgfkt=true)';
+
+    rowDbg.appendChild(checkboxDbg);
+    rowDbg.appendChild(labelDbg);
+    section.appendChild(rowDbg);
 
     const btn = document.createElement('button');
     btn.textContent = 'QR-Code öffnen';
     btn.style.cssText = 'font-size: 1rem; padding: 8px 16px; cursor: pointer;';
     btn.addEventListener('click', () => {
         const base = window.location.origin;
-        let url;
-        if (checkbox.checked && input.value) {
-            url = base + '/v2?size=' + encodeURIComponent(input.value);
-        } else {
-            url = base;
-        }
+        const params = new URLSearchParams();
+        if (checkbox.checked && input.value) params.set('size', input.value);
+        if (checkboxDbg.checked) params.set('dbgfkt', 'true');
+        const query = params.toString();
+        const url = base + '/v2' + (query ? '?' + query : '');
         window.open('/show_qr?ip=' + encodeURIComponent(url), '_blank');
     });
     section.appendChild(btn);

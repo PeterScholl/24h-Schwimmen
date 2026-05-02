@@ -32,6 +32,167 @@ Eine Basisdatenbank mit dem Benutzer ``admin`` und dem Passwort ``swim24`` wird 
 * Der Rechner auf dem der Server läuft, sollte angepasste Energiesparmodi haben, d.h. nicht in den Standby-Wechseln und auch die Festplatte soll nicht abgeschaltet werden. Dazu z.B. unter Windows ``Energiesparplaneinstellungen ändern`` -> ``Erweiterte Einstellungen ändern`` und dort enstprechende Einstellungen vornehmen
 * Um in Excel die CSV-Daten zu importieren, erstellt man eine leere Tabelle, wechselt dann in das Menü Daten und dort gibt es einen Reiter Text/CSV-Importieren. Hier kann man auch die Codierung einstellen. In der Regel arbeitet der Server nur mit UTF-8 Daten
 
+## Konfiguration (config.json)
+
+Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einstellungen:
+
+| Schlüssel | Beispielwert | Beschreibung |
+| --- | --- | --- |
+| `flask_secret_key` | `"Lang&Umständlich"` | Geheimer Schlüssel für Flask-Sessions – vor dem Live-Betrieb ändern |
+| `default_admin_pass` | `"swim24"` | Initiales Passwort für den Admin-Benutzer |
+| `laenge_schwimmerNr` | `3` | Anzahl Stellen der Schwimmernummer (z. B. 3 → 001–999) |
+| `laenge_bahn_m` | `100` | Länge einer Bahn in Metern (für Streckenberechnung) |
+| `fade_time` | `600` | **Nur v2-Oberfläche** (`/v2`): Sekunden seit dem letzten Klick, nach denen eine Schwimmerkarte blass dargestellt wird. Beim nächsten Betätigen von „Senden" wird der Schwimmer automatisch von der Bahn entfernt. `0` oder `-1` deaktiviert das Feature. |
+| `mobile_cards` | `2` | **Nur v2-Oberfläche**: Anzahl Schwimmerkarten pro Zeile auf kleinen Bildschirmen (≤ 600 px Breite). |
+| `view2_page_interval` | `5` | **View2-Seite** (`/view2`): Sekunden pro Seite bei aktiviertem Auto-Weiterblättern (Shift-Lock-Modus). |
+| `startzeit` | `"2025-06-14T08:00:00Z"` | **View- und View2-Seite**: Startzeitpunkt des Schwimmens als UTC-ISO-Timestamp. Legt den Beginn der Spezialzeiten (Tag1, Geisterstunde, Gute Nacht, Frühaufsteher, Tag2) fest. |
+
+Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
+
+## Schwimmer-Import (CSV)
+
+Im Admin-Bereich unter **Schwimmer** können Schwimmerdaten per CSV-Datei importiert werden.
+
+### Vorgehensweise
+
+1. CSV-Datei auswählen — die erste Zeile muss Spaltenüberschriften enthalten.
+2. Im Dialog wird jede **CSV-Spalte** (fett) einem **Datenbankfeld** zugeordnet. Nicht benötigte Spalten auf *Ignorieren* lassen.
+3. Pflichtfeld ist `nummer`. Alle anderen Felder sind optional.
+4. Klick auf **Importieren** überträgt die Daten.
+
+### Unterstützte Felder
+
+| Datenbankfeld | Bedeutung |
+| --- | --- |
+| `nummer` | Schwimmernummer (Pflicht, eindeutiger Schlüssel) |
+| `vorname` | Vorname |
+| `nachname` | Nachname |
+| `gruppe` | Gruppe / Team |
+| `istKind` | `1` = Kind, `0` = Erwachsener |
+| `istErw` | Alternative zu `istKind`: `0` = kein Erwachsener → wird intern als Kind (`istKind = 1`) gespeichert |
+
+### Verhalten bei bereits vorhandenen Schwimmern (Duplikate)
+
+Existiert ein Schwimmer mit der importierten Nummer bereits in der Datenbank, wird er **aktualisiert**, nicht doppelt angelegt:
+
+- **Aktualisiert:** `vorname`, `nachname`, `gruppe`, `istKind`
+- **Unverändert bleiben:** `bahnanzahl` (geschwommene Bahnen), `aktiv`-Status, Bahneinteilung
+
+So können Stammdaten (z. B. nach einer Namenskorrektur) gefahrlos neu importiert werden, ohne Bahndaten zu verlieren.
+
+## Benutzer-Import (CSV)
+
+Im Admin-Bereich unter **Benutzer** können Zugangsdaten per CSV-Datei importiert werden.
+
+### Vorgehensweise
+
+1. CSV-Datei auswählen — die erste Zeile muss Spaltenüberschriften enthalten.
+2. Im Dialog wird jede **CSV-Spalte** einem **Datenbankfeld** zugeordnet. Nicht benötigte Spalten auf *Ignorieren* lassen.
+3. Pflichtfeld ist `benutzername`. Alle anderen Felder sind optional.
+4. Klick auf **Importieren** überträgt die Daten.
+
+### Unterstützte Felder
+
+| Datenbankfeld | Bedeutung |
+| --- | --- |
+| `benutzername` | Anmeldename (Pflicht, eindeutiger Schlüssel; wird automatisch kleingeschrieben) |
+| `name` | Anzeigename / vollständiger Name |
+| `passwort` | Passwort im Klartext (wird serverseitig gehasht gespeichert) |
+| `admin` | `1` = Admin-Rechte, `0` = normaler Benutzer |
+
+### Verhalten bei bereits vorhandenen Benutzern (Duplikate)
+
+Existiert ein Benutzer mit dem importierten `benutzername` bereits, wird er **aktualisiert**, nicht doppelt angelegt:
+
+- **Aktualisiert:** `name`, `admin`-Status
+- **Passwort:** wird nur geändert, wenn in der CSV-Datei angegeben; sonst unverändert
+- **Neu angelegte Benutzer ohne Passwort** erhalten ein zufällig generiertes Passwort — dieses sollte nach dem Import manuell geändert werden
+
+## Datenexport am Ende des Wettkampfes
+
+Es gibt vier Möglichkeiten, die erfassten Daten zu exportieren. Für die Auswertung nach dem Wettkampf empfiehlt sich der CSV-Export.
+
+### CSV-Export der Schwimmerdaten (empfohlen)
+
+**Wo:** View-Seite (`/view`) oder View2-Seite (`/view2`)  
+**Auslöser:** Tastenkombination `Shift+D` (wie Download)
+
+Erzeugt die Datei `schwimmerdaten.csv` mit einer Zeile pro Schwimmer. Die Werte in den Spalten sind Meter (Bahnanzahl × Bahnlänge).
+
+| Spalte | Inhalt |
+| --- | --- |
+| `nummer` | Schwimmernummer |
+| `vorname` | Vorname |
+| `nachname` | Nachname |
+| `gruppe` | Gruppe / Team |
+| `bahnanzahl` | Gesamtstrecke in Metern |
+| `Tag1` | Strecke (m) im ersten Zeitabschnitt |
+| `Geisterstunde` | Strecke (m) in der Geisterstunde |
+| `Gute Nacht` | Strecke (m) im Nacht-Abschnitt |
+| `Frühaufsteher` | Strecke (m) im Frühaufsteher-Abschnitt |
+| `Tag2` | Strecke (m) im zweiten Tag-Abschnitt |
+
+Die Zeitgrenzen der Spezialzeiten werden relativ zur konfigurierten `startzeit` berechnet (siehe Konfiguration).
+
+### Aktions-Backup als JSON
+
+**Wo:** View-Seite (`/view`) oder View2-Seite (`/view2`)  
+**Auslöser:** Tastenkombination `Shift+B`
+
+Erzeugt die Datei `view_backup.json` mit allen bisher empfangenen Aktionen und dem aktuellen Schwimmerstand. Diese Datei kann im Admin-Bereich unter **Aktionen → JSON-Import** wieder eingespielt werden, um Daten von einem ausgefallenen Endgerät nachzuladen.
+
+### Lokaler JSON-Download (Erfassungsgerät)
+
+**Wo:** Haupt-Erfassungsseite (`/`)  
+**Auslöser:** Schaltfläche „Download JSON"
+
+Speichert den lokalen Zustand des Erfassungsgeräts (aktive Schwimmer, zwischengespeicherte Aktionen, Statusmeldungen) als `24hschwimmen.json`. Nützlich zur Fehlerdiagnose oder als Sicherungskopie, falls Aktionen noch nicht übertragen wurden.
+
+### SQL-Datenbank-Backup
+
+**Wo:** Admin-Bereich  
+**Auslöser:** Schaltfläche „Backup SQL"
+
+Lädt die vollständige SQLite-Datenbank als `backup.sql` herunter (nur für Admin-Benutzer). Enthält alle Schwimmer, Aktionen und Clients. Geeignet als Vollsicherung vor dem Abschalten des Servers.
+
+## Logging
+
+Die Logging-Konfiguration befindet sich in `logging_config.py`.
+
+**Logdatei:** `data/serverlog.log` (relativ zum Projektverzeichnis, wird automatisch angelegt)
+
+Es gibt zwei Handler mit unabhängigen Leveln:
+
+| Handler | Standard-Level | Beschreibung |
+| --- | --- | --- |
+| `file_handler` | `DEBUG` | Schreibt alle Meldungen in die Logdatei |
+| `console_handler` | `INFO` | Gibt Meldungen auf der Konsole aus (sichtbar im Gunicorn-Log) |
+
+Um den Gunicorn-Output zu reduzieren, `console_handler.setLevel(logging.WARNING)` setzen. Einzelne häufige Meldungen können im Code von `logging.info(...)` auf `logging.debug(...)` umgestellt werden — sie erscheinen dann nur noch in der Datei, nicht mehr in der Konsole.
+
+## Windows-Firewall
+
+Gegebenenfalls muss die Windows-Firewall angepasst werden. Windows-Defender-Firewall -> Erweiterete Einstellungen -> Eingehende Regel -> Neue Regel anlegen -> Port 8080 freigeben
+
+## Spezialfunktionen
+
+Im view kann man:
+
+* mit ``Shift+D`` (Download) eine CSV-Datei herunterladen
+* mit ``Shift+G`` die Gruppentabelle ein und ausblenden
+* mit ``Shift+Z`` zwischen ein- und zweispaltiger Darstellung wechseln
+* mit ``Shift+N`` die Nachnamen ein- oder ausblenden
+* mit ``Shift+U`` die Anzeige zwischen Bahnen / Strecke wechseln
+* mit ``Shift+B`` ein Backup der Actions machen, welches man im Admin-Fenster wieder importieren könnte
+
+Auf der **Erfassungsseite** (`/v2`) gibt es außerdem den URL-Parameter `size`, der die Breite der Schwimmerkarten steuert (Standardwert: `5`, entspricht ca. 200 px pro Karte). Ein kleinerer Wert ist auf Smartphones hilfreich, damit zwei Karten nebeneinander in eine Zeile passen:
+
+```
+http://<server>:8080/v2?size=3
+```
+
+Wenn man die URL mit ``?dbgfkt=true`` lädt, kann durch anklicken der Überschrift *24h-Schwimmen* eine automatisches Klicken der vorhandenen DIVs simuliert werden.
+
 ## grobe Planung
 
 Ein Mini-Python-Webserver liefert eine HTML-Seite mit Javascript aus und registriert per send requests Bahnen der Schwimmer die auf einem Endgerät per klick erfasst werden. Ebenso liefert der Webserver Daten an die Webseite.
@@ -149,139 +310,6 @@ Hier ist eine Übersicht über die Verzeichnisstruktur des Projektes:
 ├── README.md           dieser Text
 └── requirements.txt    Für die Nutzung zu installierende Python-Module
 ```
-
-## Konfiguration (config.json)
-
-Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einstellungen:
-
-| Schlüssel | Beispielwert | Beschreibung |
-| --- | --- | --- |
-| `flask_secret_key` | `"Lang&Umständlich"` | Geheimer Schlüssel für Flask-Sessions – vor dem Live-Betrieb ändern |
-| `default_admin_pass` | `"swim24"` | Initiales Passwort für den Admin-Benutzer |
-| `laenge_schwimmerNr` | `3` | Anzahl Stellen der Schwimmernummer (z. B. 3 → 001–999) |
-| `laenge_bahn_m` | `100` | Länge einer Bahn in Metern (für Streckenberechnung) |
-| `fade_time` | `600` | **Nur v2-Oberfläche** (`/v2`): Sekunden seit dem letzten Klick, nach denen eine Schwimmerkarte blass dargestellt wird. Beim nächsten Betätigen von „Senden" wird der Schwimmer automatisch von der Bahn entfernt. `0` oder `-1` deaktiviert das Feature. |
-| `mobile_cards` | `2` | **Nur v2-Oberfläche**: Anzahl Schwimmerkarten pro Zeile auf kleinen Bildschirmen (≤ 600 px Breite). |
-| `view2_page_interval` | `5` | **View2-Seite** (`/view2`): Sekunden pro Seite bei aktiviertem Auto-Weiterblättern (Shift-Lock-Modus). |
-| `startzeit` | `"2025-06-14T08:00:00Z"` | **View- und View2-Seite**: Startzeitpunkt des Schwimmens als UTC-ISO-Timestamp. Legt den Beginn der Spezialzeiten (Tag1, Geisterstunde, Gute Nacht, Frühaufsteher, Tag2) fest. |
-
-Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
-
-## Schwimmer-Import (CSV)
-
-Im Admin-Bereich unter **Schwimmer** können Schwimmerdaten per CSV-Datei importiert werden.
-
-### Vorgehensweise
-
-1. CSV-Datei auswählen — die erste Zeile muss Spaltenüberschriften enthalten.
-2. Im Dialog wird jede **CSV-Spalte** (fett) einem **Datenbankfeld** zugeordnet. Nicht benötigte Spalten auf *Ignorieren* lassen.
-3. Pflichtfeld ist `nummer`. Alle anderen Felder sind optional.
-4. Klick auf **Importieren** überträgt die Daten.
-
-### Unterstützte Felder
-
-| Datenbankfeld | Bedeutung |
-| --- | --- |
-| `nummer` | Schwimmernummer (Pflicht, eindeutiger Schlüssel) |
-| `vorname` | Vorname |
-| `nachname` | Nachname |
-| `gruppe` | Gruppe / Team |
-| `istKind` | `1` = Kind, `0` = Erwachsener |
-| `istErw` | Alternative zu `istKind`: `0` = kein Erwachsener → wird intern als Kind (`istKind = 1`) gespeichert |
-
-### Verhalten bei bereits vorhandenen Schwimmern (Duplikate)
-
-Existiert ein Schwimmer mit der importierten Nummer bereits in der Datenbank, wird er **aktualisiert**, nicht doppelt angelegt:
-
-- **Aktualisiert:** `vorname`, `nachname`, `gruppe`, `istKind`
-- **Unverändert bleiben:** `bahnanzahl` (geschwommene Bahnen), `aktiv`-Status, Bahneinteilung
-
-So können Stammdaten (z. B. nach einer Namenskorrektur) gefahrlos neu importiert werden, ohne Bahndaten zu verlieren.
-
-## Datenexport am Ende des Wettkampfes
-
-Es gibt vier Möglichkeiten, die erfassten Daten zu exportieren. Für die Auswertung nach dem Wettkampf empfiehlt sich der CSV-Export.
-
-### CSV-Export der Schwimmerdaten (empfohlen)
-
-**Wo:** View-Seite (`/view`) oder View2-Seite (`/view2`)  
-**Auslöser:** Tastenkombination `Shift+D`
-
-Erzeugt die Datei `schwimmerdaten.csv` mit einer Zeile pro Schwimmer. Die Werte in den Spalten sind Meter (Bahnanzahl × Bahnlänge).
-
-| Spalte | Inhalt |
-| --- | --- |
-| `nummer` | Schwimmernummer |
-| `vorname` | Vorname |
-| `nachname` | Nachname |
-| `gruppe` | Gruppe / Team |
-| `bahnanzahl` | Gesamtstrecke in Metern |
-| `Tag1` | Strecke (m) im ersten Zeitabschnitt |
-| `Geisterstunde` | Strecke (m) in der Geisterstunde |
-| `Gute Nacht` | Strecke (m) im Nacht-Abschnitt |
-| `Frühaufsteher` | Strecke (m) im Frühaufsteher-Abschnitt |
-| `Tag2` | Strecke (m) im zweiten Tag-Abschnitt |
-
-Die Zeitgrenzen der Spezialzeiten werden relativ zur konfigurierten `startzeit` berechnet (siehe Konfiguration).
-
-### Aktions-Backup als JSON
-
-**Wo:** View-Seite (`/view`) oder View2-Seite (`/view2`)  
-**Auslöser:** Tastenkombination `Shift+B`
-
-Erzeugt die Datei `view_backup.json` mit allen bisher empfangenen Aktionen und dem aktuellen Schwimmerstand. Diese Datei kann im Admin-Bereich unter **Aktionen → JSON-Import** wieder eingespielt werden, um Daten von einem ausgefallenen Endgerät nachzuladen.
-
-### Lokaler JSON-Download (Erfassungsgerät)
-
-**Wo:** Haupt-Erfassungsseite (`/`)  
-**Auslöser:** Schaltfläche „Download JSON"
-
-Speichert den lokalen Zustand des Erfassungsgeräts (aktive Schwimmer, zwischengespeicherte Aktionen, Statusmeldungen) als `24hschwimmen.json`. Nützlich zur Fehlerdiagnose oder als Sicherungskopie, falls Aktionen noch nicht übertragen wurden.
-
-### SQL-Datenbank-Backup
-
-**Wo:** Admin-Bereich  
-**Auslöser:** Schaltfläche „Backup SQL"
-
-Lädt die vollständige SQLite-Datenbank als `backup.sql` herunter (nur für Admin-Benutzer). Enthält alle Schwimmer, Aktionen und Clients. Geeignet als Vollsicherung vor dem Abschalten des Servers.
-
-## Logging
-
-Die Logging-Konfiguration befindet sich in `logging_config.py`.
-
-**Logdatei:** `data/serverlog.log` (relativ zum Projektverzeichnis, wird automatisch angelegt)
-
-Es gibt zwei Handler mit unabhängigen Leveln:
-
-| Handler | Standard-Level | Beschreibung |
-| --- | --- | --- |
-| `file_handler` | `DEBUG` | Schreibt alle Meldungen in die Logdatei |
-| `console_handler` | `INFO` | Gibt Meldungen auf der Konsole aus (sichtbar im Gunicorn-Log) |
-
-Um den Gunicorn-Output zu reduzieren, `console_handler.setLevel(logging.WARNING)` setzen. Einzelne häufige Meldungen können im Code von `logging.info(...)` auf `logging.debug(...)` umgestellt werden — sie erscheinen dann nur noch in der Datei, nicht mehr in der Konsole.
-
-## Windows-Firewall
-
-Gegebenenfalls muss die Windows-Firewall angepasst werden. Windows-Defender-Firewall -> Erweiterete Einstellungen -> Eingehende Regel -> Neue Regel anlegen -> Port 8080 freigeben
-
-## Spezialfunktionen
-
-Im view kann man:
-
-* mit ``Shift+D`` eine CSV-Datei herunterladen
-* mit ``Shift+G`` die Gruppentabelle ein und ausblenden
-* mit ``Shift+Z`` zwischen ein- und zweispaltiger Darstellung wechseln
-* mit ``Shift+N`` die Nachnamen ein- oder ausblenden
-* mit ``Shift+U`` die Anzeige zwischen Bahnen / Strecke wechseln
-* mit ``Shift+B`` ein Backup der Actions machen, welches man im Admin-Fenster wieder importieren könnte
-
-Auf der **Erfassungsseite** (`/v2`) gibt es außerdem den URL-Parameter `size`, der die Breite der Schwimmerkarten steuert (Standardwert: `5`, entspricht ca. 200 px pro Karte). Ein kleinerer Wert ist auf Smartphones hilfreich, damit zwei Karten nebeneinander in eine Zeile passen:
-
-```
-http://<server>:8080/v2?size=3
-```
-
-Wenn man die URL mit ``?dbgfkt=true`` lädt, kann durch anklicken der Überschrift *24h-Schwimmen* eine automatisches Klicken der vorhandenen DIVs simuliert werden.
 
 ## Git-Workflow
 

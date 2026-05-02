@@ -201,6 +201,22 @@ def admin():
             if not db.update_schwimmer(int(nummer), **felder):
                 return "DB - Fehler", 400
             return "Erfolg", 200
+        elif action == 'edit_user':
+            user_id = data.get('id')
+            if not user_id:
+                return "Keine Benutzer-ID angegeben", 400
+            felder = {}
+            if 'name'  in data: felder['name']  = data.get('name', '').strip()
+            if 'admin' in data: felder['admin'] = 1 if data.get('admin') in (True, 1, '1', 'true', 'True') else 0
+            if 'passwort' in data and data.get('passwort', '').strip():
+                from werkzeug.security import generate_password_hash
+                felder['passwort'] = generate_password_hash(data['passwort'].strip())
+            if not felder:
+                return "Keine Felder zum Ändern angegeben", 400
+            logging.info(f"Benutzer {user_id} wird bearbeitet: { {k:v for k,v in felder.items() if k != 'passwort'} }")
+            if not db.update_benutzer_by_id(int(user_id), **felder):
+                return "DB - Fehler", 400
+            return "Erfolg", 200
         elif action == 'get_table_benutzer':
             return jsonify(db.liste_tabelle('benutzer'))
         elif action == 'get_table_clients':
@@ -276,6 +292,33 @@ def admin():
             print("Validierte", validierte)
 
             return jsonify({"status": "ok", "importiert": len(validierte)}), 200
+        elif action == 'import_benutzer':
+            benutzer_liste = data.get("data", [])
+            logging.info(f"Benutzer werden importiert - {len(benutzer_liste)} Einträge")
+            if not isinstance(benutzer_liste, list):
+                return jsonify({"error": "Datenformat ungültig"}), 400
+            neu = 0
+            aktualisiert = 0
+            for b in benutzer_liste:
+                benutzername = b.get("benutzername", "").strip().lower()
+                if not benutzername:
+                    continue
+                name = b.get("name", "").strip() or benutzername
+                passwort = b.get("passwort", "").strip()
+                admin_val = b.get("admin", "0")
+                is_admin = admin_val in (1, "1", "true", "True", True)
+                vorhandener = db.finde_benutzer_by_username(benutzername)
+                if vorhandener:
+                    db.update_benutzer(benutzername, name=name, admin=int(is_admin))
+                    if passwort:
+                        db.passwort_aendern(benutzername, passwort)
+                    aktualisiert += 1
+                else:
+                    pw = passwort if passwort else generiere_passwort()
+                    db.erstelle_benutzer(name, benutzername, pw, admin=is_admin)
+                    neu += 1
+            logging.info(f"Benutzer-Import: {neu} neu, {aktualisiert} aktualisiert")
+            return jsonify({"status": "ok", "importiert": neu + aktualisiert, "neu": neu, "aktualisiert": aktualisiert}), 200
         elif action:
             return f"Unknown Action {action}", 400
 

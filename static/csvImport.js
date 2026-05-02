@@ -64,14 +64,18 @@ export function initCSVImport(fileInputSelector, previewContainerSelector, sendB
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    action: 'import_schwimmer',
+                    action: options.action || 'import_schwimmer',
                     data: parsedData
                 })
             });
             const result = await response.json();
-            showStatusMessage(`Es wurden ${result['importiert']} Schwimmer importiert bzw. aktualisiert`);
+            const label = options.importLabel || 'Einträge';
+            const detail = (result['neu'] != null)
+                ? `${result['neu']} neu, ${result['aktualisiert']} aktualisiert`
+                : `${result['importiert']} importiert bzw. aktualisiert`;
+            showStatusMessage(`${label}: ${detail}`);
         } catch (error) {
-            showStatusMessage(`Fehler beim Import der Schwimmer`);
+            showStatusMessage(`Fehler beim Import`, false);
         }
     });
 }
