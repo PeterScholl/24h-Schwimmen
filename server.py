@@ -443,7 +443,7 @@ def action():
             
             if kommando == "ADD":
                 # ADD - Action muss dokumentiert werden
-                # Prrüfung, ob diese schon vorhanden war!!!
+                # Prüfung, ob diese schon vorhanden war!!!
                 anz = db.erstelle_action(user, client_id=clientid, zeitstempel=str(timestamp), kommando=str(kommando), parameter=json.dumps(parameter))
                 logging.debug(f"Aktion ist eingetragen: {"NEW" if anz>0 else "EXISTED"}")
                 if (anz>0):

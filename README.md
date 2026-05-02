@@ -155,6 +155,30 @@ Speichert den lokalen Zustand des Erfassungsgeräts (aktive Schwimmer, zwischeng
 
 Lädt die vollständige SQLite-Datenbank als `backup.sql` herunter (nur für Admin-Benutzer). Enthält alle Schwimmer, Aktionen und Clients. Geeignet als Vollsicherung vor dem Abschalten des Servers.
 
+## Bahnkorrektur durch den Admin
+
+Meldet ein Schwimmer, dass eine Bahn fälschlicherweise nicht oder zu oft gezählt wurde, kann der Admin im Admin-Bereich unter **Checks → Korrektur-ADD** manuell einen Korrekturbefehl absetzen.
+
+### Schritte
+
+1. Admin-Bereich öffnen und **Checks** in der Navigationsleiste auswählen.
+1. Im Abschnitt **Korrektur-ADD** die Felder ausfüllen:
+
+| Feld | Bedeutung |
+| --- | --- |
+| Schwimmernr. | Nummer des betroffenen Schwimmers |
+| Anzahl | Zu addierende Bahnen — positiv zum Hinzufügen, negativ zum Abziehen |
+| Bahnnr. | Bahn, der die Korrektur zugeordnet wird |
+| Kommentar | Freitext zur Nachvollziehbarkeit (Vorbesetzung: `correction`) |
+
+1. Klick auf **ADD senden** überträgt den Befehl sofort an den Server.
+
+### Hinweise zur Korrektur
+
+* Der Kommentar wird als vierter Eintrag im Parameter-Array der Action gespeichert und ist damit im **SchwimmerLog** sowie in der Actions-Tabelle nachvollziehbar.
+* Korrekturbuchungen erscheinen wie reguläre ADD-Aktionen in der Auswertung und im CSV-Export.
+* Eine versehentlich zu viel gezählte Bahn wird durch `Anzahl = -1` korrigiert, eine fehlende Bahn durch `Anzahl = +1`.
+
 ## Logging
 
 Die Logging-Konfiguration befindet sich in `logging_config.py`.

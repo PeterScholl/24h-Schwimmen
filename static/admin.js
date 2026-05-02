@@ -745,7 +745,72 @@ function showChecksSection() {
     let table = document.createElement('table');
     table.id = "checkAnzahlenTable";
     checkSection.appendChild(table);
+    checkSection.appendChild(document.createElement('hr'));
     let heading = document.createElement('h2');
+    heading.innerText = "Korrektur-ADD";
+    checkSection.appendChild(heading);
+
+    const corrForm = document.createElement('div');
+    corrForm.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:12px;';
+
+    function labeledInput(labelText, type, value, min) {
+        const wrap = document.createElement('label');
+        wrap.style.cssText = 'display:flex;flex-direction:column;font-size:0.9rem;';
+        wrap.textContent = labelText;
+        const inp = document.createElement('input');
+        inp.type = type;
+        inp.value = value;
+        if (min !== undefined) inp.min = min;
+        inp.style.cssText = 'width:6em;padding:4px;margin-top:2px;';
+        wrap.appendChild(inp);
+        return { wrap, inp };
+    }
+
+    const { wrap: wNr,   inp: inpNr   } = labeledInput('Schwimmernr.', 'number', '1', '1');
+    const { wrap: wAnz,  inp: inpAnz  } = labeledInput('Anzahl',       'number', '1');
+    const { wrap: wBahn, inp: inpBahn } = labeledInput('Bahnnr.',       'number', '1', '0');
+    const { wrap: wText, inp: inpText } = labeledInput('Kommentar',     'text',   'correction');
+    inpText.style.cssText = 'width:12em;padding:4px;margin-top:2px;';
+
+    const sendBtn = document.createElement('button');
+    sendBtn.textContent = 'ADD senden';
+    sendBtn.style.cssText = 'padding:6px 14px;cursor:pointer;';
+    sendBtn.addEventListener('click', async () => {
+        const nummer = parseInt(inpNr.value);
+        const anzahl = parseInt(inpAnz.value);
+        const bahnnr = parseInt(inpBahn.value);
+        const kommentar = inpText.value.trim() || 'correction';
+        if (isNaN(nummer) || nummer < 1 || isNaN(anzahl) || isNaN(bahnnr)) {
+            showStatusMessage('Ungültige Eingabe', false);
+            return;
+        }
+        try {
+            const response = await fetch('/action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify([{
+                    kommando: 'ADD',
+                    parameter: [nummer, anzahl, bahnnr, kommentar],
+                    timestamp: new Date().toISOString()
+                }])
+            });
+            const result = await response.json();
+            const status = result?.results?.[0]?.status ?? '?';
+            showStatusMessage(`ADD gesendet — Status: ${status}`, response.ok && status === 'erfolgreich');
+        } catch (err) {
+            showStatusMessage(`Netzwerkfehler: ${err}`, false);
+        }
+    });
+
+    corrForm.appendChild(wNr);
+    corrForm.appendChild(wAnz);
+    corrForm.appendChild(wBahn);
+    corrForm.appendChild(wText);
+    corrForm.appendChild(sendBtn);
+    checkSection.appendChild(corrForm);
+
+    checkSection.appendChild(document.createElement('hr'));
+    heading = document.createElement('h2');
     heading.innerText = "ACTIONS importieren (JSON)";
     checkSection.appendChild(heading);
     // Bereich für die ImportDaten
