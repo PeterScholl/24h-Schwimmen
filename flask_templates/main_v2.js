@@ -107,6 +107,7 @@ function schwimmerHinzufuegen(nummer) {
             schwimmer.push(neuer);
         }
     }
+    render();
 }
 
 function fillSchwimmerAusMeinenBahnen() {
