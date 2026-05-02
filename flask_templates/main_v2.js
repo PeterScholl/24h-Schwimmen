@@ -1,6 +1,7 @@
 import { schwimmerNummerErfragen, showStatusMessage } from './mymodals.js'
 
 const schwimmerNrLength = parseInt("{{schwimmerNrLen}}");
+const fadeTime = parseInt("{{fadeTime}}") || 0; // Sekunden bis Schwimmer als abgelaufen gilt (0 = deaktiviert)
 const DEBUG = false;
 
 function logMessage(text, isSuccess = true) {
@@ -11,45 +12,44 @@ function logMessage(text, isSuccess = true) {
     });
 }
 
-let formIsDirty = false; // Flag, das anzeigt, ob Daten geändert wurden
-// Beim Verlassen der Seite warnen, falls Änderungen vorhanden sind
+let formIsDirty = false;
 window.addEventListener('beforeunload', function (event) {
-    if (formIsDirty) {
+    if (formIsDirty || selectedNummern.size > 0) {
         event.preventDefault();
-        // Zeigt eine Bestätigungsmeldung an, wenn der Benutzer versucht, die Seite zu verlassen
         const message = "Es gibt ungespeicherte Änderungen. Möchten Sie die Seite wirklich verlassen?";
-        //event.returnValue = message;  // Laut Chat-GPT Standard für viele Browser
-        return message; // Für einige andere Browser
+        return message;
     }
 });
 
-let verwaltete_bahnen = [7]; //Liste der Bahnen, die von diesem Client verwaltet werden
+let verwaltete_bahnen = [7];
 const input = document.getElementById("bahnen");
 if (isBahnenInputValid(input.value)) {
     verwaltete_bahnen = input.value.split(",").map(s => parseInt(s.trim(), 10));
-    //console.log("Verwaltete Bahnen", verwaltete_bahnen);
 }
 
 // Daten schwimmer und actions
 let schwimmer = [];
 let actions = [];
 let statMessages = [];
-let alleSchwimmer = {}; // Beinhaltet die Schwimmer in der Datenbank in einem Dictionary mit nummer als Key
+let alleSchwimmer = {};
 
-let longPressTimer; // Variable für den Timer um einen Longpress von einem Touchmove zu unterscheiden
+// Ausgewählte Schwimmer (warten auf Senden)
+const selectedNummern = new Map(); // nummer → ISO-Timestamp des Klickzeitpunkts
+
+// Sortierung: 'zeit' (nach Priorität/Aktivität) oder 'nummer' (aufsteigend nach Schwimmernummer)
+let sortModus = 'zeit';
+
+let longPressTimer;
 
 document.getElementById('schwimmerHinzufuegen').addEventListener('click', promptSchwimmerHinzufuegen);
 document.getElementById('downloadJsonBtn').addEventListener('click', downloadJSON);
+document.getElementById('sendenBtn').addEventListener('click', senden);
 
 async function promptSchwimmerHinzufuegen() {
-    // var nummer = prompt("Nummer:");
     var nummer = await schwimmerNummerErfragen(schwimmerNrLength);
     console.log("Erfrage Nummer:", nummer);
 
-    if (nummer == null) {
-        // Modal wurde geschlossen
-        return
-    }
+    if (nummer == null) return;
 
     if (!(nummer !== null && nummer.trim() !== "" && !isNaN(nummer))) {
         showStatusMessage("Ungültige Schwimmernummer", false);
@@ -62,16 +62,13 @@ async function promptSchwimmerHinzufuegen() {
 function schwimmerHinzufuegen(nummer) {
     console.debug("Schwimmer Nr. ", nummer, "wird gesucht...");
 
-    // Der gesuchte Schwimmer soll auf jeden Fall oben in die Liste
     const maxPrio = Math.max(Math.max(...schwimmer.map(s => s.prio)), 0);
 
-    //Wenn der schwimmer schon in der Liste schwimmer ist, wird seine Priorität auf das aktuelle Maximum gesetzt
     const aktiver = schwimmer.find(s => s.nummer == nummer);
     if (aktiver) {
         console.debug("... aktiver Schwimmer");
-        // prio auf max
         aktiver.prio = maxPrio + 1;
-    } else { //Wenn der schwimmer in der Liste alleSchwimmer ist, wird er in die Liste schwimmer übernommen ...
+    } else {
         fetchSchwimmer(nummer);
         const bekannter = alleSchwimmer[parseInt(nummer)] ?? null;
         if (bekannter) {
@@ -89,7 +86,6 @@ function schwimmerHinzufuegen(nummer) {
             } else {
                 scopy.aufBahn = bekannter.auf_bahn;
             }
-            console.log("SchwimmerKopie", scopy);
             schwimmer.push(scopy);
             actions.push({
                 kommando: "ACT",
@@ -97,7 +93,7 @@ function schwimmerHinzufuegen(nummer) {
                 timestamp: new Date().toISOString(),
                 transmitted: false
             });
-        } else { //Ansonsten wird er in der Liste Schwimmer neu erzeugt
+        } else {
             console.debug("Schwimmer war nicht bekannt");
             const neuer = {
                 nummer: parseInt(nummer),
@@ -119,7 +115,6 @@ function fillSchwimmerAusMeinenBahnen() {
     });
     console.log("Alle Schwimmer Values", alleSchwimmerValues);
     const meineSchwimmer = alleSchwimmerValues.filter(s => verwaltete_bahnen.includes(s.auf_bahn) && s.aktiv == 1);
-    // Alle Schwimmer die davon noch nicht in schwimmer sind einfügen
     meineSchwimmer.forEach(s_neu => {
         console.log("Prüfe: ", s_neu);
         if (!schwimmer.some(s => s.nummer == s_neu.nummer)) {
@@ -130,71 +125,46 @@ function fillSchwimmerAusMeinenBahnen() {
                 bahnen: s_neu.bahnanzahl,
                 aktiv: true,
                 aufBahn: s_neu.auf_bahn,
-                prio: 0 //hinten anfügen
+                prio: 0
             };
-            console.log("SchwimmerKopie", scopy);
             schwimmer.push(scopy);
         }
     });
 }
 
 function toggleInfoBar() {
-    // Das Info-Bar-Element auswählen
     const infoBar = document.getElementById("infoBar");
-
-    // Überprüfen, ob die Info-Leiste gerade sichtbar ist
     if (infoBar.style.display === "none" || infoBar.style.display === "") {
-        // Info-Leiste einblenden
         infoBar.style.display = "flex";
     } else {
-        // Info-Leiste ausblenden
         infoBar.style.display = "none";
     }
 }
 
-
 function downloadJSON() {
-    // Daten für JSON-Umwandlung in ein Dictionary packen
     const data = { "schwimmer": schwimmer, "alleSchwimmer": alleSchwimmer, "actions": actions, "statMessages": statMessages };
-
-    // In JSON-Text umwandeln
     const jsonString = JSON.stringify(data, null, 2);
-
-    // Blob erstellen (Dateiobjekt)
     const blob = new Blob([jsonString], { type: "application/json" });
-
-    // Temporären Download-Link erstellen
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.download = "24hschwimmen.json";
-
-    // Link klicken (Download starten)
     document.body.appendChild(link);
     link.click();
-
-    // Aufräumen
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
 }
 
 function isBahnenInputValid(value) {
-    // Prüft, ob der Eingabewert eine durch Kommas getrennte Liste von Zahlen ist,
-    // z. B. "3", "1,2", "10,20,30", aber kein leerer String.
-    // Regulärer Ausdruck:
-    // ^         → Anfang des Strings
-    // \d+       → mindestens eine Ziffer
-    // (,\d+)*   → optional beliebig viele Gruppen aus Komma gefolgt von mindestens einer Ziffer
-    // $         → Ende des Strings
     return /^(\d+(,\d+)*)$/.test(value.trim());
 }
 
 function checkBahnenInput() {
     const input = document.getElementById("bahnen");
     if (isBahnenInputValid(input.value)) {
-        input.style.backgroundColor = ""; // gültig
+        input.style.backgroundColor = "";
     } else {
-        input.style.backgroundColor = "#fdd"; // ungültig (rot)
+        input.style.backgroundColor = "#fdd";
     }
 }
 
@@ -203,156 +173,111 @@ function parseBahnenInput() {
     if (isBahnenInputValid(input.value)) {
         input.blur();
         const zahlen = input.value.split(",").map(s => parseInt(s.trim(), 10));
-        console.log("Gültige Bahnnummern:", zahlen);
         verwaltete_bahnen = zahlen;
         showStatusMessage("Bahnen geändert", true, 1000);
         fetchSchwimmerVonBahnen();
         fillSchwimmerAusMeinenBahnen();
-    } else { //Fehlerhafte Bahnnummern
+    } else {
         showStatusMessage("Ungültiges Format! Bitte nur Zahlen, getrennt durch Kommas.", false);
         input.value = verwaltete_bahnen.join(',');
-        checkBahnenInput(); //Farbe wieder richtig setzen
+        checkBahnenInput();
     }
 }
 
 const contextMenu = document.getElementById("contextMenu");
-let clickedDiv = null; //Wenn auf ein Div geklickt wird - merken
+let clickedDiv = null;
 
 // **********************************************************
 //   Behandlung und Verarbeitung der DIV-Darstellung
 // **********************************************************
 const container = document.getElementById('container');
 
-// Map für laufende Fade-Operationen - soll auf ein DIV nach einem Klick angewandt werden
-const fadeControllers = new Map();
-//window.__fadeControllers = fadeControllers; // Fürs debuggen sichtbar machen
+// Senden-Button: Anzahl ausgewählter Schwimmer anzeigen
+function updateSendenButton() {
+    const count = selectedNummern.size;
+    document.getElementById('sendenCount').textContent = count;
+    document.getElementById('sendenBtn').style.opacity = count > 0 ? '1' : '0.4';
+}
 
-// Fading-Funktion blendet ein Div langsam aus
-async function fadeOut(div, duration = 3000) {
-    return new Promise((resolve, reject) => {
-        let opacity = 1;
-        const interval = 50;
-        const decrement = interval / duration;
+// Alle ausgewählten Schwimmer verarbeiten und zum Server senden
+function senden() {
+    // Abgelaufene Schwimmer: prio >= fadeTime und nicht manuell ausgewählt
+    const expiredNummern = (fadeTime > 0)
+        ? schwimmer.filter(s => s.prio >= fadeTime && !selectedNummern.has(s.nummer)).map(s => s.nummer)
+        : [];
 
-        const controller = fadeControllers.get(Number(div.dataset.nummer));
+    if (selectedNummern.size === 0 && expiredNummern.length === 0) return;
 
-        if (!controller || controller.signal.aborted) {
-            return reject('Fade abgebrochen 1');
-        }
-
-        const fade = setInterval(() => {
-            if (!controller || controller.signal.aborted) {
-                clearInterval(fade);
-                div.style.opacity = 1;
-                return reject('Fade abgebrochen 2');
-            }
-            opacity -= decrement;
-            div.style.opacity = opacity;
-            if (opacity <= 0) {
-                clearInterval(fade);
-                resolve();
-            }
-        }, interval);
+    // Abgelaufene Schwimmer automatisch entfernen (wie Wischen nach links)
+    expiredNummern.forEach(nummer => {
+        const div = container.querySelector(`.schwimmer[data-nummer="${nummer}"]`);
+        if (div) removeSchwimmerDiv(div, true, false);
     });
+
+    // Ausgewählte Schwimmer verarbeiten
+    selectedNummern.forEach((clickTimestamp, nummer) => {
+        const s_data = schwimmer.find(s => s.nummer == nummer);
+        if (s_data) {
+            if (!s_data.aufBahn || !verwaltete_bahnen.includes(s_data.aufBahn)) {
+                s_data.aufBahn = verwaltete_bahnen[0];
+            }
+            s_data.prio = 0;
+            s_data.bahnen = Math.max(s_data.bahnen, alleSchwimmer[nummer] ? alleSchwimmer[nummer].bahnanzahl : 0);
+            s_data.bahnen += 1;
+            actions.push({
+                kommando: "ADD",
+                parameter: [nummer, 1, s_data.aufBahn],
+                timestamp: clickTimestamp,
+                transmitted: false
+            });
+        }
+    });
+
+    selectedNummern.clear();
+    updateFormIsDirty(true);
+    render();
+    transmitActions();
+    updateSendenButton();
 }
 
-
-// Angezeigte Bahnen in einem Schwimmer-Div verändern
-function aendereBahnenInDiv(div, anz) {
-    // Finde das span mit der Klasse "bahnen"
-    const bahnenSpan = div.querySelector('.bahnen');
-    // Extrahiere die Zahl aus dem Textinhalt des span
-    let bahnen = parseInt(bahnenSpan.textContent.match(/\d+/)[0], 10);
-    // Ändere um Anzahl
-    bahnen += anz;
-    // Setze die neue Zahl im span
-    bahnenSpan.textContent = `(${bahnen})`;
-}
-
-// Click auf ein Element in dem Container mit den Schimmern
-container.addEventListener('click', async (event) => {
+// Klick auf Schwimmer-Div: auswählen / abwählen
+container.addEventListener('click', (event) => {
     const clicked_schwimmer = event.target.closest('.schwimmer');
-    console.log("Klick in Container", clicked_schwimmer);
-
-    if (!clicked_schwimmer || !container.contains(clicked_schwimmer)) {
-        return; // Klick war außerhalb eines Box-Elements
-    }
+    if (!clicked_schwimmer || !container.contains(clicked_schwimmer)) return;
 
     const nummer = parseInt(clicked_schwimmer.dataset.nummer);
-    clicked_schwimmer.style.backgroundColor = "aqua";
-    console.log(`Schwimmer ${nummer} wurde geklickt.`);
-    // Falls schon ein Fade läuft: abbrechen
-    if (fadeControllers.has(nummer)) {
-        fadeControllers.get(nummer).abort();
-        fadeControllers.delete(nummer);
-        clicked_schwimmer.style.opacity = 1; // sofort wieder sichtbar
-        //Angezeigte Bahn wieder um eins Verringern
-        aendereBahnenInDiv(clicked_schwimmer, -1);
-        clicked_schwimmer.style.backgroundColor = "";
-        //console.log(`Fade von Div ${nummer} abgebrochen.`);
-        return;
-    }
 
-    // Angezeigte Bahn um eins erhöhen
-    aendereBahnenInDiv(clicked_schwimmer, 1);
-
-    // Neuen Controller speichern
-    const controller = new AbortController();
-    fadeControllers.set(nummer, controller);
-
-    try {
-        await fadeOut(clicked_schwimmer);
-        if (fadeControllers.has(nummer)) {
-            fadeControllers.delete(nummer);
-            console.log(`Aktion nach Fade von Div ${nummer} ausführen.`);
-            // Hier deine eigentliche Klick-Aktion!
-            const s_data = schwimmer.find(s => s.nummer == nummer);
-            console.log("s_data", s_data);
-            if (s_data) {
-                console.log("Schwimmer: Bahnen erhöhen und Prio auf 0 setzen", s_data);
-                if (!s_data.aufBahn || !verwaltete_bahnen.includes(s_data.aufBahn)) {
-                    console.log(`Bahn des Schwimmers ${nummer} auf ${verwaltete_bahnen[0]} gesetzt`);
-                    s_data.aufBahn = verwaltete_bahnen[0];
-                }
-                s_data.prio = 0;
-                //Evtl. genauere Daten in alleSchwimmer
-                s_data.bahnen = Math.max(s_data.bahnen, alleSchwimmer[nummer] ? alleSchwimmer[nummer].bahnanzahl : 0);
-                s_data.bahnen += 1;
-
-                clicked_schwimmer.style.opacity = '';
-                render();
-                actions.push({
-                    kommando: "ADD",
-                    parameter: [nummer, 1, s_data.aufBahn],
-                    timestamp: new Date().toISOString(),
-                    transmitted: false
-                });
-                updateFormIsDirty(true);
-
-            }
+    if (selectedNummern.has(nummer)) {
+        // Abwählen
+        selectedNummern.delete(nummer);
+        clicked_schwimmer.classList.remove('selected');
+        // Hintergrundfarbe wiederherstellen
+        const s_data = schwimmer.find(s => s.nummer == nummer);
+        if (s_data && !verwaltete_bahnen.includes(s_data.aufBahn)) {
+            clicked_schwimmer.style.backgroundColor = "#b8d4ea";
+        } else {
+            clicked_schwimmer.style.removeProperty("background-color");
         }
-    } catch (e) {
-        console.log(e);
+    } else {
+        // Auswählen
+        selectedNummern.set(nummer, new Date().toISOString());
+        clicked_schwimmer.classList.add('selected');
+        clicked_schwimmer.style.removeProperty("background-color"); // CSS-Klasse übernimmt Farbe
     }
+
+    updateSendenButton();
 });
 
 // Kontextmenü bei Rechtsklick auf Schwimmer div
 container.addEventListener('contextmenu', function (event) {
     const clicked_schwimmer = event.target.closest('.schwimmer');
-    console.log("RechtsKlick in Container", clicked_schwimmer);
+    if (!clicked_schwimmer || !container.contains(clicked_schwimmer)) return;
 
-    if (!clicked_schwimmer || !container.contains(clicked_schwimmer)) {
-        return; // Klick war außerhalb eines Box-Elements
-    }
-
-    event.preventDefault(); // Standard-Rechtsklick unterdrücken
+    event.preventDefault();
     clickedDiv = clicked_schwimmer;
-
-    // Menü an Mausposition anzeigen
     showSchwimmerContextMenu(event.pageX, event.pageY);
 });
 
-// Kontextmenü ausblenden bei Klick außerhalb
 document.addEventListener("click", function (e) {
     if (!contextMenu.contains(e.target)) {
         contextMenu.style.display = "none";
@@ -360,22 +285,18 @@ document.addEventListener("click", function (e) {
 });
 document.addEventListener("contextmenu", function (e) {
     const clicked_schwimmer = e.target.closest('.schwimmer');
-    console.log("RechtsKlick in Container", clicked_schwimmer);
-
     if (!clicked_schwimmer || !container.contains(clicked_schwimmer)) {
         contextMenu.style.display = "none";
     }
 });
 
 function showSchwimmerContextMenu(x, y) {
-    // Optionalanzeige "Fremdbahnen entfernen" nur einblenden, wenn Fremdschwimmer da sind
     const nurEigene = document.getElementById("nurEigene");
     if (schwimmer.some(s => !verwaltete_bahnen.includes(s.aufBahn))) {
         nurEigene.style.display = "block";
     } else {
         nurEigene.style.display = "none";
     }
-    // Bahn abziehen nur Anzeigen, wenn Anzahl größer 0
     const s_data = schwimmer.find(s => s.nummer == parseInt(clickedDiv.dataset.nummer));
     const bahnAbziehen = document.getElementById("rundeAbziehenOption");
     if (!s_data || s_data.bahnen <= 0) {
@@ -383,118 +304,106 @@ function showSchwimmerContextMenu(x, y) {
     } else {
         bahnAbziehen.style.display = "block";
     }
-    // Erst anzeigen, damit offsetWidth/Height korrekt bestimmt werden können
-    // dann so platzieren das das Menü nicht über den Rand hinaus ragt.
     contextMenu.style.display = "block";
     contextMenu.style.top = "0px";
-    contextMenu.style.left = "0px"; // Temporär platzieren
+    contextMenu.style.left = "0px";
 
     const menuWidth = contextMenu.offsetWidth;
     const menuHeight = contextMenu.offsetHeight;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    // Berechnete Position korrigieren, falls über den Rand
     const posX = (x + menuWidth > viewportWidth) ? viewportWidth - menuWidth - 5 : x;
     const posY = (y + menuHeight > viewportHeight) ? viewportHeight - menuHeight - 5 : y;
 
     contextMenu.style.left = `${Math.max(posX, 0)}px`;
     contextMenu.style.top = `${Math.max(posY, 0)}px`;
-
 }
 
 function addSwipeHandler(div) {
     let startX = 0;
-    let currentX = 0;
     let swipedleft = false;
     let swipedright = false;
+    const threshold = 70; // px bis Aktion ausgelöst wird
 
-    const threshold = div.offsetWidth / 4; // Funktioniert nur, wenn das div schon gerendert ist
-    //const threshold = div.getBoundingClientRect().width; //Alternative
-    //console.log("Threshold: ",threshold);
-    const maxmovedist = 1.5 * threshold;
+    function resetDiv() {
+        div.style.transition = 'transform 0.2s ease, background-color 0.2s ease';
+        div.style.transform = 'translateX(0)';
+        div.style.backgroundColor = '';
+        div.style.zIndex = '';
+    }
 
     div.addEventListener('touchstart', e => {
         longPressTimer = setTimeout(() => {
             showSchwimmerContextMenu(e.touches[0].clientX, e.touches[0].clientY);
-        }, 600); // Dauer in mx
-        if (fadeControllers.has(Number(div.dataset.nummer))) {
-            return;             // bricht die weitere Verarbeitung ab, wenn das Objekt gerade fadet
-        }
+        }, 600);
 
-        //e.preventDefault(); /* dann geht kein Klicken mehr */
+        swipedleft = false;
+        swipedright = false;
         div.dataset.swiping = "true";
         startX = e.touches[0].clientX;
         div.style.zIndex = '1000';
-        div.style.transition = 'none'; // Bewegung ohne Übergang - folgt dem Finger sofort
+        div.style.transition = 'none';
     }, { passive: false });
 
     div.addEventListener('touchmove', e => {
         clearTimeout(longPressTimer);
         e.preventDefault();
-        if (div.dataset.swiping != "true") {
-            return;             // bricht die weitere Verarbeitung ab wenn touchstart schon abgebrochen wurde
-        }
+        if (div.dataset.swiping != "true") return;
 
-        currentX = e.touches[0].clientX;
-        const deltaX = Math.max(-maxmovedist, Math.min(maxmovedist, currentX - startX));
+        const deltaX = e.touches[0].clientX - startX;
+        // Horizontale Bewegung begrenzen
+        const clamped = Math.max(-220, Math.min(220, deltaX));
+        div.style.transform = `translateX(${clamped}px)`;
 
-        div.style.transform = `translateX(${deltaX}px)`;
-
-        // Wenn mehr als die Hälfte verschoben → Farbe ändern
-        if (deltaX > threshold) {
-            div.style.backgroundColor = 'lightgreen';
-            div.style.transform = `translate(${deltaX}px,${3 * (deltaX - threshold)}px)`;
-            swipedright = true;
-        } else if (deltaX < -threshold) {
-            div.style.backgroundColor = 'red';
-            div.style.transform = `translateX(${2 * deltaX + threshold}px) scale(${(deltaX + 1.2 * maxmovedist) / (1.2 * maxmovedist - threshold)})`;
+        if (clamped < -threshold) {
+            div.style.backgroundColor = '#ef9a9a'; // helles Rot
             swipedleft = true;
+            swipedright = false;
+        } else if (clamped > threshold) {
+            div.style.backgroundColor = '#a5d6a7'; // helles Grün
+            swipedright = true;
+            swipedleft = false;
         } else {
             div.style.backgroundColor = '';
             swipedleft = false;
             swipedright = false;
         }
-    }, { passive: false }); // wichtig ?!
+    }, { passive: false });
 
     div.addEventListener('touchend', () => {
         clearTimeout(longPressTimer);
-        if (div.dataset.swiping != "true") {
-            return;             // bricht die weitere Verarbeitung ab, wenn touchstart wg. Fading schon unterbunden wurde
-        }
+        if (div.dataset.swiping != "true") return;
         delete div.dataset.swiping;
+
         if (swipedleft) {
             swipedleft = false;
-            removeSchwimmerDiv(div);
+            // Karte nach links herausschieben, dann entfernen
+            div.style.transition = 'transform 0.25s ease, opacity 0.25s ease';
+            div.style.transform = 'translateX(-130%)';
+            div.style.opacity = '0';
+            setTimeout(() => removeSchwimmerDiv(div), 260);
         } else if (swipedright) {
-            // Schiebe das Element ans Ende der Liste
-            schwimmer.forEach(s => { if (s.nummer === parseInt(div.dataset.nummer)) s.prio = 0; });
-            // zurücksetzen
             swipedright = false;
-            div.style.transform = 'translateX(0)';
-            div.style.backgroundColor = '';
-            div.style.zIndex = '';
-            render();
+            schwimmer.forEach(s => { if (s.nummer === parseInt(div.dataset.nummer)) s.prio = 0; });
+            // Karte zurückfedern, dann Neuordnung via FLIP-Animation in render()
+            resetDiv();
+            setTimeout(() => render(), 220);
         } else {
-            div.style.transition = 'transform 0.2s ease'; //Springt zurück
-            // zurücksetzen
-            div.style.transform = 'translateX(0)';
-            div.style.backgroundColor = '';
-            div.style.zIndex = '';
+            resetDiv();
         }
     });
 }
 
 function removeSchwimmerDiv(div, setinactive = true, dorender = true) {
-    // Abgleich der Daten in alleSchwimmer mit den Daten des Schwimmers der entfernt wird.
-    // entferne das Element (du hast das bereits implementiert)
     div.style.opacity = 0;
-    const index = schwimmer.findIndex(s => parseInt(s.nummer) == parseInt(div.dataset.nummer));
+    const nummer = parseInt(div.dataset.nummer);
+    selectedNummern.delete(nummer);
+    updateSendenButton();
+    const index = schwimmer.findIndex(s => parseInt(s.nummer) == nummer);
     if (index !== -1) {
         let entfernterSchwimmer = schwimmer[index];
-        schwimmer.splice(index, 1); //lösche einen Eintrag an Stelle index
-        // Aktualisiere die Daten in alleSchwimmer - Bahnen reicht
-        // console.log(`entfernter Schwimmer ${entfernterSchwimmer.nummer} hat bisher ${alleSchwimmer[entfernterSchwimmer.nummer].bahnanzahl} Bahnen`);
+        schwimmer.splice(index, 1);
         if (alleSchwimmer[entfernterSchwimmer.nummer]) {
             alleSchwimmer[entfernterSchwimmer.nummer].bahnanzahl = Math.max(alleSchwimmer[entfernterSchwimmer.nummer].bahnanzahl, entfernterSchwimmer.bahnen);
         }
@@ -506,39 +415,40 @@ function removeSchwimmerDiv(div, setinactive = true, dorender = true) {
                 timestamp: new Date().toISOString(),
                 transmitted: false
             });
+            updateFormIsDirty(true);
+            transmitActions();
         }
     }
-    //div.remove();
     if (dorender) render();
 }
 
 function render() {
     const container = document.getElementById("container");
 
-    // 1. Aktuelle Positionen merken (First)
     const firstRects = new Map();
-    // 2. Vorhandene Schwimmernummern sammeln
     const existingDivs = new Map();
     container.querySelectorAll(".schwimmer").forEach(div => {
-        firstRects.set(Number(div.dataset.nummer), div.getBoundingClientRect());
+        firstRects.set(div.dataset.nummer, div.getBoundingClientRect());
         existingDivs.set(Number(div.dataset.nummer), div);
     });
 
-    const sortedSchwimmer = [...schwimmer].sort((a, b) => a.prio - b.prio); //umgekehrt sortiert
+    // insertBefore(div, firstChild) kehrt die Reihenfolge um →
+    // für 'nummer' absteigend sortieren, damit DOM aufsteigend (000 zuerst) erscheint
+    const sortedSchwimmer = sortModus === 'nummer'
+        ? [...schwimmer].sort((a, b) => b.nummer - a.nummer)
+        : [...schwimmer].sort((a, b) => a.prio - b.prio);
     const aktuelleSNummern = new Set(sortedSchwimmer.map(s => s.nummer));
 
-    // Divs ausblenden, die nicht mehr in aktuelle Nummern vorhanden sind
     existingDivs.forEach((div, nummer) => {
         if (!aktuelleSNummern.has(nummer)) {
             div.classList.add("fade-out");
             div.style.transition = "opacity 300ms, transform 300ms";
             div.style.opacity = 0;
             div.style.transform = "scale(0.9)";
-            setTimeout(() => div.remove(), 300); // Entfernen nach Animation
+            setTimeout(() => div.remove(), 300);
         }
     });
 
-    // Divs nach priorität sortiert in den Container setzen
     sortedSchwimmer.forEach((s) => {
         let div = existingDivs.get(s.nummer);
 
@@ -546,12 +456,12 @@ function render() {
             div = document.createElement("div");
             div.className = "schwimmer";
             div.dataset.nummer = s.nummer;
-            container.appendChild(div); //Notwendig, da sonst der Swipe-Handler nicht gesetzt werden kann
+            container.appendChild(div);
             addSwipeHandler(div);
         }
 
         div.dataset.prio = s.prio ?? 0;
-        if (!fadeControllers.has(Number(div.dataset.nummer)) && div.dataset.swiping !== "true") {
+        if (div.dataset.swiping !== "true") {
             const snummer = schwimmerNrLength > 0 ? String(s.nummer).padStart(schwimmerNrLength, '0') : s.nummer;
 
             div.innerHTML = `
@@ -562,20 +472,28 @@ function render() {
                     ${DEBUG ? `<span class="prio">Prio: ${s.prio}</span>` : ""}
                 </div>
             `;
-            if (!verwaltete_bahnen.includes(s.aufBahn)) {
+
+            // Auswahlzustand und Hintergrundfarbe setzen
+            const isSelected = selectedNummern.has(s.nummer);
+            const isExpired = fadeTime > 0 && s.prio >= fadeTime;
+            div.classList.toggle('selected', isSelected);
+            div.classList.toggle('expired', isExpired && !isSelected);
+            if (isSelected) {
+                div.style.removeProperty("background-color"); // CSS-Klasse übernimmt Farbe
+            } else if (isExpired) {
+                div.style.removeProperty("background-color"); // .expired CSS-Klasse übernimmt Farbe
+            } else if (!verwaltete_bahnen.includes(s.aufBahn)) {
                 div.style.backgroundColor = "#b8d4ea";
             } else {
                 div.style.removeProperty("background-color");
             }
         }
 
-        //container.appendChild(div); // wird ans Ende gesetzt (neu sortiert)
-        container.insertBefore(div, container.firstChild); //Umgekehrte Sortierung um Sprung beim Entfernen von DIVS zu vermeiden
+        container.insertBefore(div, container.firstChild);
     });
 
-    // 3. Nach dem Umordnen: neue Positionen messen (Last) + bewegung dorthin Animate
     container.querySelectorAll(".schwimmer").forEach(div => {
-        const nummer = Number(div.dataset.nummer);
+        const nummer = div.dataset.nummer;
         const first = firstRects.get(nummer);
         const last = div.getBoundingClientRect();
 
@@ -596,16 +514,12 @@ function render() {
     });
 }
 
-
-
 // Sekündliches auffrischen der darstellung
-const interval = 1000; // Auffrischung in ms
+const interval = 1000;
 setInterval(() => {
-    schwimmer.forEach((s) => (s.prio += interval / 1000)); // Prio um 1 erhöhen
+    schwimmer.forEach((s) => (s.prio += interval / 1000));
     render();
 }, interval);
-
-
 
 // ----------------------------------------------------------
 //  ENDE  Behandlung und Verarbeitung der DIV-Darstellung
@@ -626,7 +540,7 @@ async function transmitActions() {
         console.log("transmit Action");
         isFetching = true;
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 Sekunden Timeout
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
 
         const response = await fetch('/action', {
             method: 'POST',
@@ -640,8 +554,8 @@ async function transmitActions() {
         if (response.ok) {
             pending.forEach(a => a.transmitted = true);
             const resp = await response.json();
-            //console.log(resp);
             if (resp["updates"]) parseUpdates(resp);
+            if (resp["results"]) showResultErrors(resp["results"]);
             updateFormIsDirty(false);
             updateServerStatus(true);
         } else {
@@ -658,12 +572,10 @@ async function transmitActions() {
 function redrawStatusBar() {
     const statusspan = document.getElementById('serverStatus');
     if (server_verbunden) {
-        //console.log("Color:",formIsDirty ? 'yellow' : 'green');
         statusspan.innerHTML = `
             <span style="height: 10px; width: 10px; background-color: ${formIsDirty ? 'yellow' : 'green'}; border-radius: 50%; display: inline-block; margin-right: 5px">
             </span> Verbunden
             `;
-
     } else {
         statusspan.innerHTML = `
             <span style="height: 10px; width: 10px; background-color: red; border-radius: 50%; display: inline-block; margin-right: 5px">
@@ -673,8 +585,7 @@ function redrawStatusBar() {
 }
 
 function updateServerStatus(neu) {
-    //console.log("updateServerStatus - alt", server_verbunden, "neu", neu, "ungespeicherte Daten: ", formIsDirty);
-    if (server_verbunden != neu) { //Server status hat sich geändert
+    if (server_verbunden != neu) {
         server_verbunden = neu;
         logMessage(neu ? "Server wieder verbunden" : "Serververbindung verloren", neu);
         showStatusMessage(neu ? "Server wieder verbunden" : "Serververbindung verloren", neu);
@@ -683,25 +594,17 @@ function updateServerStatus(neu) {
 }
 
 function updateFormIsDirty(neu) {
-    //console.log("updateFormIsDirty - alt", formIsDirty, "neu", neu, "Serverstatus: ", server_verbunden);
-    if (formIsDirty != neu) { //FormIdDirty- status hat sich geändert
+    if (formIsDirty != neu) {
         formIsDirty = neu;
         redrawStatusBar();
     }
 }
 
-/**
- * Holt die Daten der auf dem Server gespeicherten Schwimmer und legt sie in 
- * alleSchwimmer ab
- * 
- * @param {number} [id=-1] // id des zu holenden Schwimmers -1 gleich alle
- * @returns {void}
- */
 async function fetchSchwimmer(id = -1) {
     try {
         console.log("Schwimmer holen");
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 Sekunden Timeout
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
         const parameters = (id == -1) ? [] : [id];
 
         const response = await fetch('/action', {
@@ -717,29 +620,21 @@ async function fetchSchwimmer(id = -1) {
             const resp = await response.json();
             console.log(resp);
             if (resp["updates"]) parseUpdates(resp);
-            //console.log(alleSchwimmer);
             updateServerStatus(true);
         } else {
             updateServerStatus(false);
         }
     } catch (error) {
-        console.log(`Error on fetchSchwimmer mit ID ${id} (-1 steht für alle)`, error);
+        console.log(`Error on fetchSchwimmer mit ID ${id}`, error);
         updateServerStatus(false);
-    } finally {
     }
 }
 
-/**
- * Holt die Daten der auf dem Server gespeicherten Schwimmer auf den verwalteten
- * Bahnen
- * 
- * @returns {void}
- */
 async function fetchSchwimmerVonBahnen() {
     try {
         console.log(`Schwimmer von Bahnen ${verwaltete_bahnen} holen`);
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 Sekunden Timeout
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
 
         const response = await fetch('/action', {
             method: 'POST',
@@ -752,7 +647,6 @@ async function fetchSchwimmerVonBahnen() {
 
         if (response.ok) {
             const resp = await response.json();
-            console.log("In FetchSchwimmerVonBahnen response:", resp);
             if (resp["updates"]) parseUpdates(resp);
             updateServerStatus(true);
         } else {
@@ -761,16 +655,32 @@ async function fetchSchwimmerVonBahnen() {
     } catch (error) {
         console.log(`Error on fetchSchwimmerVonBahnen (${verwaltete_bahnen}):`, error);
         updateServerStatus(false);
-    } finally {
     }
 }
 
+function showResultErrors(results) {
+    const errors = results.filter(r => r.status !== "erfolgreich" && r.status !== "existierte bereits");
+    if (errors.length === 0) return;
+    const msg = errors.map(r => {
+        const nr = r.nummer != null ? `Schwimmer ${r.nummer}: ` : '';
+        return `${nr}${r.status}`;
+    }).join('\n');
+    showStatusMessage(msg, false, 6000);
+}
 
 function parseUpdates(resp) {
     if (resp["updates"] && Array.isArray(resp["updates"])) {
         resp["updates"].forEach((eintrag) => {
-            alleSchwimmer[parseInt(eintrag["nummer"])] = { ...eintrag };
+            const nummer = parseInt(eintrag["nummer"]);
+            alleSchwimmer[nummer] = { ...eintrag };
             debugLog(`Schwimmer Nummer ${eintrag["nummer"]} aktualisiert`);
+
+            const aktiv = schwimmer.find(s => s.nummer === nummer);
+            if (aktiv) {
+                if (eintrag.bahnanzahl != null) aktiv.bahnen = eintrag.bahnanzahl;
+                if (eintrag.vorname)  aktiv.vorname  = eintrag.vorname;
+                if (eintrag.nachname) aktiv.nachname = eintrag.nachname;
+            }
         });
     }
 }
@@ -783,15 +693,12 @@ function debugLog(...args) {
     if (DEBUG) console.log(...args);
 }
 
-// Option: Runde abziehen - aus dem Kontextmenü des Schwimmers
 document.getElementById("rundeAbziehenOption").addEventListener("click", function () {
     if (clickedDiv) {
         const nummer = parseInt(clickedDiv.dataset.nummer);
         if (confirm(`Eine Bahn bei Schwimmer ${nummer} abziehen?`)) {
             const s_data = schwimmer.find(s => s.nummer == nummer);
-            console.log("s_data", s_data);
             if (s_data) {
-                console.log("Schwimmer: Bahn abziehen", s_data);
                 s_data.bahnen -= 1;
                 render();
                 actions.push({
@@ -801,6 +708,7 @@ document.getElementById("rundeAbziehenOption").addEventListener("click", functio
                     transmitted: false
                 });
                 updateFormIsDirty(true);
+                transmitActions();
             }
         }
     }
@@ -820,22 +728,25 @@ document.getElementById("deleteSwimmer").addEventListener("click", function () {
     contextMenu.style.display = "none";
 });
 
-// Event Listener für Fremdbahnen entfernen
 document.getElementById("nurEigene").addEventListener("click", function () {
     let index = schwimmer.findIndex(s => !verwaltete_bahnen.includes(s.aufBahn));
     while (index !== -1) {
-        //lösche das DIV
         const div = document.querySelector(`div[data-nummer="${schwimmer[index].nummer}"]`);
-        removeSchwimmerDiv(div, false, false); // auf Inaktiv sezten - false, render - false - erst wenn alle weg sind 
+        removeSchwimmerDiv(div, false, false);
         index = schwimmer.findIndex(s => !verwaltete_bahnen.includes(s.aufBahn));
     }
-    render(); //hier wird gerendert.
+    render();
     contextMenu.style.display = "none";
 });
 
 document.getElementById("toggleInfoBar").addEventListener("click", toggleInfoBar);
+document.getElementById("sortModusBtn").addEventListener("click", () => {
+    sortModus = sortModus === 'zeit' ? 'nummer' : 'zeit';
+    document.getElementById("sortModusBtn").textContent = sortModus === 'zeit' ? 'Zeit' : 'Nummer';
+    render();
+});
 document.getElementById("bahnen").addEventListener("input", checkBahnenInput);
-document.getElementById("bahnen").addEventListener("blur", (event) => { parseBahnenInput(); });
+document.getElementById("bahnen").addEventListener("blur", () => { parseBahnenInput(); });
 document.getElementById("bahnen").addEventListener("keydown", (event) => {
     if (event.key === 'Enter') {
         event.preventDefault();
@@ -843,17 +754,22 @@ document.getElementById("bahnen").addEventListener("keydown", (event) => {
     }
 });
 
-
-
 debugLog("Initial commands - Grundlagen einrichten");
-//alle Dreißig Sekunden die Daten zum Server schicken
 setInterval(transmitActions, 30000);
 
-// zu Beginn Daten vom Server holen
 fetchSchwimmer().then(() => {
-    // und  nach erhalt die der verwalteten Bahnen eintragen
     fillSchwimmerAusMeinenBahnen();
-    // und einmal zeichnen
     render();
 });
 
+// Debug-Hooks: aufgerufen aus index_v2.html (Modul-Grenze)
+window.debugSchwimmerHinzufuegen = function(nummer) {
+    schwimmerHinzufuegen(String(nummer));
+    render();
+};
+window.debugSchwimmerEntfernen = function() {
+    if (schwimmer.length === 0) return;
+    const zufaelliger = schwimmer[Math.floor(Math.random() * schwimmer.length)];
+    const div = document.querySelector(`div[data-nummer="${zufaelliger.nummer}"]`);
+    if (div) removeSchwimmerDiv(div);
+};

@@ -2,6 +2,10 @@
     "flask_secret_key": "Lang&Umständlich",
     "default_admin_pass": "swim24",
     "laenge_schwimmerNr": 3,
-    "laenge_bahn_m": 100
-   }
+    "laenge_bahn_m": 100,
+    "fade_time": 600,
+    "mobile_cards": 2,
+    "view2_page_interval": 10,
+    "startzeit": "2025-06-14T08:00:00Z"
+ }
   

@@ -42,7 +42,7 @@ export function initCSVImport(fileInputSelector, previewContainerSelector, sendB
                     return entry;
                 });
                 renderPreview(Object.values(mapping).filter(k => k), parsedData, previewContainer);
-            }, options.knownHeaders);
+            }, options.knownHeaders, () => { fileInput.value = ''; previewContainer.innerHTML = ''; parsedData = []; });
         } else {
 
             parsedData = lines.slice(1).map(line => {
@@ -202,23 +202,43 @@ function renderPreview(headers, data, container) {
     document.getElementById("pageInfo").textContent = `Seite ${currentPage + 1} / ${totalPages}`;
 }
 
-function showHeaderMappingModal(headers, onConfirm, knownHeaders) {
+function showHeaderMappingModal(headers, onConfirm, knownHeaders, onCancel) {
     const modal = document.createElement('div');
     console.log("in showHeaderMappingModal");
     modal.innerHTML = `
-        <div class="modal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-        background: white; border: 1px solid #ccc; padding: 1em; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  z-index: 1000; width: 300px; max-width: 90%; max-height: 80vh; overflow-y: auto;">
-            <h3 style="width: 100%;">Spalten zuordnen</h3>
+        <div class="modal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: white; border: 1px solid #ccc; padding: 1em; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        z-index: 1000; width: 380px; max-width: 95%; max-height: 80vh; overflow-y: auto;">
+            <h3 style="margin-top:0;">Spalten zuordnen</h3>
+            <p style="font-size:0.85rem;color:#555;margin:0 0 0.8em;">
+                Jede <strong>Spalte der CSV-Datei</strong> (fett) wird einer Datenbankspalte zugeordnet.
+                Nicht benötigte Spalten auf <em>Ignorieren</em> lassen.
+            </p>
             <form id="headerMappingForm">
-                ${headers.map((h, i) => `
-                    <label style="display: block; margin-bottom: 0.5em;">${h}
-                        <select data-index="${i}" style="width: 100%;">
-                            ${knownHeaders.map(opt => `<option value="${opt}">${opt || 'Ignorieren'}</option>`).join('')}
-                        </select>
-                    </label>
-                `).join('')}
-                <button type="submit">Importieren</button>
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th style="text-align:left;padding:4px 6px;border-bottom:1px solid #ccc;font-size:0.85rem;color:#555;">CSV-Spalte</th>
+                            <th style="text-align:left;padding:4px 6px;border-bottom:1px solid #ccc;font-size:0.85rem;color:#555;">→ Datenbankfeld</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${headers.map((h, i) => `
+                            <tr>
+                                <td style="padding:4px 6px;"><strong>${h}</strong></td>
+                                <td style="padding:4px 6px;">
+                                    <select data-index="${i}" style="width:100%;">
+                                        ${knownHeaders.map(opt => `<option value="${opt}">${opt || 'Ignorieren'}</option>`).join('')}
+                                    </select>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <div style="display:flex;gap:8px;margin-top:1em;">
+                    <button type="submit">Importieren</button>
+                    <button type="button" id="headerMappingCancel">Abbrechen</button>
+                </div>
             </form>
         </div>`;
     document.body.appendChild(modal);
@@ -229,4 +249,6 @@ function showHeaderMappingModal(headers, onConfirm, knownHeaders) {
         modal.remove();
         onConfirm(mapping);
     };
+
+    document.getElementById('headerMappingCancel').onclick = () => { modal.remove(); if (onCancel) onCancel(); };
 }

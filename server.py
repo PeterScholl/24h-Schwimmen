@@ -185,6 +185,22 @@ def admin():
                 return "Erfolg", 200
             else:
                 return "Keine Schwimmernummer angegeben", 400
+        elif action == 'edit_swimmer':
+            # Gesamter /admin-Endpunkt ist bereits auf user_role == 'admin' beschränkt
+            nummer = data.get('nummer')
+            if not nummer:
+                return "Keine Schwimmernummer angegeben", 400
+            felder = {}
+            if 'vorname'  in data: felder['vorname']  = data.get('vorname', '').strip()
+            if 'nachname' in data: felder['nachname'] = data.get('nachname', '').strip()
+            if 'gruppe'   in data: felder['gruppe']   = data.get('gruppe', '').strip()
+            if 'istKind'  in data: felder['istKind']  = 1 if data.get('istKind') in (True, 1, '1', 'true', 'True') else 0
+            if not felder:
+                return "Keine Felder zum Ändern angegeben", 400
+            logging.info(f"Schwimmer {nummer} wird bearbeitet: {felder}")
+            if not db.update_schwimmer(int(nummer), **felder):
+                return "DB - Fehler", 400
+            return "Erfolg", 200
         elif action == 'get_table_benutzer':
             return jsonify(db.liste_tabelle('benutzer'))
         elif action == 'get_table_clients':
@@ -198,6 +214,19 @@ def admin():
         elif action == 'get_table_actions':
             logging.info("Tabelle actions wird abgerufen")
             return jsonify(db.liste_tabelle('actions')), 200
+        elif action == 'get_table_actions_paged':
+            limit = int(data.get('limit', 50))
+            page  = int(data.get('page',  1))
+            offset = (page - 1) * limit
+            logging.info(f"Tabelle actions paginiert: Seite {page}, Limit {limit}, Offset {offset}")
+            rows  = db.liste_tabelle_paged('actions', limit, offset)
+            total = db.count_tabelle('actions')
+            return jsonify({'data': rows, 'total': total, 'page': page, 'limit': limit}), 200
+        elif action == 'get_swimmer_log':
+            nummer = int(data.get('nummer', 0))
+            schwimmer = db.lies_schwimmer(nummer)
+            actions  = db.finde_actions_by_schwimmer_nummer(nummer)
+            return jsonify({'schwimmer': schwimmer, 'actions': actions}), 200
         elif action == 'get_checkAnzahlTable':
             logging.info("Tabelle checkAnzahlen wird abgerufen")
             return jsonify(db.checkBahnenAnzahlen()), 200
@@ -265,15 +294,32 @@ def admin():
 
 @app.route("/")
 def index():
-    #return send_from_directory("static", "index.html")
+    return redirect(url_for('index_v2'))
+
+@app.route("/v1")
+def index_v1():
     params = {
         'user_role': session.get('user_role',""),
         'userrealname': session.get('realname',"Unbekannt"),
         'username': session.get('user',"unknown"),
         'clientID': session.get('clientID',"--"),
-        'debugfunktion': request.args.get('dbgfkt') == 'true'
+        'debugfunktion': request.args.get('dbgfkt') == 'true',
+        'card_font_size': request.args.get('size', '5')
     }
     return render_template("index.html", **params)
+
+@app.route("/v2")
+def index_v2():
+    params = {
+        'user_role': session.get('user_role',""),
+        'userrealname': session.get('realname',"Unbekannt"),
+        'username': session.get('user',"unknown"),
+        'clientID': session.get('clientID',"--"),
+        'debugfunktion': request.args.get('dbgfkt') == 'true',
+        'card_font_size': request.args.get('size', '5'),
+        'mobile_cards': config.get('mobile_cards', 2)
+    }
+    return render_template("index_v2.html", **params)
 
 @app.route("/main.js")
 def send_mainjs():
@@ -282,10 +328,19 @@ def send_mainjs():
     }
     return render_template("main.js", **params), 200, {'Content-Type': 'application/javascript'}
 
+@app.route("/main_v2.js")
+def send_mainjs_v2():
+    params = {
+        'schwimmerNrLen': config["laenge_schwimmerNr"],
+        'fadeTime': config.get("fade_time", 0)
+    }
+    return render_template("main_v2.js", **params), 200, {'Content-Type': 'application/javascript'}
+
 @app.route("/view.js")
 def send_viewjs():
     params = {
-        'bahnlaenge': config["laenge_bahn_m"]
+        'bahnlaenge': config["laenge_bahn_m"],
+        'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z')
     }
     return render_template("view.js", **params), 200, {'Content-Type': 'application/javascript'}
 
@@ -296,6 +351,19 @@ def static_files(filename):
 @app.route("/view")
 def view():
     return send_from_directory("static", "view.html")
+
+@app.route("/view2")
+def view2():
+    return send_from_directory("static", "view2.html")
+
+@app.route("/view2.js")
+def send_view2js():
+    params = {
+        'bahnlaenge': config["laenge_bahn_m"],
+        'page_interval': config.get('view2_page_interval', 5),
+        'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z')
+    }
+    return render_template("view2.js", **params), 200, {'Content-Type': 'application/javascript'}
 
 @app.route("/show_qr")
 def show_qr():
@@ -333,17 +401,21 @@ def action():
                 # ADD - Action muss dokumentiert werden
                 # Prrüfung, ob diese schon vorhanden war!!!
                 anz = db.erstelle_action(user, client_id=clientid, zeitstempel=str(timestamp), kommando=str(kommando), parameter=json.dumps(parameter))
-                logging.info(f"Aktion ist eingetragen: {"NEW" if anz>0 else "EXISTED"}")
+                logging.debug(f"Aktion ist eingetragen: {"NEW" if anz>0 else "EXISTED"}")
                 if (anz>0):
                     try:
                         nummer = int(parameter[0])
                         anzahl = int(parameter[1])
                         bahnnr = int(parameter[2]) if len(parameter) > 2 else 0
                         logging.info(f"ADD wird ausgeführt: Schwimmer {nummer}, Anzahl {anzahl}, BahnNr {bahnnr}")
-                        db.aendere_bahnanzahl_um(nummer,anzahl,clientid,bahnnr=bahnnr)
-                        logging.info("ADD ist ausgeführt")
-                        results.append({"kommando": kommando, "status": "erfolgreich", "nummer": nummer, "anzahl": anzahl})
-                        #updates.append(db.lies_schwimmer(nummer))
+                        if (nummer > 0):
+                            db.aendere_bahnanzahl_um(nummer,anzahl,clientid,bahnnr=bahnnr)
+                            logging.debug("ADD ist ausgeführt")
+                            results.append({"kommando": kommando, "status": "erfolgreich", "nummer": nummer, "anzahl": anzahl})
+                        else:
+                            logging.error(f"ADD nicht ausgeführt für ungültige Schwimmernummer {nummer}")
+                            results.append({"kommando": kommando, "status": f"ungültige Schwimmernummer: {nummer}", "nummer": nummer, "anzahl": anzahl})
+                        updates.append(db.lies_schwimmer(nummer))
                     except (ValueError, IndexError) as e:
                         logging.info(f"Fehler bei ADD-Parametern: {e}")
                         results.append({"kommando": kommando, "status": f"ungültige Parameter: {str(e)}"})
@@ -383,10 +455,11 @@ def action():
                 try:
                     nummer = int(parameter[0])
                     value = int(parameter[1])
-                    logging.info(f"ACT ausgeführt: Schwimmer {nummer} wird {value}")
+                    logging.info(f"ACT ausgeführt: Schwimmer {nummer} erhält Activitätswert {value}")
+                    db.erstelle_action(user, client_id=clientid, zeitstempel=str(timestamp), kommando=str(kommando), parameter=json.dumps(parameter))
                     if (db.update_schwimmer(nummer,aktiv = value)):
                         results.append({"kommando": kommando, "status": "erfolgreich", "nummer": nummer, "value": value})
-                    else: 
+                    else:
                         results.append({"kommando": kommando, "status": "FEHLER", "nummer": nummer, "value": value})
                 except (ValueError, IndexError) as e:
                     logging.info(f"Fehler bei ACT-Parametern: {e}")

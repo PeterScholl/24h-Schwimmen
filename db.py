@@ -254,6 +254,34 @@ def liste_tabelle(table_name):
         return []
 
 
+def count_tabelle(table_name):
+    """Gibt die Gesamtanzahl der Zeilen in der angegebenen Tabelle zurück."""
+    try:
+        cursor = db.execute(f"SELECT COUNT(*) FROM {table_name}")
+        return cursor.fetchone()[0]
+    except Exception as e:
+        print(f"Fehler beim Zählen in Tabelle {table_name}: {e}")
+        return 0
+
+def liste_tabelle_paged(table_name, limit, offset):
+    """
+    Gibt einen Ausschnitt der Tabelle zurück, neueste Einträge zuerst (rowid DESC).
+    limit:  Anzahl Zeilen pro Seite
+    offset: Übersprungene Zeilen (= (Seite-1) * limit)
+    """
+    try:
+        cursor = db.execute(
+            f"SELECT * FROM {table_name} ORDER BY rowid DESC LIMIT ? OFFSET ?",
+            (limit, offset)
+        )
+        columns = [desc[0] for desc in cursor.description]
+        rows = cursor.fetchall()
+        return [dict_from_row(row, columns) for row in rows]
+    except Exception as e:
+        print(f"Fehler beim paginierten Zugriff auf Tabelle {table_name}: {e}")
+        return []
+
+
 def dump():
     """
     gibt einen Dump der Datenbank zurück, der per Flask zum Download angeboten werden kann
@@ -377,7 +405,7 @@ def aendere_bahnanzahl_um(nummer, anzahl, client_id, bahnnr=0):
     Falls der Schwimmer nicht existiert, wird er mit Standardwerten angelegt.
     """
     bahnanzahl = get_bahnanzahl(int(nummer))
-    logging.info(f"Schwimmer Ändern mit Nummer {nummer}")
+    logging.debug(f"Schwimmer Ändern mit Nummer {nummer}")
     #print(schwimmer if (schwimmer) else f"Schwimmer {nummer} Nicht gefunden")
     
     if bahnanzahl is None:
@@ -619,6 +647,25 @@ def finde_actions_after_timestamp(timestamp):
     rows = db.fetchall(query, params)
     return [dict_from_table_row(row, 'actions') for row in rows]
 
+def finde_actions_by_schwimmer_nummer(nummer):
+    """
+    Gibt alle Actions zurück, bei denen parameter[0] der Schwimmernummer entspricht
+    (ADD, ACT, GET-Kommandos), sortiert nach Zeitstempel aufsteigend.
+    """
+    query = '''
+        SELECT * FROM actions
+        WHERE CAST(json_extract(parameter, '$[0]') AS INTEGER) = ?
+        ORDER BY zeitstempel ASC
+    '''
+    try:
+        cursor = db.execute(query, (int(nummer),))
+        columns = [desc[0] for desc in cursor.description]
+        rows = cursor.fetchall()
+        return [dict(zip(columns, row)) for row in rows]
+    except Exception as e:
+        print(f"Fehler beim Abrufen der Actions für Schwimmer {nummer}: {e}")
+        return []
+
 
 #========================
 #    Testabschnitt
@@ -627,25 +674,27 @@ def finde_actions_after_timestamp(timestamp):
 def checkBahnenAnzahlen():
     """
     Prüft ob die Bahnanzahlen in der Actionstabelle mit denen in der Schwimmer DB
-    übereinstimen und gibt die Unterschiede zurück
+    übereinstimmen und gibt die Unterschiede zurück.
+    Summiert parameter[1] aller ADD-Actions pro Schwimmer (inkl. negativer Werte für
+    gelöschte Bahnen) und klemmt das Ergebnis auf 0 – analog zur Server-Logik.
     """
-    query = """select 
-    a.schwimmerID,
-    s.vorname,
-    s.bahnanzahl as Anz,
-    a.anzahl as ActionAnz,
-    a.kommando
-    FROM (
+    query = """
     SELECT
-        kommando,
-        CAST(json_extract(parameter, '$[0]') AS INTEGER) AS schwimmerID, 
-        count(json_extract(parameter, '$[1]')) AS anzahl 
-    FROM actions 
-    WHERE kommando = "ADD" 
-    GROUP BY schwimmerID 
+        a.schwimmerID,
+        s.vorname,
+        s.bahnanzahl AS Anz,
+        a.anzahl AS ActionAnz,
+        MAX(a.anzahl, 0) AS ActionAnzErwartet
+    FROM (
+        SELECT
+            CAST(json_extract(parameter, '$[0]') AS INTEGER) AS schwimmerID,
+            SUM(CAST(json_extract(parameter, '$[1]') AS INTEGER)) AS anzahl
+        FROM actions
+        WHERE kommando = 'ADD'
+        GROUP BY schwimmerID
     ) a
-    JOIN schwimmer s ON s.nummer = a.schwimmerID 
-    WHERE Anz <> ActionAnz
+    JOIN schwimmer s ON s.nummer = a.schwimmerID
+    WHERE s.bahnanzahl <> MAX(a.anzahl, 0)
     ORDER BY schwimmerID ASC;
     """
     try:

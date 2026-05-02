@@ -261,7 +261,7 @@ function App() {
 
     useEffect(() => {
         holeNeueDaten();
-        initSpezialzeiten(new Date("2025-06-14T08:00:00Z"));
+        initSpezialzeiten(new Date("{{startzeit}}"));
     }, []); // [] - sorgt dafür, dass dieser Effect (diese Funktion) nur ein einziges Mal ausgeführt wird
 
     // Der Timer für das holen neuer Daten

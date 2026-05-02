@@ -4,7 +4,7 @@ Erfassung von geleisteten Bahnen bei einem 24 Stunden schwimmen
 
 ## Szenario
 
-Bei einem 24 Stundenschwimmen sollen digital die geleisteten Bahnen verschiedener Schiwmmer innerhalb dieser 24 Stunden auf digitalen Endgeräten erfasst und auf einem zentralen Rechner gesammelt werden.
+Bei einem 24 Stundenschwimmen sollen digital die geleisteten Bahnen verschiedener Schwimmer innerhalb dieser 24 Stunden auf digitalen Endgeräten erfasst und auf einem zentralen Rechner gesammelt werden.
 Dabei soll die Bedienung möglichst intuitiv sein und die Datensicherheit besonders hoch, so dass selbst bei einem Ausfall des Servers oder eines Endgerätes die Informationen auf mehreren Stellen verteilt gespeichert sind.
 Die Erfassung soll auf möglichst vielen verschiedenen Endgeräten möglich sein (verschiedene Bildschirmgrößen, responsive Design)
 
@@ -149,6 +149,116 @@ Hier ist eine Übersicht über die Verzeichnisstruktur des Projektes:
 ├── README.md           dieser Text
 └── requirements.txt    Für die Nutzung zu installierende Python-Module
 ```
+
+## Konfiguration (config.json)
+
+Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einstellungen:
+
+| Schlüssel | Beispielwert | Beschreibung |
+| --- | --- | --- |
+| `flask_secret_key` | `"Lang&Umständlich"` | Geheimer Schlüssel für Flask-Sessions – vor dem Live-Betrieb ändern |
+| `default_admin_pass` | `"swim24"` | Initiales Passwort für den Admin-Benutzer |
+| `laenge_schwimmerNr` | `3` | Anzahl Stellen der Schwimmernummer (z. B. 3 → 001–999) |
+| `laenge_bahn_m` | `100` | Länge einer Bahn in Metern (für Streckenberechnung) |
+| `fade_time` | `600` | **Nur v2-Oberfläche** (`/v2`): Sekunden seit dem letzten Klick, nach denen eine Schwimmerkarte blass dargestellt wird. Beim nächsten Betätigen von „Senden" wird der Schwimmer automatisch von der Bahn entfernt. `0` oder `-1` deaktiviert das Feature. |
+| `mobile_cards` | `2` | **Nur v2-Oberfläche**: Anzahl Schwimmerkarten pro Zeile auf kleinen Bildschirmen (≤ 600 px Breite). |
+| `view2_page_interval` | `5` | **View2-Seite** (`/view2`): Sekunden pro Seite bei aktiviertem Auto-Weiterblättern (Shift-Lock-Modus). |
+| `startzeit` | `"2025-06-14T08:00:00Z"` | **View- und View2-Seite**: Startzeitpunkt des Schwimmens als UTC-ISO-Timestamp. Legt den Beginn der Spezialzeiten (Tag1, Geisterstunde, Gute Nacht, Frühaufsteher, Tag2) fest. |
+
+Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
+
+## Schwimmer-Import (CSV)
+
+Im Admin-Bereich unter **Schwimmer** können Schwimmerdaten per CSV-Datei importiert werden.
+
+### Vorgehensweise
+
+1. CSV-Datei auswählen — die erste Zeile muss Spaltenüberschriften enthalten.
+2. Im Dialog wird jede **CSV-Spalte** (fett) einem **Datenbankfeld** zugeordnet. Nicht benötigte Spalten auf *Ignorieren* lassen.
+3. Pflichtfeld ist `nummer`. Alle anderen Felder sind optional.
+4. Klick auf **Importieren** überträgt die Daten.
+
+### Unterstützte Felder
+
+| Datenbankfeld | Bedeutung |
+| --- | --- |
+| `nummer` | Schwimmernummer (Pflicht, eindeutiger Schlüssel) |
+| `vorname` | Vorname |
+| `nachname` | Nachname |
+| `gruppe` | Gruppe / Team |
+| `istKind` | `1` = Kind, `0` = Erwachsener |
+| `istErw` | Alternative zu `istKind`: `0` = kein Erwachsener → wird intern als Kind (`istKind = 1`) gespeichert |
+
+### Verhalten bei bereits vorhandenen Schwimmern (Duplikate)
+
+Existiert ein Schwimmer mit der importierten Nummer bereits in der Datenbank, wird er **aktualisiert**, nicht doppelt angelegt:
+
+- **Aktualisiert:** `vorname`, `nachname`, `gruppe`, `istKind`
+- **Unverändert bleiben:** `bahnanzahl` (geschwommene Bahnen), `aktiv`-Status, Bahneinteilung
+
+So können Stammdaten (z. B. nach einer Namenskorrektur) gefahrlos neu importiert werden, ohne Bahndaten zu verlieren.
+
+## Datenexport am Ende des Wettkampfes
+
+Es gibt vier Möglichkeiten, die erfassten Daten zu exportieren. Für die Auswertung nach dem Wettkampf empfiehlt sich der CSV-Export.
+
+### CSV-Export der Schwimmerdaten (empfohlen)
+
+**Wo:** View-Seite (`/view`) oder View2-Seite (`/view2`)  
+**Auslöser:** Tastenkombination `Shift+D`
+
+Erzeugt die Datei `schwimmerdaten.csv` mit einer Zeile pro Schwimmer. Die Werte in den Spalten sind Meter (Bahnanzahl × Bahnlänge).
+
+| Spalte | Inhalt |
+| --- | --- |
+| `nummer` | Schwimmernummer |
+| `vorname` | Vorname |
+| `nachname` | Nachname |
+| `gruppe` | Gruppe / Team |
+| `bahnanzahl` | Gesamtstrecke in Metern |
+| `Tag1` | Strecke (m) im ersten Zeitabschnitt |
+| `Geisterstunde` | Strecke (m) in der Geisterstunde |
+| `Gute Nacht` | Strecke (m) im Nacht-Abschnitt |
+| `Frühaufsteher` | Strecke (m) im Frühaufsteher-Abschnitt |
+| `Tag2` | Strecke (m) im zweiten Tag-Abschnitt |
+
+Die Zeitgrenzen der Spezialzeiten werden relativ zur konfigurierten `startzeit` berechnet (siehe Konfiguration).
+
+### Aktions-Backup als JSON
+
+**Wo:** View-Seite (`/view`) oder View2-Seite (`/view2`)  
+**Auslöser:** Tastenkombination `Shift+B`
+
+Erzeugt die Datei `view_backup.json` mit allen bisher empfangenen Aktionen und dem aktuellen Schwimmerstand. Diese Datei kann im Admin-Bereich unter **Aktionen → JSON-Import** wieder eingespielt werden, um Daten von einem ausgefallenen Endgerät nachzuladen.
+
+### Lokaler JSON-Download (Erfassungsgerät)
+
+**Wo:** Haupt-Erfassungsseite (`/`)  
+**Auslöser:** Schaltfläche „Download JSON"
+
+Speichert den lokalen Zustand des Erfassungsgeräts (aktive Schwimmer, zwischengespeicherte Aktionen, Statusmeldungen) als `24hschwimmen.json`. Nützlich zur Fehlerdiagnose oder als Sicherungskopie, falls Aktionen noch nicht übertragen wurden.
+
+### SQL-Datenbank-Backup
+
+**Wo:** Admin-Bereich  
+**Auslöser:** Schaltfläche „Backup SQL"
+
+Lädt die vollständige SQLite-Datenbank als `backup.sql` herunter (nur für Admin-Benutzer). Enthält alle Schwimmer, Aktionen und Clients. Geeignet als Vollsicherung vor dem Abschalten des Servers.
+
+## Logging
+
+Die Logging-Konfiguration befindet sich in `logging_config.py`.
+
+**Logdatei:** `data/serverlog.log` (relativ zum Projektverzeichnis, wird automatisch angelegt)
+
+Es gibt zwei Handler mit unabhängigen Leveln:
+
+| Handler | Standard-Level | Beschreibung |
+| --- | --- | --- |
+| `file_handler` | `DEBUG` | Schreibt alle Meldungen in die Logdatei |
+| `console_handler` | `INFO` | Gibt Meldungen auf der Konsole aus (sichtbar im Gunicorn-Log) |
+
+Um den Gunicorn-Output zu reduzieren, `console_handler.setLevel(logging.WARNING)` setzen. Einzelne häufige Meldungen können im Code von `logging.info(...)` auf `logging.debug(...)` umgestellt werden — sie erscheinen dann nur noch in der Datei, nicht mehr in der Konsole.
 
 ## Windows-Firewall
 

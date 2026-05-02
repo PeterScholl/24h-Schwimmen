@@ -130,26 +130,45 @@ td.truncated:hover {
   justify-content: center; /*center;*/
 }
 .schwimmer {
+  container-type: inline-size;
   touch-action: pan-y; /* 'pan-y' oder 'none', je nach Bedarf */
-  will-change: transform; 
-  flex: 0 1 200px;
+  will-change: transform;
+  flex: 0 1 var(--swimmer-card-width, 200px);
   border: 1px solid black;
-  padding: 1rem;
+  padding: 0.4rem 0.2rem;
   background-color: lightblue;
   text-align: center;
   transition: all 0.5s;
 }
+
 .schwimmer .nummer {
-  font-size: 2rem;
+  font-size: 38cqi;
+  font-weight: bold;
+  white-space: nowrap;
+  line-height: 1;
 }
 
-.schwimmer .bahnen {
-  font-size: 1.2rem;
+.schwimmer .info {
+  font-size: 10cqi;
+  margin-top: 0.2em;
 }
 
 .schwimmer .name {
-  font-size: 1rem;
-  margin-top: 0.5rem;
+  margin-right: 0.3em;
+}
+
+.schwimmer .bahnen {
+  font-size: 10cqi;
+}
+
+.schwimmer.selected {
+  background-color: aqua;
+  box-shadow: 0 0 0 3px #0097a7;
+}
+
+.schwimmer.expired {
+  background-color: #f0f0f0;
+  color: #aaa;
 }
 
 .schwimmer .prio {

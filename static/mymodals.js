@@ -85,10 +85,11 @@ export function schwimmerNummerErfragen(length = 3) {
         const innerHTML = `
             <h2 style="color: black;">Schwimmer Nummer:</h2>
             <input type="number" id="nummer" name="nummer" placeholder="${'x'.repeat(length>=0?length:0)}" maxlength="3"
-                   style="font-size: 3em; text-align: center; width: 100%;">
-            <br>
-            <button id="closeBtn">Schließen</button>
-            <button id="confirmBtn">Bestätigen</button>
+                   style="font-size: 3em; text-align: center; width: 100%; box-sizing: border-box; margin-bottom: 16px; display: block;">
+            <div style="display: flex; gap: 8px; justify-content: center;">
+                <button id="closeBtn">Schließen</button>
+                <button id="confirmBtn">Bestätigen</button>
+            </div>
         `;
         document.getElementById('modalContent').innerHTML = innerHTML;
         const modal = document.getElementById('myModal');
@@ -150,10 +151,6 @@ function checkNummerInput() {
     }
 }
 
-// Funktion zum Löschen der Eingabe
-function clearNummer() {
-    document.getElementById("nummer").value = ''; // Eingabefeld leeren
-}
 
 initMyModal();
 initStatusMessage();
