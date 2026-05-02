@@ -247,6 +247,15 @@ function showSwimmerTable() {
             section.appendChild(stable);
             // Bereich für den Datenimport
             section.appendChild(document.createElement('hr'));
+            const importInfo = document.createElement('p');
+            importInfo.style.cssText = 'font-size:0.9rem;color:#555;margin:6px 0 10px;';
+            importInfo.innerHTML =
+                '<strong>CSV-Import:</strong> Spalten der Datei werden im nächsten Schritt den Datenbankfeldern zugeordnet. ' +
+                'Pflichtfeld ist <em>nummer</em>. ' +
+                'Felder ohne Zuordnung (Ignorieren) bleiben unverändert.<br>' +
+                'Existiert ein Schwimmer mit der Nummer bereits, werden nur Name, Gruppe und Kind-Flag aktualisiert — ' +
+                'geschwommene Bahnen und der Aktiv-Status bleiben erhalten.';
+            section.appendChild(importInfo);
             const input = document.createElement('input');
             input.type = 'file';
             input.id = 'csvInput';

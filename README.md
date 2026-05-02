@@ -166,6 +166,37 @@ Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einst
 
 Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
 
+## Schwimmer-Import (CSV)
+
+Im Admin-Bereich unter **Schwimmer** können Schwimmerdaten per CSV-Datei importiert werden.
+
+### Vorgehensweise
+
+1. CSV-Datei auswählen — die erste Zeile muss Spaltenüberschriften enthalten.
+2. Im Dialog wird jede **CSV-Spalte** (fett) einem **Datenbankfeld** zugeordnet. Nicht benötigte Spalten auf *Ignorieren* lassen.
+3. Pflichtfeld ist `nummer`. Alle anderen Felder sind optional.
+4. Klick auf **Importieren** überträgt die Daten.
+
+### Unterstützte Felder
+
+| Datenbankfeld | Bedeutung |
+| --- | --- |
+| `nummer` | Schwimmernummer (Pflicht, eindeutiger Schlüssel) |
+| `vorname` | Vorname |
+| `nachname` | Nachname |
+| `gruppe` | Gruppe / Team |
+| `istKind` | `1` = Kind, `0` = Erwachsener |
+| `istErw` | Alternative zu `istKind`: `0` = kein Erwachsener → wird intern als Kind (`istKind = 1`) gespeichert |
+
+### Verhalten bei bereits vorhandenen Schwimmern (Duplikate)
+
+Existiert ein Schwimmer mit der importierten Nummer bereits in der Datenbank, wird er **aktualisiert**, nicht doppelt angelegt:
+
+- **Aktualisiert:** `vorname`, `nachname`, `gruppe`, `istKind`
+- **Unverändert bleiben:** `bahnanzahl` (geschwommene Bahnen), `aktiv`-Status, Bahneinteilung
+
+So können Stammdaten (z. B. nach einer Namenskorrektur) gefahrlos neu importiert werden, ohne Bahndaten zu verlieren.
+
 ## Logging
 
 Die Logging-Konfiguration befindet sich in `logging_config.py`.
