@@ -1,101 +1,101 @@
-nummer,name,geschlecht,verein,geburtsjahr
-001,Ben Müller,m,SV Poseidon,2010
-002,Anna-Lena Schneider,w,Wasserfreunde,2009
-003,Clàra Méndez,w,,2011
-004,Maximilian,m,Delphin 08,
-005,Léa Dubois,w,SV Delphin,2012
-006,Tom O'Connor,m,,2010
-007,Lisa Weiß,w,Wasserfreunde,2008
-008,Paul Šimić,m,Neptun Köln,2011
-009,Emma-Maria Krüger,w,,2010
-010,Noah Zhang,m,TSV Schwimmclub,2009
-011,Tim Méndez,m,,2009
-012,Clara Zhang,w,TSV Schwimmclub,2007
-013,Mia Méndez,w,SV Poseidon,2011
-014,Emma Müller,w,Delphin 08,2013
-015,Lina Schneider,w,SV Delphin,2011
-016,Leon Krüger,m,TSV Schwimmclub,2012
-017,Noah Méndez,m,Neptun Köln,2009
-018,Lina Becker,w,Neptun Köln,2012
-019,Paul Müller,m,TSV Schwimmclub,2010
-020,Sophie Müller,w,,2007
-021,Léa Krüger,w,SV Delphin,2013
-022,Elias Weiß,m,Wasserfreunde,2008
-023,Maximilian Weiß,m,SV Poseidon,2007
-024,Maximilian Müller,m,SV Delphin,
-025,Léa Šimić,w,TSV Schwimmclub,2013
-026,Tom O'Connor,m,Neptun Köln,2009
-027,Mia Schneider,w,SV Poseidon,2011
-028,Paul Krüger,m,Delphin 08,2007
-029,Marie Becker,w,SV Delphin,2008
-030,Léa Zhang,w,Delphin 08,2008
-031,Tim Zhang,m,SV Poseidon,2011
-032,Elias Krüger,m,SV Delphin,
-033,Lina Dubois,w,SV Delphin,2009
-034,Laura Becker,w,Wasserfreunde,2012
-035,Paul Šimić,m,Neptun Köln,2013
-036,Mia Weiß,w,,2012
-037,Mia Müller,w,Wasserfreunde,2009
-038,Laura Zhang,w,Neptun Köln,2010
-039,Elias Becker,m,SV Poseidon,2009
-040,Tom Méndez,m,Wasserfreunde,2009
-041,Luca Šimić,m,Neptun Köln,2011
-042,Tom O'Connor,m,Wasserfreunde,2011
-043,Emma Becker,w,Wasserfreunde,2012
-044,Leon Šimić,m,Delphin 08,
-045,Noah O'Connor,m,SV Delphin,2010
-046,Maximilian Méndez,m,Wasserfreunde,2011
-047,Lisa Schneider,w,Delphin 08,2010
-048,Léa Šimić,w,TSV Schwimmclub,2009
-049,Leon Weiß,m,,2012
-050,Maximilian Becker,m,TSV Schwimmclub,2008
-051,Sophie Méndez,w,Delphin 08,2007
-052,Jonas O'Connor,m,TSV Schwimmclub,2009
-053,Tim Méndez,m,SV Poseidon,2010
-054,Léa O'Connor,w,SV Poseidon,
-055,Marie Dubois,w,,2008
-056,Sophie Schneider,w,TSV Schwimmclub,2008
-057,Ben Dubois,m,Wasserfreunde,2007
-058,Sophie Zhang,w,Delphin 08,2008
-059,Mia Méndez,w,Neptun Köln,2013
-060,Lina Weiß,w,Delphin 08,2012
-061,Luca Schneider,m,Delphin 08,2011
-062,Emma Müller,w,SV Poseidon,2007
-063,Ben Dubois,m,TSV Schwimmclub,2013
-064,Marie Dubois,w,SV Delphin,2007
-065,Tom Schneider,m,TSV Schwimmclub,2008
-066,Marie O'Connor,w,SV Delphin,2009
-067,Lisa Becker,w,Neptun Köln,2012
-068,Laura O'Connor,w,Delphin 08,2010
-069,Anna Zhang,w,Wasserfreunde,2007
-070,Mia Zhang,w,Wasserfreunde,2009
-071,Emma Becker,w,Wasserfreunde,2013
-072,Paul Becker,m,SV Delphin,
-073,Paul Müller,m,SV Delphin,2013
-074,Lisa O'Connor,w,SV Poseidon,2010
-075,Jonas Méndez,m,,2011
-076,Elias Schneider,m,Wasserfreunde,
-077,Noah O'Connor,m,Neptun Köln,
-078,Clara Müller,w,Wasserfreunde,2011
-079,Marie Méndez,w,,
-080,Elias Becker,m,,2012
-081,Emma Schneider,w,,2010
-082,Noah Méndez,m,Wasserfreunde,2007
-083,Ben Dubois,m,Delphin 08,2013
-084,Laura Schneider,w,SV Poseidon,2012
-085,Elias Krüger,m,SV Poseidon,2010
-086,Paul Becker,m,Wasserfreunde,2010
-087,Leon Méndez,m,Neptun Köln,2007
-088,Elias Šimić,m,TSV Schwimmclub,2011
-089,Lina Weiß,w,,2008
-090,Tim Dubois,m,SV Poseidon,2010
-091,Mia Schneider,w,,2008
-092,Laura Schneider,w,TSV Schwimmclub,2012
-093,Laura O'Connor,w,Neptun Köln,2013
-094,Tom Méndez,m,SV Delphin,2009
-095,Sophie Krüger,w,Delphin 08,2009
-096,Maximilian Weiß,m,TSV Schwimmclub,2012
-097,Leon Becker,m,SV Poseidon,2009
-098,Léa Schneider,w,Wasserfreunde,2007
-099,Tom Šimić,m,TSV Schwimmclub,2012
-100,Tom Becker,m,SV Poseidon,2013
+nummer,vorname,nachname,geschlecht,verein,geburtsjahr
+001,Ben,Müller,m,SV Poseidon,2010
+002,Anna-Lena,Schneider,w,Wasserfreunde,2009
+003,Clàra,Méndez,w,,2011
+004,Maximilian,,m,Delphin 08,
+005,Léa,Dubois,w,SV Delphin,2012
+006,Tom,O'Connor,m,,2010
+007,Lisa,Weiß,w,Wasserfreunde,2008
+008,Paul,Šimić,m,Neptun Köln,2011
+009,Emma-Maria,Krüger,w,,2010
+010,Noah,Zhang,m,TSV Schwimmclub,2009
+011,Tim,Méndez,m,,2009
+012,Clara,Zhang,w,TSV Schwimmclub,2007
+013,Mia,Méndez,w,SV Poseidon,2011
+014,Emma,Müller,w,Delphin 08,2013
+015,Lina,Schneider,w,SV Delphin,2011
+016,Leon,Krüger,m,TSV Schwimmclub,2012
+017,Noah,Méndez,m,Neptun Köln,2009
+018,Lina,Becker,w,Neptun Köln,2012
+019,Paul,Müller,m,TSV Schwimmclub,2010
+020,Sophie,Müller,w,,2007
+021,Léa,Krüger,w,SV Delphin,2013
+022,Elias,Weiß,m,Wasserfreunde,2008
+023,Maximilian,Weiß,m,SV Poseidon,2007
+024,Maximilian,Müller,m,SV Delphin,
+025,Léa,Šimić,w,TSV Schwimmclub,2013
+026,Tom,O'Connor,m,Neptun Köln,2009
+027,Mia,Schneider,w,SV Poseidon,2011
+028,Paul,Krüger,m,Delphin 08,2007
+029,Marie,Becker,w,SV Delphin,2008
+030,Léa,Zhang,w,Delphin 08,2008
+031,Tim,Zhang,m,SV Poseidon,2011
+032,Elias,Krüger,m,SV Delphin,
+033,Lina,Dubois,w,SV Delphin,2009
+034,Laura,Becker,w,Wasserfreunde,2012
+035,Paul,Šimić,m,Neptun Köln,2013
+036,Mia,Weiß,w,,2012
+037,Mia,Müller,w,Wasserfreunde,2009
+038,Laura,Zhang,w,Neptun Köln,2010
+039,Elias,Becker,m,SV Poseidon,2009
+040,Tom,Méndez,m,Wasserfreunde,2009
+041,Luca,Šimić,m,Neptun Köln,2011
+042,Tom,O'Connor,m,Wasserfreunde,2011
+043,Emma,Becker,w,Wasserfreunde,2012
+044,Leon,Šimić,m,Delphin 08,
+045,Noah,O'Connor,m,SV Delphin,2010
+046,Maximilian,Méndez,m,Wasserfreunde,2011
+047,Lisa,Schneider,w,Delphin 08,2010
+048,Léa,Šimić,w,TSV Schwimmclub,2009
+049,Leon,Weiß,m,,2012
+050,Maximilian,Becker,m,TSV Schwimmclub,2008
+051,Sophie,Méndez,w,Delphin 08,2007
+052,Jonas,O'Connor,m,TSV Schwimmclub,2009
+053,Tim,Méndez,m,SV Poseidon,2010
+054,Léa,O'Connor,w,SV Poseidon,
+055,Marie,Dubois,w,,2008
+056,Sophie,Schneider,w,TSV Schwimmclub,2008
+057,Ben,Dubois,m,Wasserfreunde,2007
+058,Sophie,Zhang,w,Delphin 08,2008
+059,Mia,Méndez,w,Neptun Köln,2013
+060,Lina,Weiß,w,Delphin 08,2012
+061,Luca,Schneider,m,Delphin 08,2011
+062,Emma,Müller,w,SV Poseidon,2007
+063,Ben,Dubois,m,TSV Schwimmclub,2013
+064,Marie,Dubois,w,SV Delphin,2007
+065,Tom,Schneider,m,TSV Schwimmclub,2008
+066,Marie,O'Connor,w,SV Delphin,2009
+067,Lisa,Becker,w,Neptun Köln,2012
+068,Laura,O'Connor,w,Delphin 08,2010
+069,Anna,Zhang,w,Wasserfreunde,2007
+070,Mia,Zhang,w,Wasserfreunde,2009
+071,Emma,Becker,w,Wasserfreunde,2013
+072,Paul,Becker,m,SV Delphin,
+073,Paul,Müller,m,SV Delphin,2013
+074,Lisa,O'Connor,w,SV Poseidon,2010
+075,Jonas,Méndez,m,,2011
+076,Elias,Schneider,m,Wasserfreunde,
+077,Noah,O'Connor,m,Neptun Köln,
+078,Clara,Müller,w,Wasserfreunde,2011
+079,Marie,Méndez,w,,
+080,Elias,Becker,m,,2012
+081,Emma,Schneider,w,,2010
+082,Noah,Méndez,m,Wasserfreunde,2007
+083,Ben,Dubois,m,Delphin 08,2013
+084,Laura,Schneider,w,SV Poseidon,2012
+085,Elias,Krüger,m,SV Poseidon,2010
+086,Paul,Becker,m,Wasserfreunde,2010
+087,Leon,Méndez,m,Neptun Köln,2007
+088,Elias,Šimić,m,TSV Schwimmclub,2011
+089,Lina,Weiß,w,,2008
+090,Tim,Dubois,m,SV Poseidon,2010
+091,Mia,Schneider,w,,2008
+092,Laura,Schneider,w,TSV Schwimmclub,2012
+093,Laura,O'Connor,w,Neptun Köln,2013
+094,Tom,Méndez,m,SV Delphin,2009
+095,Sophie,Krüger,w,Delphin 08,2009
+096,Maximilian,Weiß,m,TSV Schwimmclub,2012
+097,Leon,Becker,m,SV Poseidon,2009
+098,Léa,Schneider,w,Wasserfreunde,2007
+099,Tom,Šimić,m,TSV Schwimmclub,2012
+100,Tom,Becker,m,SV Poseidon,2013

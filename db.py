@@ -361,16 +361,12 @@ def insertOrUpdateSchwimmer(nummer, **kwargs):
     return cursor
     
 
-# Aktualisiert Felder eines Schwimmers anhand der ID
-# Die zu aktualisierenden Felder werden dynamisch übergeben, z. B.:
-# update_schwimmer(1, bahnanzahl=5, aktiv=0)
-# Das funktioniert durch **kwargs, womit beliebige Schlüssel-Wert-Paare übergeben werden können.
 def update_schwimmer(schwimmer_id, **kwargs):
     """
     Aktualisiert Felder eines Schwimmers anhand der ID.
-    Die zu aktualisierenden Felder werden dynamisch übergeben, z. B.:
-    update_schwimmer(1, bahnanzahl=5, aktiv=0)
-    Das funktioniert durch **kwargs, womit beliebige Schlüssel-Wert-Paare übergeben werden können.
+    Beliebige Felder als Keyword-Argumente übergeben, z. B.:
+        update_schwimmer(1, bahnanzahl=5, aktiv=0)
+    Gibt None zurück, wenn kein Schwimmer mit der ID gefunden wurde.
     """
     # Baut dynamisch das SET-Statement für SQL, z. B. "bahnanzahl=?, aktiv=?"
     keys = ', '.join([f"{k}=?" for k in kwargs])
