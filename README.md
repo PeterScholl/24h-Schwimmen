@@ -13,10 +13,10 @@ Die Erfassung soll auf möglichst vielen verschiedenen Endgeräten möglich sein
 ### Windows
 
 * Release als ZIP-Datei auf einem Windows-System herunterladen, entpacken und die Exe-Datei ausführen
-* Im Gui-Menu die Admin-Webseite starten (einloggen mit ``admin`` und ``swim24``)
-* Auf der Schwimmer-Seite einige Schwimmer aus dem Ordner testfiles importieren
+* Der Browser sollte automatisch starten - einloggen mit ``admin`` und ``swim24``
+* unten links auf die Admin-Oberfläche wechseln und im Bereich Schwimmer einige Schwimmer aus dem Ordner testfiles importieren
 * Benutzer anlegen
-* Zur *normalen* Webseite wechseln und ausprobieren
+* Zur *normalen* Webseite wechseln und ausprobieren (wieder unten links)
 
 ### Linux bzw. Source
 
