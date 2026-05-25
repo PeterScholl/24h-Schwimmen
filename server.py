@@ -191,14 +191,31 @@ def admin():
             if not nummer:
                 return "Keine Schwimmernummer angegeben", 400
             felder = {}
-            if 'vorname'  in data: felder['vorname']  = data.get('vorname', '').strip()
-            if 'nachname' in data: felder['nachname'] = data.get('nachname', '').strip()
-            if 'gruppe'   in data: felder['gruppe']   = data.get('gruppe', '').strip()
-            if 'istKind'  in data: felder['istKind']  = 1 if data.get('istKind') in (True, 1, '1', 'true', 'True') else 0
+            if 'vorname'     in data: felder['vorname']     = data.get('vorname', '').strip()
+            if 'nachname'    in data: felder['nachname']    = data.get('nachname', '').strip()
+            if 'gruppe'      in data: felder['gruppe']      = data.get('gruppe', '').strip()
+            if 'istKind'     in data: felder['istKind']     = 1 if data.get('istKind') in (True, 1, '1', 'true', 'True') else 0
+            if 'bahnanzahl'  in data: felder['bahnanzahl']  = int(data.get('bahnanzahl'))
             if not felder:
                 return "Keine Felder zum Ändern angegeben", 400
             logging.info(f"Schwimmer {nummer} wird bearbeitet: {felder}")
             if not db.update_schwimmer(int(nummer), **felder):
+                return "DB - Fehler", 400
+            return "Erfolg", 200
+        elif action == 'edit_user':
+            user_id = data.get('id')
+            if not user_id:
+                return "Keine Benutzer-ID angegeben", 400
+            felder = {}
+            if 'name'  in data: felder['name']  = data.get('name', '').strip()
+            if 'admin' in data: felder['admin'] = 1 if data.get('admin') in (True, 1, '1', 'true', 'True') else 0
+            if 'passwort' in data and data.get('passwort', '').strip():
+                from werkzeug.security import generate_password_hash
+                felder['passwort'] = generate_password_hash(data['passwort'].strip())
+            if not felder:
+                return "Keine Felder zum Ändern angegeben", 400
+            logging.info(f"Benutzer {user_id} wird bearbeitet: { {k:v for k,v in felder.items() if k != 'passwort'} }")
+            if not db.update_benutzer_by_id(int(user_id), **felder):
                 return "DB - Fehler", 400
             return "Erfolg", 200
         elif action == 'get_table_benutzer':
@@ -273,9 +290,36 @@ def admin():
             logging.info(f"Importiert wurden {len(validierte)} Schwimmer")
             db.db.setBegin(False)
 
-            print("Validierte", validierte)
+            print("Validierte [0:10]", validierte[0:10])
 
             return jsonify({"status": "ok", "importiert": len(validierte)}), 200
+        elif action == 'import_benutzer':
+            benutzer_liste = data.get("data", [])
+            logging.info(f"Benutzer werden importiert - {len(benutzer_liste)} Einträge")
+            if not isinstance(benutzer_liste, list):
+                return jsonify({"error": "Datenformat ungültig"}), 400
+            neu = 0
+            aktualisiert = 0
+            for b in benutzer_liste:
+                benutzername = b.get("benutzername", "").strip().lower()
+                if not benutzername:
+                    continue
+                name = b.get("name", "").strip() or benutzername
+                passwort = b.get("passwort", "").strip()
+                admin_val = b.get("admin", "0")
+                is_admin = admin_val in (1, "1", "true", "True", True)
+                vorhandener = db.finde_benutzer_by_username(benutzername)
+                if vorhandener:
+                    db.update_benutzer(benutzername, name=name, admin=int(is_admin))
+                    if passwort:
+                        db.passwort_aendern(benutzername, passwort)
+                    aktualisiert += 1
+                else:
+                    pw = passwort if passwort else generiere_passwort()
+                    db.erstelle_benutzer(name, benutzername, pw, admin=is_admin)
+                    neu += 1
+            logging.info(f"Benutzer-Import: {neu} neu, {aktualisiert} aktualisiert")
+            return jsonify({"status": "ok", "importiert": neu + aktualisiert, "neu": neu, "aktualisiert": aktualisiert}), 200
         elif action:
             return f"Unknown Action {action}", 400
 
@@ -284,7 +328,7 @@ def admin():
         'userrealname': session.get('realname',"Unbekannt"),
         'username': session.get('user',"unknown"),
         'clientID': session.get('clientID',"--"),
-        'schwimmerNrLen': config["laenge_schwimmerNr"]
+        'schwimmerNrLen': config["laenge_schwimmerNr_digits"]
     }
     return render_template('admin.html',**params)
 
@@ -318,22 +362,22 @@ def index_v2():
         'clientID': session.get('clientID',"--"),
         'debugfunktion': request.args.get('dbgfkt') == 'true',
         'card_font_size': request.args.get('size', '5'),
-        'mobile_cards': config.get('mobile_cards', 2)
+        'mobile_cards_col': config.get('mobile_cards_col', 2)
     }
     return render_template("index_v2.html", **params)
 
 @app.route("/main.js")
 def send_mainjs():
     params = {
-        'schwimmerNrLen': config["laenge_schwimmerNr"]
+        'schwimmerNrLen': config["laenge_schwimmerNr_digits"]
     }
     return render_template("main.js", **params), 200, {'Content-Type': 'application/javascript'}
 
 @app.route("/main_v2.js")
 def send_mainjs_v2():
     params = {
-        'schwimmerNrLen': config["laenge_schwimmerNr"],
-        'fadeTime': config.get("fade_time", 0)
+        'schwimmerNrLen': config["laenge_schwimmerNr_digits"],
+        'fadeTime': config.get("fade_time_s", 0)
     }
     return render_template("main_v2.js", **params), 200, {'Content-Type': 'application/javascript'}
 
@@ -341,7 +385,8 @@ def send_mainjs_v2():
 def send_viewjs():
     params = {
         'bahnlaenge': config["laenge_bahn_m"],
-        'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z')
+        'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z'),
+        'swimmer_list_interval': config.get('swimmer_list_update_interval_s', 60)
     }
     return render_template("view.js", **params), 200, {'Content-Type': 'application/javascript'}
 
@@ -361,10 +406,15 @@ def view2():
 def send_view2js():
     params = {
         'bahnlaenge': config["laenge_bahn_m"],
-        'page_interval': config.get('view2_page_interval', 5),
-        'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z')
+        'page_interval': config.get('view2_page_interval_s', 10),
+        'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z'),
+        'swimmer_list_interval': config.get('swimmer_list_update_interval_s', 60)
     }
     return render_template("view2.js", **params), 200, {'Content-Type': 'application/javascript'}
+
+@app.route("/api/ips")
+def api_ips():
+    return jsonify(get_all_ips())
 
 @app.route("/show_qr")
 def show_qr():
@@ -400,7 +450,7 @@ def action():
             
             if kommando == "ADD":
                 # ADD - Action muss dokumentiert werden
-                # Prrüfung, ob diese schon vorhanden war!!!
+                # Prüfung, ob diese schon vorhanden war!!!
                 anz = db.erstelle_action(user, client_id=clientid, zeitstempel=str(timestamp), kommando=str(kommando), parameter=json.dumps(parameter))
                 logging.debug(f"Aktion ist eingetragen: {"NEW" if anz>0 else "EXISTED"}")
                 if (anz>0):
@@ -441,17 +491,19 @@ def action():
                     nummer = int(parameter[0])
                     updates = [db.lies_schwimmer(nummer)]
             elif kommando == "VIEW": # Update des Viewbildschirms angefordert
-                if (len(parameter)>0): #nur begrenzter Zeitraum
+                if "update_swimmer" in parameter: # Nur Schwimmerliste
+                    data = {'swimmerMap': db.liste_tabelle('schwimmer')}
+                    return jsonify(data), 200
+                elif len(parameter) > 0: # Begrenzter Zeitraum
                     sinceTimestamp = parameter[0]
-                    data = {}
-                    data['actions'] = db.finde_actions_after_timestamp(sinceTimestamp)
+                    data = {'actions': db.finde_actions_after_timestamp(sinceTimestamp)}
                     return jsonify(data), 200
-                else: #Volständige übermittlung
-                    data = {}
-                    data['swimmerMap'] = db.liste_tabelle('schwimmer')
-                    data['actions'] = db.liste_tabelle('actions')
+                else: # Vollständige Übermittlung
+                    data = {
+                        'swimmerMap': db.liste_tabelle('schwimmer'),
+                        'actions': db.liste_tabelle('actions')
+                    }
                     return jsonify(data), 200
-                pass
             elif kommando == "ACT": # Status Aktiv ändern
                 try:
                     nummer = int(parameter[0])

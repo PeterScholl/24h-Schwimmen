@@ -125,10 +125,16 @@ function showUserTable() {
             section.appendChild(heading);
             // Button um CSV herunterzuladen
             const csvbutton = document.createElement('Button');
-            csvbutton.textContent = "CSV";
-            csvbutton.style.margin = "0px 20px";
+            csvbutton.textContent = "CSV-Download";
+            csvbutton.style.margin = "0px 5px 0px 20px"; // oben-rechts-unten-links
             csvbutton.addEventListener("click", () => downloadCSV(userData));
             section.appendChild(csvbutton);
+            // Button um neuen User anzulegen
+            const newbutton = document.createElement('Button');
+            newbutton.textContent = "Neuer Nutzer";
+            newbutton.style.margin = "0px 0px"; //oben/unten - links/rechts
+            newbutton.addEventListener("click", () => showSection('adduser'));
+            section.appendChild(newbutton);
             // Seitendarstellungskontrolle
             // Alle alten Divs paginationcontrol löschen - sollte maximal eins sein
             document.querySelectorAll('div#paginationControls').forEach(el => el.remove());
@@ -141,6 +147,16 @@ function showUserTable() {
             section.appendChild(stable);
             // Bereich für den Datenimport
             section.appendChild(document.createElement('hr'));
+            const importInfo = document.createElement('p');
+            importInfo.style.cssText = 'font-size:0.9rem;color:#555;max-width:600px;';
+            importInfo.innerHTML = `
+                <strong>CSV-Import:</strong> Pflichtfeld ist <code>benutzername</code>.
+                Optional: <code>name</code>, <code>passwort</code>, <code>admin</code> (0 oder 1).<br>
+                Existiert ein Benutzer mit dem Benutzernamen bereits, werden <em>Name</em> und <em>Admin-Status</em> aktualisiert.
+                Das Passwort wird nur geändert, wenn es in der CSV angegeben ist.
+                Fehlt das Passwort bei einem neuen Benutzer, wird ein Zufallspasswort vergeben – bitte anschließend ändern.
+            `;
+            section.appendChild(importInfo);
             const input = document.createElement('input');
             input.type = 'file';
             input.id = 'csvInput';
@@ -152,7 +168,13 @@ function showUserTable() {
             button.id = "csvSend";
             button.innerText = 'Importieren';
             section.appendChild(button);
-            initCSVImport('#csvInput', '#csvPreviewContainer', '#csvSend', { url: '/admin' });
+            initCSVImport('#csvInput', '#csvPreviewContainer', '#csvSend', {
+                url: '/admin',
+                action: 'import_benutzer',
+                knownHeaders: ['', 'benutzername', 'name', 'passwort', 'admin'],
+                importLabel: 'Benutzer',
+                onSuccess: () => showUserTable()
+            });
             renderTable(userData, 'userTable', ['id', 'name', 'benutzername', 'admin'], { 'Del': delUser, 'Edit': editUser });
         })
         .catch(error => {
@@ -160,8 +182,63 @@ function showUserTable() {
         });
 }
 
-function editUser(nummer) { //TODO
-    alert(`Bearbeite Nutzer: ${nummer}`); // Placeholder
+function editUser(id) {
+    const u = userData.find(u => parseInt(u.id) === parseInt(id));
+    if (!u) return;
+
+    let dlg = document.getElementById('editUserDialog');
+    if (!dlg) {
+        dlg = document.createElement('dialog');
+        dlg.id = 'editUserDialog';
+        dlg.style.cssText = 'padding:1.5rem; min-width:280px; border-radius:6px;';
+        document.body.appendChild(dlg);
+    }
+
+    dlg.innerHTML = `
+        <h3 style="margin-top:0">Benutzer „${u.benutzername}" bearbeiten</h3>
+        <label style="display:block;margin-bottom:6px">Anzeigename<br>
+            <input id="euName" type="text" value="${u.name ?? ''}" style="width:100%;box-sizing:border-box">
+        </label>
+        <label style="display:block;margin-bottom:6px">Neues Passwort <span style="color:#888;font-size:0.85em">(leer lassen = unverändert)</span><br>
+            <input id="euPasswort" type="password" style="width:100%;box-sizing:border-box">
+        </label>
+        <label style="display:block;margin-bottom:12px">
+            <input id="euAdmin" type="checkbox" ${u.admin ? 'checked' : ''}> Admin-Rechte
+        </label>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button id="euSave">Speichern</button>
+            <button id="euCancel">Abbrechen</button>
+        </div>
+    `;
+
+    dlg.querySelector('#euCancel').onclick = () => dlg.close();
+    dlg.querySelector('#euSave').onclick = () => {
+        const payload = {
+            action: 'edit_user',
+            id: id,
+            name:   dlg.querySelector('#euName').value.trim(),
+            admin:  dlg.querySelector('#euAdmin').checked ? 1 : 0,
+        };
+        const pw = dlg.querySelector('#euPasswort').value;
+        if (pw) payload.passwort = pw;
+
+        fetch('/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        }).then(r => r.text().then(text => {
+            if (r.ok) {
+                Object.assign(u, { name: payload.name, admin: payload.admin });
+                showStatusMessage(`Benutzer ${u.benutzername} gespeichert`, true);
+                dlg.close();
+                renderTable(userData, 'userTable', ['id', 'name', 'benutzername', 'admin'], { 'Del': delUser, 'Edit': editUser });
+            } else {
+                showStatusMessage(`Fehler: ${text}`, false);
+            }
+        }));
+    };
+
+    dlg.showModal();
 }
 
 function delUser(nummer) {
@@ -268,8 +345,11 @@ function showSwimmerTable() {
             button.innerText = 'Importieren';
             section.appendChild(button);
             initCSVImport('#csvInput', '#csvPreviewContainer', '#csvSend', { url: '/admin',
-                knownHeaders: ['', 'nummer', 'vorname', 'nachname', 'istKind', 'istErw', 'gruppe']
-             });
+                action: 'import_schwimmer',
+                knownHeaders: ['', 'nummer', 'vorname', 'nachname', 'istKind', 'istErw', 'gruppe'],
+                importLabel: 'Schwimmer',
+                onSuccess: () => showSwimmerTable()
+            });
 
             const swimmerHeader = ['nummer', 'vorname', 'nachname', 'istKind', 'gruppe', 'bahnanzahl', 'auf_bahn', 'aktiv'];
             const swimmerAktionen = { 'Del': deleteSwimmer, 'Edit': editSwimmer };
@@ -660,7 +740,85 @@ function showChecksSection() {
     checkSection.innerHTML = ''; // erst leeren 
     let button = document.createElement('button');
     button.innerText = "Anzahlen Prüfen";
-    button.addEventListener('click', (e) => fetchAndFillTable(null, 'checkAnzahlenTable', 'get_checkAnzahlTable', 'Anzahlen'));
+    button.addEventListener('click', () => {
+        fetch('/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ action: 'get_checkAnzahlTable' })
+        })
+            .then(r => r.json())
+            .then(data => {
+                const table = document.getElementById('checkAnzahlenTable');
+                table.innerHTML = '';
+                if (data.length === 0) {
+                    table.innerHTML = '<tr><th>Keine Abweichungen gefunden</th></tr>';
+                    return;
+                }
+                // "Alle übernehmen"-Button (ggf. alten ersetzen)
+                document.getElementById('checkAllBtn')?.remove();
+                const allBtn = document.createElement('button');
+                allBtn.id = 'checkAllBtn';
+                allBtn.textContent = 'Alle übernehmen';
+                allBtn.style.cssText = 'margin-bottom:8px;';
+                table.insertAdjacentElement('beforebegin', allBtn);
+
+                const rowMeta = []; // { entry, row, btn } – für "Alle übernehmen"
+
+                const applyEntry = async (e) => {
+                    const res = await fetch('/admin', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'edit_swimmer', nummer: e.schwimmerID, bahnanzahl: e.ActionAnzErwartet })
+                    });
+                    return res.ok;
+                };
+
+                const headerRow = document.createElement('tr');
+                [...Object.keys(data[0]), 'Aktion'].forEach(k => {
+                    const th = document.createElement('th');
+                    th.textContent = k.charAt(0).toUpperCase() + k.slice(1);
+                    headerRow.appendChild(th);
+                });
+                table.appendChild(headerRow);
+                data.forEach(entry => {
+                    const row = document.createElement('tr');
+                    Object.values(entry).forEach(value => {
+                        const td = document.createElement('td');
+                        td.textContent = value;
+                        row.appendChild(td);
+                    });
+                    const tdBtn = document.createElement('td');
+                    const btn = document.createElement('button');
+                    btn.textContent = 'Übernehmen';
+                    btn.title = `ActionAnzErwartet (${entry.ActionAnzErwartet}) als Bahnanzahl speichern`;
+                    btn.addEventListener('click', async () => {
+                        if (await applyEntry(entry)) {
+                            row.style.opacity = '0.4';
+                            btn.disabled = true;
+                            showStatusMessage(`Schwimmer ${entry.schwimmerID}: Bahnanzahl auf ${entry.ActionAnzErwartet} gesetzt`);
+                        } else {
+                            showStatusMessage(`Fehler bei Schwimmer ${entry.schwimmerID}`, false);
+                        }
+                    });
+                    rowMeta.push({ entry, row, btn });
+                    tdBtn.appendChild(btn);
+                    row.appendChild(tdBtn);
+                    table.appendChild(row);
+                });
+
+                allBtn.addEventListener('click', async () => {
+                    allBtn.disabled = true;
+                    const results = await Promise.all(rowMeta.map(m => applyEntry(m.entry).then(ok => ({ ...m, ok }))));
+                    const failed = results.filter(r => !r.ok);
+                    results.filter(r => r.ok).forEach(r => { r.row.style.opacity = '0.4'; r.btn.disabled = true; });
+                    if (failed.length === 0) {
+                        showStatusMessage(`Alle ${results.length} Schwimmer aktualisiert`);
+                    } else {
+                        showStatusMessage(`${results.length - failed.length} aktualisiert, ${failed.length} Fehler`, false);
+                    }
+                });
+            });
+    });
     checkSection.appendChild(button);
     const info = document.createElement('span');
     info.innerText = "Gibt Schwimmer aus, bei denen die Anzahlen in Actions nicht denen in der Schwimmer-Tabelle entspricht"
@@ -668,7 +826,72 @@ function showChecksSection() {
     let table = document.createElement('table');
     table.id = "checkAnzahlenTable";
     checkSection.appendChild(table);
+    checkSection.appendChild(document.createElement('hr'));
     let heading = document.createElement('h2');
+    heading.innerText = "Korrektur-ADD";
+    checkSection.appendChild(heading);
+
+    const corrForm = document.createElement('div');
+    corrForm.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:12px;';
+
+    function labeledInput(labelText, type, value, min) {
+        const wrap = document.createElement('label');
+        wrap.style.cssText = 'display:flex;flex-direction:column;font-size:0.9rem;';
+        wrap.textContent = labelText;
+        const inp = document.createElement('input');
+        inp.type = type;
+        inp.value = value;
+        if (min !== undefined) inp.min = min;
+        inp.style.cssText = 'width:6em;padding:4px;margin-top:2px;';
+        wrap.appendChild(inp);
+        return { wrap, inp };
+    }
+
+    const { wrap: wNr,   inp: inpNr   } = labeledInput('Schwimmernr.', 'number', '1', '1');
+    const { wrap: wAnz,  inp: inpAnz  } = labeledInput('Anzahl',       'number', '1');
+    const { wrap: wBahn, inp: inpBahn } = labeledInput('Bahnnr.',       'number', '1', '0');
+    const { wrap: wText, inp: inpText } = labeledInput('Kommentar',     'text',   'correction');
+    inpText.style.cssText = 'width:12em;padding:4px;margin-top:2px;';
+
+    const sendBtn = document.createElement('button');
+    sendBtn.textContent = 'ADD senden';
+    sendBtn.style.cssText = 'padding:6px 14px;cursor:pointer;';
+    sendBtn.addEventListener('click', async () => {
+        const nummer = parseInt(inpNr.value);
+        const anzahl = parseInt(inpAnz.value);
+        const bahnnr = parseInt(inpBahn.value);
+        const kommentar = inpText.value.trim() || 'correction';
+        if (isNaN(nummer) || nummer < 1 || isNaN(anzahl) || isNaN(bahnnr)) {
+            showStatusMessage('Ungültige Eingabe', false);
+            return;
+        }
+        try {
+            const response = await fetch('/action', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify([{
+                    kommando: 'ADD',
+                    parameter: [nummer, anzahl, bahnnr, kommentar],
+                    timestamp: new Date().toISOString()
+                }])
+            });
+            const result = await response.json();
+            const status = result?.results?.[0]?.status ?? '?';
+            showStatusMessage(`ADD gesendet — Status: ${status}`, response.ok && status === 'erfolgreich');
+        } catch (err) {
+            showStatusMessage(`Netzwerkfehler: ${err}`, false);
+        }
+    });
+
+    corrForm.appendChild(wNr);
+    corrForm.appendChild(wAnz);
+    corrForm.appendChild(wBahn);
+    corrForm.appendChild(wText);
+    corrForm.appendChild(sendBtn);
+    checkSection.appendChild(corrForm);
+
+    checkSection.appendChild(document.createElement('hr'));
+    heading = document.createElement('h2');
     heading.innerText = "ACTIONS importieren (JSON)";
     checkSection.appendChild(heading);
     // Bereich für die ImportDaten
@@ -783,8 +1006,8 @@ function showQRSection() {
     section.appendChild(heading);
 
     // Checkbox + Zahlenfeld für size-Parameter
-    const row = document.createElement('div');
-    row.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 16px;';
+    const rowSize = document.createElement('div');
+    rowSize.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 10px;';
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -805,23 +1028,44 @@ function showQRSection() {
 
     checkbox.addEventListener('change', () => { input.disabled = !checkbox.checked; });
 
-    row.appendChild(checkbox);
-    row.appendChild(label);
-    row.appendChild(input);
-    section.appendChild(row);
+    rowSize.appendChild(checkbox);
+    rowSize.appendChild(label);
+    rowSize.appendChild(input);
+    section.appendChild(rowSize);
+
+    // Checkbox für dbgfkt-Parameter
+    const rowDbg = document.createElement('div');
+    rowDbg.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 16px;';
+
+    const checkboxDbg = document.createElement('input');
+    checkboxDbg.type = 'checkbox';
+    checkboxDbg.id = 'qrDbgCheck';
+
+    const labelDbg = document.createElement('label');
+    labelDbg.htmlFor = 'qrDbgCheck';
+    labelDbg.textContent = 'Debug-Funktion aktivieren (dbgfkt=true)';
+
+    rowDbg.appendChild(checkboxDbg);
+    rowDbg.appendChild(labelDbg);
+    section.appendChild(rowDbg);
 
     const btn = document.createElement('button');
     btn.textContent = 'QR-Code öffnen';
     btn.style.cssText = 'font-size: 1rem; padding: 8px 16px; cursor: pointer;';
     btn.addEventListener('click', () => {
-        const base = window.location.origin;
-        let url;
-        if (checkbox.checked && input.value) {
-            url = base + '/v2?size=' + encodeURIComponent(input.value);
-        } else {
-            url = base;
-        }
-        window.open('/show_qr?ip=' + encodeURIComponent(url), '_blank');
+        const params = new URLSearchParams();
+        if (checkbox.checked && input.value) params.set('size', input.value);
+        if (checkboxDbg.checked) params.set('dbgfkt', 'true');
+        const query = params.toString();
+        fetch('/api/ips')
+            .then(r => r.json())
+            .then(ips => {
+                const host = (ips && ips.length > 0) ? ips[0] : window.location.hostname;
+                const port = window.location.port ? ':' + window.location.port : '';
+                const base = window.location.protocol + '//' + host + port;
+                const url = base + '/v2' + (query ? '?' + query : '');
+                window.open('/show_qr?ip=' + encodeURIComponent(url), '_blank');
+            });
     });
     section.appendChild(btn);
 }

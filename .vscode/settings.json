@@ -1,0 +1,5 @@
+{
+  "files.associations": {
+    "flask_templates/*.js": "jinja"
+  }
+}

@@ -361,16 +361,12 @@ def insertOrUpdateSchwimmer(nummer, **kwargs):
     return cursor
     
 
-# Aktualisiert Felder eines Schwimmers anhand der ID
-# Die zu aktualisierenden Felder werden dynamisch übergeben, z. B.:
-# update_schwimmer(1, bahnanzahl=5, aktiv=0)
-# Das funktioniert durch **kwargs, womit beliebige Schlüssel-Wert-Paare übergeben werden können.
 def update_schwimmer(schwimmer_id, **kwargs):
     """
     Aktualisiert Felder eines Schwimmers anhand der ID.
-    Die zu aktualisierenden Felder werden dynamisch übergeben, z. B.:
-    update_schwimmer(1, bahnanzahl=5, aktiv=0)
-    Das funktioniert durch **kwargs, womit beliebige Schlüssel-Wert-Paare übergeben werden können.
+    Beliebige Felder als Keyword-Argumente übergeben, z. B.:
+        update_schwimmer(1, bahnanzahl=5, aktiv=0)
+    Gibt None zurück, wenn kein Schwimmer mit der ID gefunden wurde.
     """
     # Baut dynamisch das SET-Statement für SQL, z. B. "bahnanzahl=?, aktiv=?"
     keys = ', '.join([f"{k}=?" for k in kwargs])
@@ -510,6 +506,27 @@ def erstelle_benutzer(name, benutzername, passwort, admin=False):
     '''
     params = (name, benutzername, generate_password_hash(passwort), int(admin))
     return db.execute(query, params)
+
+
+def update_benutzer_by_id(user_id, **kwargs):
+    keys = ', '.join(f'{k}=?' for k in kwargs)
+    values = list(kwargs.values()) + [int(user_id)]
+    query = f'UPDATE benutzer SET {keys} WHERE id = ?'
+    cursor = db.execute(query, values)
+    if cursor and cursor.rowcount == 0: return None
+    return cursor
+
+
+def update_benutzer(benutzername, name=None, admin=None):
+    felder = {}
+    if name is not None: felder['name'] = name
+    if admin is not None: felder['admin'] = int(admin)
+    if not felder:
+        return 0
+    set_clause = ', '.join(f'{k} = ?' for k in felder)
+    query = f'UPDATE benutzer SET {set_clause} WHERE benutzername = ?'
+    cursor = db.execute(query, list(felder.values()) + [benutzername])
+    return cursor.rowcount if cursor else 0
 
 
 def passwort_aendern(benutzername, neues_passwort):

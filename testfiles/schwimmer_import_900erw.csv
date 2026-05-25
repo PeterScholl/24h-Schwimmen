@@ -1,901 +1,901 @@
-nummer,name,geschlecht,verein,geburtsjahr
-001,Ben Müller,m,SV Poseidon,2010
-002,Anna-Lena Schneider,w,Wasserfreunde,2009
-003,Clàra Méndez,w,,2011
-004,Maximilian,m,Delphin 08,
-005,Léa Dubois,w,SV Delphin,2012
-006,Tom O'Connor,m,,2010
-007,Lisa Weiß,w,Wasserfreunde,2008
-008,Paul Šimić,m,Neptun Köln,2011
-009,Emma-Maria Krüger,w,,2010
-010,Noah Zhang,m,TSV Schwimmclub,2009
-011,Tim Méndez,m,,2009
-012,Clara Zhang,w,TSV Schwimmclub,2007
-013,Mia Méndez,w,SV Poseidon,2011
-014,Emma Müller,w,Delphin 08,2013
-015,Lina Schneider,w,SV Delphin,2011
-016,Maximilian,m,SV Poseidon,2006
-017,Léa Dubois,w,,2006
-018,László Nagy,m,Neptun Köln,2012
-019,Jiří Novák,m,,
-020,Mia Méndez,m,,2012
-021,Léa Dubois,w,Wasserfreunde,2009
-022,Džesika Kalniņa,m,TSV Schwimmclub,
-023,Maximilian,m,,2008
-024,Tim Méndez,w,,
-025,Lisa Weiß,m,,
-026,Lina Schneider,m,Wasserfreunde,
-027,Noah Zhang,w,SV Delphin,
-028,Ole-Jørgen Berg,w,SV Delphin,2013
-029,Ben Müller,w,TSV Schwimmclub,2013
-030,Džesika Kalniņa,w,Delphin 08,2013
-031,Emma Müller,w,Wasserfreunde,
-032,Ben Müller,m,TSV Schwimmclub,2011
-033,Åsa Svensson,m,Neptun Köln,
-034,Ben Müller,m,SV Poseidon,2006
-035,Maximilian,w,SV Delphin,2013
-036,Zoë Schmidt,w,Neptun Köln,2011
-037,Paul Šimić,m,TSV Schwimmclub,
-038,Ole-Jørgen Berg,m,SV Poseidon,
-039,Chloé Lemoine,w,TSV Schwimmclub,
-040,Anna-Lena Schneider,w,Wasserfreunde,2006
-041,José García,m,Neptun Köln,2013
-042,Ole-Jørgen Berg,m,SV Delphin,2008
-043,Chloé Lemoine,m,,2006
-044,Chloé Lemoine,w,Neptun Köln,2006
-045,László Nagy,m,Delphin 08,
-046,Clàra Méndez,w,Delphin 08,2006
-047,Anna-Lena Schneider,m,TSV Schwimmclub,2011
-048,Tom O'Connor,w,SV Delphin,
-049,Ben Müller,m,TSV Schwimmclub,2006
-050,Tom O'Connor,w,Delphin 08,2013
-051,Noah Zhang,m,SV Poseidon,
-052,Chloé Lemoine,w,TSV Schwimmclub,2011
-053,László Nagy,w,TSV Schwimmclub,
-054,Mārtiņš Bērziņš,m,Delphin 08,2013
-055,László Nagy,m,Wasserfreunde,2006
-056,Paul Šimić,w,SV Delphin,2013
-057,Anna-Lena Schneider,m,SV Poseidon,
-058,Zoë Schmidt,w,SV Delphin,
-059,László Nagy,m,SV Poseidon,2006
-060,Zoë Schmidt,m,Neptun Köln,
-061,Emma-Maria Krüger,w,,
-062,László Nagy,w,SV Delphin,
-063,Clara Zhang,w,TSV Schwimmclub,
-064,Jiří Novák,m,,
-065,Clara Zhang,w,,2013
-066,Ben Müller,m,SV Delphin,2010
-067,Emma Müller,m,Delphin 08,
-068,José García,w,SV Delphin,
-069,Ole-Jørgen Berg,m,Wasserfreunde,
-070,Emma-Maria Krüger,m,Delphin 08,
-071,Džesika Kalniņa,w,Delphin 08,
-072,Mia Méndez,m,Neptun Köln,2013
-073,Emma-Maria Krüger,m,Wasserfreunde,2007
-074,Emma Müller,w,,
-075,Paul Šimić,w,,
-076,Noah Zhang,m,Neptun Köln,2013
-077,Tim Méndez,w,SV Poseidon,
-078,Åsa Svensson,w,,2009
-079,Tim Méndez,w,Neptun Köln,
-080,Clara Zhang,w,Wasserfreunde,2011
-081,Anna-Lena Schneider,m,SV Delphin,
-082,Tom O'Connor,m,Neptun Köln,
-083,Ole-Jørgen Berg,w,SV Poseidon,
-084,Tim Méndez,w,Delphin 08,
-085,Mia Méndez,m,SV Delphin,2006
-086,Emma Müller,w,SV Delphin,
-087,László Nagy,w,Delphin 08,
-088,Emma-Maria Krüger,w,Neptun Köln,
-089,Clàra Méndez,m,Delphin 08,
-090,José García,w,Neptun Köln,2009
-091,Džesika Kalniņa,w,Delphin 08,2006
-092,Zoë Schmidt,w,TSV Schwimmclub,
-093,José García,m,Neptun Köln,
-094,Lisa Weiß,m,SV Poseidon,2007
-095,Mia Méndez,w,Delphin 08,
-096,Clara Zhang,w,Neptun Köln,
-097,Emma-Maria Krüger,m,,
-098,Åsa Svensson,m,TSV Schwimmclub,
-099,Chloé Lemoine,w,Delphin 08,2013
-100,Clara Zhang,m,Wasserfreunde,2008
-101,Emma-Maria Krüger,w,SV Poseidon,
-102,Tim Méndez,m,Neptun Köln,2009
-103,Zoë Schmidt,w,SV Poseidon,2006
-104,Emma Müller,m,TSV Schwimmclub,2010
-105,Anna-Lena Schneider,w,Delphin 08,
-106,Clàra Méndez,m,SV Delphin,
-107,Tim Méndez,w,,
-108,José García,m,,
-109,José García,m,Delphin 08,2013
-110,Paul Šimić,w,TSV Schwimmclub,2009
-111,Zoë Schmidt,m,Delphin 08,2013
-112,Clàra Méndez,m,SV Delphin,
-113,Tim Méndez,w,Wasserfreunde,2011
-114,Lisa Weiß,m,Delphin 08,
-115,Tim Méndez,w,Neptun Köln,
-116,Noah Zhang,w,Wasserfreunde,2012
-117,László Nagy,m,SV Delphin,2007
-118,Ole-Jørgen Berg,m,TSV Schwimmclub,2007
-119,Noah Zhang,w,Delphin 08,
-120,Chloé Lemoine,m,,
-121,José García,m,Wasserfreunde,2009
-122,Džesika Kalniņa,w,Wasserfreunde,
-123,Džesika Kalniņa,w,Neptun Köln,
-124,Lisa Weiß,m,Neptun Köln,
-125,Mia Méndez,m,SV Poseidon,
-126,Tom O'Connor,m,SV Poseidon,2010
-127,Lina Schneider,w,TSV Schwimmclub,
-128,Lisa Weiß,m,SV Delphin,2008
-129,Lina Schneider,w,,2007
-130,Anna-Lena Schneider,w,Delphin 08,
-131,Paul Šimić,w,SV Delphin,2006
-132,Tom O'Connor,m,SV Poseidon,
-133,Ben Müller,m,Neptun Köln,2006
-134,Åsa Svensson,w,Wasserfreunde,2007
-135,Mārtiņš Bērziņš,w,TSV Schwimmclub,
-136,Chloé Lemoine,m,SV Poseidon,
-137,Clàra Méndez,m,,
-138,Zoë Schmidt,m,TSV Schwimmclub,
-139,Mārtiņš Bērziņš,m,Wasserfreunde,2008
-140,Chloé Lemoine,w,Wasserfreunde,2010
-141,Chloé Lemoine,w,TSV Schwimmclub,
-142,Clàra Méndez,m,SV Delphin,
-143,José García,m,Neptun Köln,
-144,Džesika Kalniņa,m,SV Poseidon,
-145,Léa Dubois,m,Delphin 08,2010
-146,László Nagy,w,TSV Schwimmclub,
-147,José García,w,Delphin 08,
-148,Tim Méndez,m,SV Poseidon,2008
-149,Jiří Novák,m,TSV Schwimmclub,2009
-150,Lina Schneider,m,Neptun Köln,
-151,Emma-Maria Krüger,m,SV Poseidon,
-152,Clara Zhang,w,Delphin 08,2008
-153,José García,w,,2009
-154,Paul Šimić,m,,2013
-155,Anna-Lena Schneider,w,TSV Schwimmclub,
-156,Chloé Lemoine,w,SV Poseidon,2007
-157,Džesika Kalniņa,m,Wasserfreunde,
-158,Léa Dubois,w,TSV Schwimmclub,
-159,Tim Méndez,w,Delphin 08,2009
-160,Clara Zhang,w,Delphin 08,2007
-161,Maximilian,m,Delphin 08,
-162,Mārtiņš Bērziņš,w,SV Delphin,
-163,Jiří Novák,w,Delphin 08,2008
-164,Emma-Maria Krüger,m,Delphin 08,2010
-165,Emma-Maria Krüger,w,Wasserfreunde,
-166,José García,w,Neptun Köln,2006
-167,Léa Dubois,m,Neptun Köln,
-168,Tim Méndez,w,,
-169,Mārtiņš Bērziņš,m,,
-170,José García,m,SV Delphin,2008
-171,Léa Dubois,m,Neptun Köln,
-172,Clàra Méndez,m,SV Poseidon,2006
-173,Anna-Lena Schneider,w,SV Delphin,2012
-174,Anna-Lena Schneider,w,Neptun Köln,
-175,László Nagy,w,SV Delphin,
-176,Lina Schneider,m,Wasserfreunde,
-177,Tim Méndez,m,TSV Schwimmclub,2010
-178,Džesika Kalniņa,w,,
-179,László Nagy,w,TSV Schwimmclub,
-180,Mia Méndez,w,Neptun Köln,
-181,Tim Méndez,m,Wasserfreunde,2008
-182,Ben Müller,w,SV Delphin,
-183,Léa Dubois,w,Neptun Köln,2008
-184,Åsa Svensson,m,SV Poseidon,
-185,Jiří Novák,m,Neptun Köln,2012
-186,José García,w,TSV Schwimmclub,2013
-187,László Nagy,w,TSV Schwimmclub,
-188,Tom O'Connor,w,Delphin 08,2010
-189,Clàra Méndez,m,Wasserfreunde,2012
-190,Džesika Kalniņa,m,SV Delphin,2006
-191,Chloé Lemoine,w,SV Poseidon,
-192,Léa Dubois,w,SV Delphin,2010
-193,Anna-Lena Schneider,w,SV Delphin,
-194,Tom O'Connor,m,SV Poseidon,
-195,Lina Schneider,m,SV Poseidon,
-196,Zoë Schmidt,m,Neptun Köln,2012
-197,José García,m,,
-198,Åsa Svensson,w,TSV Schwimmclub,
-199,Clara Zhang,m,SV Poseidon,
-200,Åsa Svensson,m,SV Delphin,2008
-201,Chloé Lemoine,m,SV Delphin,
-202,Anna-Lena Schneider,w,Delphin 08,
-203,Léa Dubois,w,SV Poseidon,
-204,Noah Zhang,w,SV Delphin,
-205,Jiří Novák,w,TSV Schwimmclub,2010
-206,Ole-Jørgen Berg,w,Neptun Köln,2011
-207,Tim Méndez,m,SV Poseidon,
-208,Mārtiņš Bērziņš,m,TSV Schwimmclub,
-209,Anna-Lena Schneider,w,Neptun Köln,
-210,Jiří Novák,m,Delphin 08,
-211,Lisa Weiß,w,SV Delphin,2012
-212,László Nagy,m,SV Delphin,
-213,Jiří Novák,w,Delphin 08,2013
-214,Clara Zhang,m,TSV Schwimmclub,2006
-215,Noah Zhang,m,Wasserfreunde,2006
-216,Léa Dubois,m,Wasserfreunde,
-217,Emma-Maria Krüger,w,,2011
-218,Tom O'Connor,m,SV Poseidon,
-219,Lina Schneider,m,TSV Schwimmclub,2013
-220,Maximilian,m,,
-221,Noah Zhang,m,,2008
-222,Jiří Novák,m,TSV Schwimmclub,
-223,Noah Zhang,w,SV Delphin,2011
-224,Jiří Novák,w,Delphin 08,
-225,Chloé Lemoine,w,Wasserfreunde,
-226,Åsa Svensson,m,SV Poseidon,
-227,Maximilian,w,Wasserfreunde,2010
-228,Clàra Méndez,w,,
-229,José García,m,TSV Schwimmclub,
-230,Paul Šimić,m,Neptun Köln,
-231,Clara Zhang,w,SV Delphin,
-232,Paul Šimić,m,,2013
-233,Åsa Svensson,m,Delphin 08,2011
-234,Åsa Svensson,w,TSV Schwimmclub,2013
-235,Emma-Maria Krüger,w,Neptun Köln,2012
-236,Maximilian,w,Wasserfreunde,
-237,Tom O'Connor,w,SV Poseidon,
-238,Maximilian,m,Wasserfreunde,2012
-239,Jiří Novák,w,TSV Schwimmclub,2012
-240,Ben Müller,m,SV Delphin,
-241,Mārtiņš Bērziņš,m,Wasserfreunde,
-242,Džesika Kalniņa,w,Neptun Köln,2010
-243,José García,m,Neptun Köln,
-244,Zoë Schmidt,w,TSV Schwimmclub,
-245,László Nagy,m,SV Delphin,
-246,Lisa Weiß,w,TSV Schwimmclub,2011
-247,Noah Zhang,m,Neptun Köln,
-248,Léa Dubois,w,SV Delphin,2009
-249,Paul Šimić,w,Delphin 08,2007
-250,Noah Zhang,w,,2013
-251,László Nagy,w,SV Poseidon,
-252,Džesika Kalniņa,w,SV Delphin,2006
-253,Džesika Kalniņa,m,Neptun Köln,
-254,Džesika Kalniņa,m,SV Delphin,
-255,José García,w,Neptun Köln,2006
-256,Paul Šimić,w,SV Delphin,2013
-257,Lina Schneider,m,Neptun Köln,
-258,Noah Zhang,w,Delphin 08,
-259,Tim Méndez,m,Neptun Köln,
-260,Paul Šimić,m,SV Poseidon,2008
-261,Paul Šimić,m,Neptun Köln,
-262,László Nagy,w,SV Delphin,2013
-263,Emma-Maria Krüger,m,Wasserfreunde,2008
-264,Džesika Kalniņa,m,Neptun Köln,2011
-265,Paul Šimić,m,Neptun Köln,
-266,Chloé Lemoine,w,Neptun Köln,
-267,Mārtiņš Bērziņš,w,SV Delphin,2006
-268,Jiří Novák,w,Wasserfreunde,2006
-269,Jiří Novák,m,SV Poseidon,
-270,Emma-Maria Krüger,w,Delphin 08,2009
-271,Åsa Svensson,m,TSV Schwimmclub,
-272,Jiří Novák,w,,2009
-273,Mārtiņš Bērziņš,w,Wasserfreunde,
-274,Chloé Lemoine,w,,2013
-275,Ben Müller,m,SV Poseidon,2006
-276,Zoë Schmidt,m,,2013
-277,Maximilian,w,SV Poseidon,
-278,Mārtiņš Bērziņš,w,,
-279,Clàra Méndez,w,Delphin 08,
-280,Emma-Maria Krüger,w,Neptun Köln,2007
-281,Léa Dubois,w,TSV Schwimmclub,
-282,Ole-Jørgen Berg,w,SV Poseidon,2007
-283,Noah Zhang,m,Delphin 08,2011
-284,László Nagy,m,TSV Schwimmclub,2012
-285,Mārtiņš Bērziņš,w,SV Poseidon,
-286,Tom O'Connor,m,SV Delphin,
-287,Noah Zhang,w,Delphin 08,
-288,Clàra Méndez,m,TSV Schwimmclub,
-289,Lisa Weiß,w,,
-290,Ben Müller,w,,
-291,Emma Müller,m,,
-292,Clàra Méndez,m,SV Poseidon,2007
-293,Emma Müller,w,Neptun Köln,
-294,Mia Méndez,m,,2008
-295,Džesika Kalniņa,m,,
-296,Emma Müller,w,Wasserfreunde,2008
-297,Emma-Maria Krüger,m,SV Delphin,2010
-298,Ole-Jørgen Berg,w,SV Delphin,
-299,Lina Schneider,m,SV Poseidon,
-300,Džesika Kalniņa,w,SV Poseidon,2010
-301,Anna-Lena Schneider,m,Wasserfreunde,2006
-302,José García,w,SV Delphin,2013
-303,Paul Šimić,m,TSV Schwimmclub,
-304,Noah Zhang,w,TSV Schwimmclub,
-305,Léa Dubois,w,Neptun Köln,2006
-306,Chloé Lemoine,w,TSV Schwimmclub,
-307,László Nagy,w,SV Poseidon,
-308,Clàra Méndez,m,TSV Schwimmclub,
-309,José García,m,Wasserfreunde,2006
-310,Ole-Jørgen Berg,m,Neptun Köln,2011
-311,Chloé Lemoine,m,SV Poseidon,2012
-312,Džesika Kalniņa,m,Wasserfreunde,
-313,Tim Méndez,w,SV Delphin,2012
-314,Noah Zhang,m,Delphin 08,2011
-315,Noah Zhang,w,TSV Schwimmclub,
-316,José García,w,SV Delphin,2009
-317,Ole-Jørgen Berg,w,,2009
-318,László Nagy,m,SV Delphin,
-319,Anna-Lena Schneider,m,Delphin 08,
-320,László Nagy,m,Wasserfreunde,
-321,Lina Schneider,w,Wasserfreunde,2010
-322,Mia Méndez,m,,2012
-323,Ole-Jørgen Berg,m,SV Delphin,
-324,Mia Méndez,w,Neptun Köln,
-325,Paul Šimić,m,SV Poseidon,2009
-326,Noah Zhang,m,Wasserfreunde,2012
-327,Clara Zhang,m,TSV Schwimmclub,
-328,Džesika Kalniņa,w,Wasserfreunde,2006
-329,Mia Méndez,w,Delphin 08,2012
-330,Emma Müller,m,TSV Schwimmclub,
-331,Emma Müller,w,TSV Schwimmclub,
-332,Maximilian,m,TSV Schwimmclub,2012
-333,Chloé Lemoine,w,SV Poseidon,
-334,Anna-Lena Schneider,w,Wasserfreunde,2007
-335,Léa Dubois,m,SV Delphin,
-336,Paul Šimić,m,Delphin 08,
-337,Noah Zhang,m,Wasserfreunde,
-338,Emma Müller,m,,
-339,Emma Müller,w,,
-340,Clàra Méndez,m,Delphin 08,
-341,Džesika Kalniņa,w,TSV Schwimmclub,2012
-342,Lisa Weiß,m,Neptun Köln,2007
-343,Chloé Lemoine,m,Wasserfreunde,2009
-344,Zoë Schmidt,m,Neptun Köln,
-345,Mia Méndez,m,,2010
-346,Emma-Maria Krüger,w,Neptun Köln,2008
-347,Tim Méndez,m,Wasserfreunde,2011
-348,Tim Méndez,w,Delphin 08,2006
-349,Noah Zhang,m,Delphin 08,2013
-350,Mia Méndez,m,Wasserfreunde,2012
-351,Zoë Schmidt,w,Delphin 08,
-352,Tim Méndez,w,TSV Schwimmclub,
-353,Zoë Schmidt,w,,2013
-354,Lisa Weiß,w,Delphin 08,
-355,Ben Müller,m,,
-356,Clara Zhang,w,Neptun Köln,2010
-357,Mia Méndez,m,TSV Schwimmclub,2012
-358,José García,m,SV Poseidon,2009
-359,Maximilian,m,SV Delphin,
-360,Léa Dubois,m,SV Poseidon,
-361,Zoë Schmidt,w,Delphin 08,2008
-362,Zoë Schmidt,w,SV Delphin,2010
-363,Mia Méndez,m,SV Poseidon,2011
-364,Åsa Svensson,w,TSV Schwimmclub,2009
-365,Mārtiņš Bērziņš,w,,2009
-366,Mia Méndez,w,Delphin 08,
-367,Paul Šimić,w,Wasserfreunde,
-368,Ole-Jørgen Berg,m,Wasserfreunde,
-369,Ole-Jørgen Berg,m,Delphin 08,2008
-370,Maximilian,m,Wasserfreunde,2007
-371,Tim Méndez,w,Neptun Köln,2012
-372,Léa Dubois,m,TSV Schwimmclub,
-373,Åsa Svensson,m,TSV Schwimmclub,
-374,Džesika Kalniņa,w,Delphin 08,
-375,Mia Méndez,m,,
-376,Noah Zhang,m,Delphin 08,
-377,José García,w,,2013
-378,Tim Méndez,w,SV Delphin,
-379,Ben Müller,m,SV Poseidon,2006
-380,Anna-Lena Schneider,w,TSV Schwimmclub,2010
-381,Maximilian,w,Delphin 08,
-382,Mia Méndez,m,SV Poseidon,
-383,Chloé Lemoine,m,SV Delphin,2012
-384,László Nagy,w,,
-385,Chloé Lemoine,w,SV Poseidon,2007
-386,Mārtiņš Bērziņš,m,TSV Schwimmclub,
-387,Emma Müller,m,Delphin 08,
-388,Léa Dubois,m,Wasserfreunde,2007
-389,Léa Dubois,w,Neptun Köln,
-390,Anna-Lena Schneider,m,Wasserfreunde,2007
-391,Anna-Lena Schneider,m,Neptun Köln,
-392,José García,m,Neptun Köln,2006
-393,Tom O'Connor,w,Delphin 08,
-394,Jiří Novák,w,Delphin 08,
-395,Léa Dubois,w,Delphin 08,2013
-396,Clara Zhang,w,SV Delphin,2007
-397,Tim Méndez,w,Wasserfreunde,
-398,Džesika Kalniņa,m,SV Delphin,
-399,Mia Méndez,m,TSV Schwimmclub,
-400,Lina Schneider,w,Wasserfreunde,2006
-401,Tom O'Connor,w,SV Poseidon,2008
-402,László Nagy,m,Wasserfreunde,
-403,Clara Zhang,m,,
-404,Anna-Lena Schneider,w,Wasserfreunde,2012
-405,Emma Müller,w,SV Delphin,
-406,Ben Müller,w,SV Delphin,
-407,Mia Méndez,m,SV Poseidon,2010
-408,Åsa Svensson,m,Delphin 08,2007
-409,Maximilian,w,Neptun Köln,
-410,Chloé Lemoine,m,Neptun Köln,2011
-411,Maximilian,m,Neptun Köln,
-412,Emma-Maria Krüger,m,Wasserfreunde,
-413,Tim Méndez,w,Neptun Köln,
-414,Anna-Lena Schneider,w,Neptun Köln,
-415,Ole-Jørgen Berg,w,Neptun Köln,2007
-416,Lina Schneider,m,Neptun Köln,
-417,Lisa Weiß,w,SV Poseidon,2009
-418,Emma Müller,m,Delphin 08,
-419,Léa Dubois,m,SV Delphin,
-420,Zoë Schmidt,w,Wasserfreunde,
-421,Jiří Novák,m,SV Delphin,
-422,Clàra Méndez,m,SV Poseidon,2008
-423,Clàra Méndez,m,Delphin 08,
-424,Lisa Weiß,w,Neptun Köln,2012
-425,Chloé Lemoine,w,TSV Schwimmclub,2012
-426,Maximilian,w,Delphin 08,2008
-427,Noah Zhang,w,Wasserfreunde,2010
-428,Lina Schneider,w,Delphin 08,2008
-429,Emma-Maria Krüger,m,,
-430,José García,m,Neptun Köln,2009
-431,Noah Zhang,m,Neptun Köln,
-432,Mia Méndez,m,TSV Schwimmclub,2013
-433,Lina Schneider,m,SV Delphin,2013
-434,Tom O'Connor,w,SV Poseidon,
-435,László Nagy,w,,
-436,Noah Zhang,m,SV Delphin,
-437,Noah Zhang,m,Wasserfreunde,
-438,Paul Šimić,m,,2008
-439,Jiří Novák,w,TSV Schwimmclub,2009
-440,Chloé Lemoine,w,Delphin 08,
-441,Maximilian,m,,2012
-442,Emma-Maria Krüger,m,Neptun Köln,2006
-443,Mia Méndez,m,SV Poseidon,
-444,Anna-Lena Schneider,m,TSV Schwimmclub,
-445,José García,w,SV Poseidon,2010
-446,Emma Müller,w,SV Delphin,
-447,Ben Müller,w,,2008
-448,Chloé Lemoine,m,TSV Schwimmclub,
-449,László Nagy,w,,
-450,Tom O'Connor,w,Neptun Köln,2010
-451,Tom O'Connor,m,Neptun Köln,
-452,Clara Zhang,m,SV Poseidon,2006
-453,Mia Méndez,w,Neptun Köln,2012
-454,Lisa Weiß,m,,2013
-455,Ole-Jørgen Berg,m,SV Poseidon,
-456,Léa Dubois,w,Wasserfreunde,
-457,Paul Šimić,w,SV Poseidon,2009
-458,Paul Šimić,m,SV Delphin,2012
-459,Paul Šimić,w,TSV Schwimmclub,2007
-460,Paul Šimić,w,SV Delphin,2008
-461,Paul Šimić,m,Delphin 08,
-462,Emma Müller,w,,2010
-463,Lina Schneider,w,Delphin 08,
-464,Åsa Svensson,m,,2009
-465,Zoë Schmidt,m,Delphin 08,
-466,Maximilian,w,Delphin 08,
-467,Chloé Lemoine,w,Delphin 08,2013
-468,Anna-Lena Schneider,m,TSV Schwimmclub,
-469,Clàra Méndez,w,SV Poseidon,2013
-470,Tom O'Connor,m,TSV Schwimmclub,
-471,Lisa Weiß,w,,2006
-472,Lisa Weiß,w,SV Delphin,2007
-473,Džesika Kalniņa,w,,
-474,Zoë Schmidt,m,,
-475,José García,m,Delphin 08,
-476,Lina Schneider,w,Delphin 08,
-477,László Nagy,m,TSV Schwimmclub,
-478,Ole-Jørgen Berg,m,SV Delphin,2012
-479,Ben Müller,w,Wasserfreunde,
-480,Tim Méndez,w,,
-481,Noah Zhang,w,SV Poseidon,
-482,Noah Zhang,w,TSV Schwimmclub,
-483,Maximilian,w,Delphin 08,
-484,Emma Müller,m,SV Poseidon,
-485,José García,m,,2010
-486,Mia Méndez,w,SV Poseidon,2006
-487,Léa Dubois,w,Wasserfreunde,
-488,Tom O'Connor,m,,
-489,Lina Schneider,m,SV Delphin,
-490,Džesika Kalniņa,m,SV Poseidon,
-491,Emma Müller,w,TSV Schwimmclub,2008
-492,Lisa Weiß,w,,2008
-493,László Nagy,m,Wasserfreunde,2006
-494,Clàra Méndez,m,SV Delphin,
-495,José García,w,Neptun Köln,
-496,Anna-Lena Schneider,w,Wasserfreunde,2008
-497,Ben Müller,m,,
-498,Tim Méndez,w,TSV Schwimmclub,
-499,Ben Müller,m,Wasserfreunde,
-500,Clara Zhang,w,,2008
-501,Léa Dubois,m,SV Poseidon,
-502,Lina Schneider,m,Neptun Köln,
-503,Chloé Lemoine,m,,
-504,Lisa Weiß,m,SV Poseidon,2011
-505,Léa Dubois,w,,
-506,Tom O'Connor,m,,
-507,Anna-Lena Schneider,m,TSV Schwimmclub,
-508,Džesika Kalniņa,w,TSV Schwimmclub,2011
-509,Mia Méndez,w,SV Delphin,2009
-510,Clàra Méndez,w,Neptun Köln,2012
-511,Lisa Weiß,w,,2007
-512,Tom O'Connor,w,,2007
-513,Anna-Lena Schneider,w,TSV Schwimmclub,2013
-514,Zoë Schmidt,m,Neptun Köln,2008
-515,Tim Méndez,m,SV Poseidon,
-516,Mārtiņš Bērziņš,m,,2008
-517,José García,w,Neptun Köln,2008
-518,Maximilian,m,,
-519,László Nagy,w,SV Poseidon,
-520,Ole-Jørgen Berg,w,TSV Schwimmclub,2008
-521,Anna-Lena Schneider,m,Neptun Köln,
-522,Mia Méndez,m,TSV Schwimmclub,
-523,László Nagy,w,Neptun Köln,2009
-524,Clàra Méndez,w,,2011
-525,Chloé Lemoine,m,TSV Schwimmclub,
-526,Åsa Svensson,w,,2009
-527,Clàra Méndez,m,SV Delphin,2007
-528,Maximilian,m,TSV Schwimmclub,2008
-529,José García,m,TSV Schwimmclub,
-530,Mia Méndez,m,TSV Schwimmclub,
-531,Mia Méndez,m,SV Delphin,2010
-532,Paul Šimić,w,SV Poseidon,2006
-533,Emma-Maria Krüger,w,,
-534,László Nagy,m,Delphin 08,
-535,José García,m,,
-536,Tim Méndez,w,Neptun Köln,
-537,Mārtiņš Bērziņš,m,SV Poseidon,
-538,Lisa Weiß,w,Wasserfreunde,2008
-539,Zoë Schmidt,m,Delphin 08,
-540,Džesika Kalniņa,w,SV Poseidon,
-541,Emma Müller,m,TSV Schwimmclub,2011
-542,Lisa Weiß,m,SV Poseidon,
-543,Anna-Lena Schneider,m,,2007
-544,Jiří Novák,w,TSV Schwimmclub,
-545,Maximilian,w,,2008
-546,Ole-Jørgen Berg,m,Neptun Köln,
-547,Lina Schneider,w,,2009
-548,Zoë Schmidt,m,TSV Schwimmclub,
-549,Lina Schneider,w,SV Delphin,2009
-550,Lina Schneider,m,SV Delphin,
-551,Clara Zhang,m,Neptun Köln,2008
-552,Paul Šimić,m,SV Poseidon,
-553,Emma-Maria Krüger,w,SV Delphin,
-554,Tim Méndez,m,SV Delphin,2006
-555,Maximilian,w,Delphin 08,2008
-556,Léa Dubois,w,TSV Schwimmclub,2011
-557,Åsa Svensson,w,,
-558,Tom O'Connor,m,SV Delphin,2006
-559,Mārtiņš Bērziņš,m,Delphin 08,2006
-560,László Nagy,w,Delphin 08,2012
-561,Clara Zhang,w,TSV Schwimmclub,2006
-562,Chloé Lemoine,w,SV Poseidon,2013
-563,Léa Dubois,m,TSV Schwimmclub,2009
-564,Lina Schneider,m,SV Delphin,
-565,Clara Zhang,m,SV Poseidon,2006
-566,Clara Zhang,m,,
-567,Lina Schneider,m,Neptun Köln,
-568,László Nagy,w,SV Delphin,2013
-569,Zoë Schmidt,w,Neptun Köln,
-570,Tom O'Connor,m,Wasserfreunde,2012
-571,Åsa Svensson,w,Delphin 08,2008
-572,Ben Müller,w,Delphin 08,
-573,László Nagy,m,SV Poseidon,
-574,Léa Dubois,w,Wasserfreunde,2010
-575,Clàra Méndez,w,Delphin 08,2006
-576,Clàra Méndez,w,TSV Schwimmclub,2006
-577,Léa Dubois,w,Wasserfreunde,2011
-578,Maximilian,w,SV Poseidon,2010
-579,Chloé Lemoine,w,Wasserfreunde,
-580,Anna-Lena Schneider,m,TSV Schwimmclub,
-581,Jiří Novák,m,TSV Schwimmclub,
-582,Zoë Schmidt,m,,
-583,Chloé Lemoine,w,SV Poseidon,
-584,Chloé Lemoine,w,Delphin 08,
-585,Clàra Méndez,m,,
-586,Chloé Lemoine,m,SV Poseidon,2007
-587,Tom O'Connor,w,SV Delphin,2009
-588,Lina Schneider,m,SV Delphin,2012
-589,Anna-Lena Schneider,m,Wasserfreunde,2013
-590,Paul Šimić,m,Neptun Köln,
-591,Anna-Lena Schneider,w,SV Poseidon,2006
-592,Anna-Lena Schneider,w,Neptun Köln,
-593,Lina Schneider,m,Delphin 08,2012
-594,Chloé Lemoine,w,SV Poseidon,
-595,Maximilian,m,Wasserfreunde,
-596,Ole-Jørgen Berg,w,Wasserfreunde,2006
-597,Emma Müller,w,,2006
-598,Ben Müller,w,Neptun Köln,
-599,Tim Méndez,m,SV Poseidon,
-600,Ole-Jørgen Berg,m,Neptun Köln,2007
-601,Zoë Schmidt,w,TSV Schwimmclub,
-602,Léa Dubois,w,Neptun Köln,2011
-603,Lina Schneider,w,SV Poseidon,
-604,Clara Zhang,m,SV Poseidon,
-605,László Nagy,m,,2010
-606,Tim Méndez,m,SV Delphin,
-607,Emma-Maria Krüger,m,SV Poseidon,
-608,José García,w,,2011
-609,Léa Dubois,w,Neptun Köln,2010
-610,Chloé Lemoine,w,TSV Schwimmclub,
-611,Chloé Lemoine,w,Delphin 08,
-612,Lisa Weiß,w,,2007
-613,José García,w,Delphin 08,
-614,Tim Méndez,m,SV Poseidon,2013
-615,José García,w,,2008
-616,Mārtiņš Bērziņš,w,SV Poseidon,
-617,Lisa Weiß,w,Wasserfreunde,
-618,Maximilian,w,Delphin 08,
-619,Maximilian,m,Neptun Köln,2009
-620,Åsa Svensson,m,,
-621,Léa Dubois,w,TSV Schwimmclub,2006
-622,László Nagy,w,Wasserfreunde,
-623,Anna-Lena Schneider,w,Neptun Köln,2007
-624,Paul Šimić,w,SV Poseidon,
-625,Mārtiņš Bērziņš,w,Wasserfreunde,2010
-626,Džesika Kalniņa,w,TSV Schwimmclub,
-627,Emma Müller,w,SV Delphin,2010
-628,Jiří Novák,m,TSV Schwimmclub,
-629,László Nagy,w,SV Delphin,2006
-630,Tim Méndez,w,TSV Schwimmclub,
-631,Emma-Maria Krüger,m,,2007
-632,Mārtiņš Bērziņš,w,,2009
-633,Tom O'Connor,m,SV Delphin,
-634,Åsa Svensson,w,SV Poseidon,
-635,Clara Zhang,w,Neptun Köln,2011
-636,Noah Zhang,w,Delphin 08,2008
-637,Clara Zhang,w,Wasserfreunde,
-638,Åsa Svensson,m,TSV Schwimmclub,
-639,Åsa Svensson,w,Wasserfreunde,2007
-640,Chloé Lemoine,w,Neptun Köln,2013
-641,Tom O'Connor,m,,2006
-642,Paul Šimić,w,SV Poseidon,
-643,Mārtiņš Bērziņš,m,,
-644,Chloé Lemoine,m,,2011
-645,Jiří Novák,m,TSV Schwimmclub,
-646,Noah Zhang,m,,
-647,Chloé Lemoine,w,SV Poseidon,
-648,Chloé Lemoine,w,SV Poseidon,
-649,Ben Müller,m,SV Delphin,2006
-650,Džesika Kalniņa,m,Delphin 08,
-651,Anna-Lena Schneider,m,Delphin 08,
-652,Emma-Maria Krüger,w,SV Delphin,2013
-653,Jiří Novák,w,,
-654,Ben Müller,w,SV Poseidon,
-655,Lina Schneider,m,Neptun Köln,2008
-656,Chloé Lemoine,m,SV Delphin,2007
-657,Tom O'Connor,w,SV Poseidon,
-658,Tom O'Connor,m,Neptun Köln,
-659,Mārtiņš Bērziņš,m,SV Poseidon,
-660,Noah Zhang,w,,
-661,Tim Méndez,m,Neptun Köln,
-662,Åsa Svensson,m,Wasserfreunde,
-663,Åsa Svensson,m,SV Poseidon,2006
-664,Noah Zhang,m,Delphin 08,
-665,Noah Zhang,m,,
-666,Léa Dubois,w,Wasserfreunde,2008
-667,Maximilian,w,TSV Schwimmclub,
-668,Anna-Lena Schneider,m,SV Delphin,
-669,Léa Dubois,w,SV Poseidon,
-670,Mia Méndez,m,Neptun Köln,2013
-671,Anna-Lena Schneider,w,,2007
-672,Ben Müller,w,SV Delphin,
-673,Maximilian,w,Delphin 08,2011
-674,Mārtiņš Bērziņš,m,SV Poseidon,
-675,Åsa Svensson,w,,2006
-676,Mia Méndez,w,Delphin 08,
-677,Clàra Méndez,w,Delphin 08,2011
-678,Ben Müller,m,,2007
-679,Anna-Lena Schneider,m,TSV Schwimmclub,
-680,Chloé Lemoine,m,SV Poseidon,2010
-681,Ole-Jørgen Berg,w,SV Delphin,2009
-682,Paul Šimić,m,SV Delphin,2013
-683,Emma Müller,m,Neptun Köln,
-684,José García,w,Delphin 08,
-685,Lina Schneider,m,Delphin 08,
-686,Emma Müller,m,Neptun Köln,2008
-687,Džesika Kalniņa,m,SV Delphin,2011
-688,Emma-Maria Krüger,w,Delphin 08,2010
-689,László Nagy,w,,2012
-690,Tom O'Connor,m,SV Poseidon,2011
-691,Lina Schneider,w,SV Poseidon,
-692,Emma Müller,m,SV Delphin,2009
-693,Mia Méndez,w,SV Delphin,
-694,José García,w,TSV Schwimmclub,
-695,José García,w,,
-696,José García,m,,
-697,Ole-Jørgen Berg,w,SV Delphin,
-698,Chloé Lemoine,w,Delphin 08,
-699,László Nagy,m,SV Poseidon,2010
-700,Lisa Weiß,w,,
-701,Lina Schneider,m,Neptun Köln,
-702,Clara Zhang,m,Wasserfreunde,
-703,Chloé Lemoine,w,Wasserfreunde,
-704,Maximilian,m,SV Poseidon,2013
-705,Lisa Weiß,m,SV Delphin,
-706,Mārtiņš Bērziņš,w,SV Delphin,2010
-707,Džesika Kalniņa,m,Neptun Köln,2007
-708,Emma-Maria Krüger,w,,2010
-709,Lina Schneider,m,Wasserfreunde,2009
-710,Clara Zhang,m,Wasserfreunde,
-711,Noah Zhang,m,Delphin 08,2010
-712,Åsa Svensson,w,SV Poseidon,
-713,Léa Dubois,w,SV Poseidon,
-714,Chloé Lemoine,w,SV Poseidon,
-715,Zoë Schmidt,w,SV Delphin,2006
-716,Mia Méndez,m,TSV Schwimmclub,2010
-717,Džesika Kalniņa,w,Wasserfreunde,
-718,Ole-Jørgen Berg,m,SV Poseidon,
-719,Lina Schneider,m,SV Poseidon,2013
-720,Mārtiņš Bērziņš,w,Wasserfreunde,2006
-721,Ben Müller,m,Wasserfreunde,
-722,Tim Méndez,w,,2008
-723,Åsa Svensson,w,SV Poseidon,2007
-724,Paul Šimić,m,Neptun Köln,2010
-725,Maximilian,w,Neptun Köln,
-726,László Nagy,w,Delphin 08,
-727,Tim Méndez,m,SV Delphin,
-728,José García,w,Delphin 08,
-729,José García,m,TSV Schwimmclub,
-730,Emma-Maria Krüger,w,TSV Schwimmclub,
-731,Lisa Weiß,m,SV Poseidon,
-732,Åsa Svensson,m,Neptun Köln,
-733,Åsa Svensson,m,Wasserfreunde,
-734,Anna-Lena Schneider,m,TSV Schwimmclub,2011
-735,Clara Zhang,m,,2008
-736,Emma Müller,m,,
-737,Clàra Méndez,m,Wasserfreunde,2008
-738,Maximilian,m,SV Poseidon,2006
-739,László Nagy,w,Wasserfreunde,2008
-740,Ole-Jørgen Berg,m,Neptun Köln,2007
-741,Anna-Lena Schneider,m,Neptun Köln,2012
-742,Ole-Jørgen Berg,m,SV Poseidon,2012
-743,Emma-Maria Krüger,w,Delphin 08,
-744,Ole-Jørgen Berg,m,Delphin 08,2012
-745,Noah Zhang,w,TSV Schwimmclub,2012
-746,Ben Müller,m,SV Delphin,2009
-747,Maximilian,m,Neptun Köln,
-748,Džesika Kalniņa,m,,
-749,Léa Dubois,w,SV Delphin,
-750,Clara Zhang,m,SV Delphin,2006
-751,Clàra Méndez,m,SV Delphin,2011
-752,Mārtiņš Bērziņš,m,SV Poseidon,2006
-753,José García,m,SV Delphin,2008
-754,Zoë Schmidt,m,SV Poseidon,2009
-755,Clara Zhang,m,SV Delphin,
-756,Paul Šimić,m,TSV Schwimmclub,
-757,Ole-Jørgen Berg,w,Wasserfreunde,2006
-758,László Nagy,m,SV Poseidon,2008
-759,Anna-Lena Schneider,w,SV Poseidon,
-760,Tim Méndez,w,TSV Schwimmclub,2007
-761,Emma Müller,m,Delphin 08,
-762,Ole-Jørgen Berg,m,Neptun Köln,
-763,Jiří Novák,m,SV Poseidon,
-764,Paul Šimić,w,SV Delphin,
-765,Anna-Lena Schneider,m,,
-766,Tim Méndez,m,Neptun Köln,2009
-767,Ben Müller,m,Delphin 08,2011
-768,Mārtiņš Bērziņš,w,Wasserfreunde,
-769,Zoë Schmidt,m,Delphin 08,
-770,Lina Schneider,w,Wasserfreunde,
-771,Ole-Jørgen Berg,w,Wasserfreunde,2010
-772,Paul Šimić,m,SV Delphin,
-773,Ben Müller,m,,2007
-774,Emma Müller,m,SV Poseidon,2011
-775,Tim Méndez,w,SV Delphin,
-776,Mia Méndez,w,,2010
-777,Mia Méndez,m,Neptun Köln,
-778,László Nagy,m,,2006
-779,Emma Müller,w,SV Delphin,2013
-780,Ole-Jørgen Berg,m,Neptun Köln,
-781,Jiří Novák,w,SV Poseidon,2007
-782,Tim Méndez,w,,2012
-783,Clàra Méndez,w,SV Poseidon,
-784,Ole-Jørgen Berg,w,Wasserfreunde,
-785,Noah Zhang,m,Wasserfreunde,2012
-786,Ole-Jørgen Berg,w,Wasserfreunde,
-787,Jiří Novák,m,SV Poseidon,
-788,José García,w,SV Delphin,
-789,Maximilian,m,,2010
-790,Tim Méndez,m,Wasserfreunde,
-791,Zoë Schmidt,m,Neptun Köln,2011
-792,Emma Müller,m,SV Poseidon,2007
-793,Ben Müller,m,Wasserfreunde,
-794,Emma-Maria Krüger,m,SV Delphin,2008
-795,Noah Zhang,m,,
-796,Paul Šimić,m,SV Poseidon,
-797,Clàra Méndez,w,TSV Schwimmclub,2007
-798,László Nagy,w,SV Delphin,2007
-799,Lisa Weiß,m,Delphin 08,2007
-800,Mārtiņš Bērziņš,m,SV Poseidon,2008
-801,Ole-Jørgen Berg,m,TSV Schwimmclub,2011
-802,Clara Zhang,m,Wasserfreunde,
-803,Ben Müller,w,SV Delphin,2011
-804,Tim Méndez,w,TSV Schwimmclub,2012
-805,Zoë Schmidt,w,Wasserfreunde,2010
-806,Chloé Lemoine,w,SV Delphin,2008
-807,Maximilian,w,Neptun Köln,2010
-808,Chloé Lemoine,m,SV Delphin,
-809,Mia Méndez,m,Neptun Köln,2011
-810,Léa Dubois,w,TSV Schwimmclub,2012
-811,Clàra Méndez,m,SV Delphin,2006
-812,Ben Müller,m,SV Delphin,
-813,Ben Müller,w,Delphin 08,2011
-814,Clàra Méndez,w,,
-815,Maximilian,m,SV Poseidon,2006
-816,Ben Müller,w,SV Poseidon,2006
-817,Maximilian,w,,2009
-818,Jiří Novák,w,SV Delphin,
-819,Džesika Kalniņa,m,Delphin 08,2013
-820,Ole-Jørgen Berg,w,Neptun Köln,
-821,Emma Müller,m,SV Delphin,
-822,Tim Méndez,m,Delphin 08,2008
-823,José García,w,Neptun Köln,2009
-824,Chloé Lemoine,m,,
-825,Jiří Novák,m,Delphin 08,
-826,Noah Zhang,w,SV Poseidon,
-827,Mārtiņš Bērziņš,w,Neptun Köln,
-828,Chloé Lemoine,w,TSV Schwimmclub,
-829,Mārtiņš Bērziņš,w,TSV Schwimmclub,2008
-830,Emma Müller,m,TSV Schwimmclub,2011
-831,Tom O'Connor,m,SV Poseidon,
-832,Lisa Weiß,w,Neptun Köln,
-833,Clara Zhang,w,TSV Schwimmclub,2012
-834,Zoë Schmidt,m,,2013
-835,László Nagy,m,SV Poseidon,2012
-836,Léa Dubois,w,Wasserfreunde,
-837,László Nagy,w,Wasserfreunde,
-838,Džesika Kalniņa,w,Neptun Köln,
-839,Léa Dubois,w,SV Delphin,
-840,Paul Šimić,w,,2010
-841,Chloé Lemoine,m,,
-842,Jiří Novák,m,Neptun Köln,
-843,Chloé Lemoine,w,Delphin 08,2006
-844,Clàra Méndez,w,SV Poseidon,
-845,Zoë Schmidt,w,Neptun Köln,
-846,Tom O'Connor,w,Delphin 08,
-847,Emma-Maria Krüger,m,SV Delphin,
-848,Ben Müller,w,Neptun Köln,2013
-849,Tim Méndez,w,TSV Schwimmclub,
-850,László Nagy,w,Wasserfreunde,2008
-851,Jiří Novák,m,,2007
-852,Mia Méndez,m,,
-853,Clara Zhang,m,Neptun Köln,2008
-854,Noah Zhang,m,Neptun Köln,2013
-855,Mārtiņš Bērziņš,m,Delphin 08,2008
-856,László Nagy,w,SV Delphin,
-857,Léa Dubois,m,Delphin 08,2013
-858,Léa Dubois,m,,2011
-859,Tim Méndez,m,Delphin 08,2008
-860,Lisa Weiß,m,TSV Schwimmclub,
-861,Noah Zhang,m,Delphin 08,
-862,Ole-Jørgen Berg,m,,
-863,Jiří Novák,m,SV Delphin,
-864,Džesika Kalniņa,m,,2012
-865,Lina Schneider,w,TSV Schwimmclub,2011
-866,Lisa Weiß,w,Neptun Köln,2013
-867,László Nagy,w,Neptun Köln,2010
-868,Mia Méndez,m,SV Delphin,2009
-869,Léa Dubois,m,Neptun Köln,2007
-870,Clàra Méndez,m,SV Delphin,2011
-871,Ben Müller,w,,
-872,Anna-Lena Schneider,m,Wasserfreunde,2009
-873,Léa Dubois,m,Wasserfreunde,
-874,Chloé Lemoine,w,Neptun Köln,2008
-875,Paul Šimić,m,SV Poseidon,
-876,Åsa Svensson,m,,2008
-877,Zoë Schmidt,m,SV Poseidon,
-878,Paul Šimić,w,Wasserfreunde,
-879,Jiří Novák,m,TSV Schwimmclub,
-880,José García,m,Wasserfreunde,2013
-881,Lina Schneider,w,Wasserfreunde,
-882,Åsa Svensson,w,Neptun Köln,
-883,Paul Šimić,m,Delphin 08,2013
-884,Jiří Novák,w,Wasserfreunde,2012
-885,Maximilian,w,,
-886,Maximilian,m,Wasserfreunde,
-887,Paul Šimić,w,TSV Schwimmclub,2012
-888,Mārtiņš Bērziņš,w,Wasserfreunde,2010
-889,Anna-Lena Schneider,m,TSV Schwimmclub,2011
-890,Åsa Svensson,w,,
-891,Mārtiņš Bērziņš,w,TSV Schwimmclub,
-892,László Nagy,w,Delphin 08,
-893,Mia Méndez,m,Delphin 08,2008
-894,Emma-Maria Krüger,m,TSV Schwimmclub,
-895,Džesika Kalniņa,m,SV Poseidon,
-896,Ben Müller,m,Delphin 08,
-897,Chloé Lemoine,m,Neptun Köln,2013
-898,Anna-Lena Schneider,m,SV Delphin,2008
-899,Clara Zhang,w,Wasserfreunde,2009
-900,Džesika Kalniņa,w,TSV Schwimmclub,2013
+nummer,vorname,nachname,geschlecht,verein,geburtsjahr
+001,Ben,Müller,m,SV Poseidon,2010
+002,Anna-Lena,Schneider,w,Wasserfreunde,2009
+003,Clàra,Méndez,w,,2011
+004,Maximilian,,m,Delphin 08,
+005,Léa,Dubois,w,SV Delphin,2012
+006,Tom,O'Connor,m,,2010
+007,Lisa,Weiß,w,Wasserfreunde,2008
+008,Paul,Šimić,m,Neptun Köln,2011
+009,Emma-Maria,Krüger,w,,2010
+010,Noah,Zhang,m,TSV Schwimmclub,2009
+011,Tim,Méndez,m,,2009
+012,Clara,Zhang,w,TSV Schwimmclub,2007
+013,Mia,Méndez,w,SV Poseidon,2011
+014,Emma,Müller,w,Delphin 08,2013
+015,Lina,Schneider,w,SV Delphin,2011
+016,Maximilian,,m,SV Poseidon,2006
+017,Léa,Dubois,w,,2006
+018,László,Nagy,m,Neptun Köln,2012
+019,Jiří,Novák,m,,
+020,Mia,Méndez,m,,2012
+021,Léa,Dubois,w,Wasserfreunde,2009
+022,Džesika,Kalniņa,m,TSV Schwimmclub,
+023,Maximilian,,m,,2008
+024,Tim,Méndez,w,,
+025,Lisa,Weiß,m,,
+026,Lina,Schneider,m,Wasserfreunde,
+027,Noah,Zhang,w,SV Delphin,
+028,Ole-Jørgen,Berg,w,SV Delphin,2013
+029,Ben,Müller,w,TSV Schwimmclub,2013
+030,Džesika,Kalniņa,w,Delphin 08,2013
+031,Emma,Müller,w,Wasserfreunde,
+032,Ben,Müller,m,TSV Schwimmclub,2011
+033,Åsa,Svensson,m,Neptun Köln,
+034,Ben,Müller,m,SV Poseidon,2006
+035,Maximilian,,w,SV Delphin,2013
+036,Zoë,Schmidt,w,Neptun Köln,2011
+037,Paul,Šimić,m,TSV Schwimmclub,
+038,Ole-Jørgen,Berg,m,SV Poseidon,
+039,Chloé,Lemoine,w,TSV Schwimmclub,
+040,Anna-Lena,Schneider,w,Wasserfreunde,2006
+041,José,García,m,Neptun Köln,2013
+042,Ole-Jørgen,Berg,m,SV Delphin,2008
+043,Chloé,Lemoine,m,,2006
+044,Chloé,Lemoine,w,Neptun Köln,2006
+045,László,Nagy,m,Delphin 08,
+046,Clàra,Méndez,w,Delphin 08,2006
+047,Anna-Lena,Schneider,m,TSV Schwimmclub,2011
+048,Tom,O'Connor,w,SV Delphin,
+049,Ben,Müller,m,TSV Schwimmclub,2006
+050,Tom,O'Connor,w,Delphin 08,2013
+051,Noah,Zhang,m,SV Poseidon,
+052,Chloé,Lemoine,w,TSV Schwimmclub,2011
+053,László,Nagy,w,TSV Schwimmclub,
+054,Mārtiņš,Bērziņš,m,Delphin 08,2013
+055,László,Nagy,m,Wasserfreunde,2006
+056,Paul,Šimić,w,SV Delphin,2013
+057,Anna-Lena,Schneider,m,SV Poseidon,
+058,Zoë,Schmidt,w,SV Delphin,
+059,László,Nagy,m,SV Poseidon,2006
+060,Zoë,Schmidt,m,Neptun Köln,
+061,Emma-Maria,Krüger,w,,
+062,László,Nagy,w,SV Delphin,
+063,Clara,Zhang,w,TSV Schwimmclub,
+064,Jiří,Novák,m,,
+065,Clara,Zhang,w,,2013
+066,Ben,Müller,m,SV Delphin,2010
+067,Emma,Müller,m,Delphin 08,
+068,José,García,w,SV Delphin,
+069,Ole-Jørgen,Berg,m,Wasserfreunde,
+070,Emma-Maria,Krüger,m,Delphin 08,
+071,Džesika,Kalniņa,w,Delphin 08,
+072,Mia,Méndez,m,Neptun Köln,2013
+073,Emma-Maria,Krüger,m,Wasserfreunde,2007
+074,Emma,Müller,w,,
+075,Paul,Šimić,w,,
+076,Noah,Zhang,m,Neptun Köln,2013
+077,Tim,Méndez,w,SV Poseidon,
+078,Åsa,Svensson,w,,2009
+079,Tim,Méndez,w,Neptun Köln,
+080,Clara,Zhang,w,Wasserfreunde,2011
+081,Anna-Lena,Schneider,m,SV Delphin,
+082,Tom,O'Connor,m,Neptun Köln,
+083,Ole-Jørgen,Berg,w,SV Poseidon,
+084,Tim,Méndez,w,Delphin 08,
+085,Mia,Méndez,m,SV Delphin,2006
+086,Emma,Müller,w,SV Delphin,
+087,László,Nagy,w,Delphin 08,
+088,Emma-Maria,Krüger,w,Neptun Köln,
+089,Clàra,Méndez,m,Delphin 08,
+090,José,García,w,Neptun Köln,2009
+091,Džesika,Kalniņa,w,Delphin 08,2006
+092,Zoë,Schmidt,w,TSV Schwimmclub,
+093,José,García,m,Neptun Köln,
+094,Lisa,Weiß,m,SV Poseidon,2007
+095,Mia,Méndez,w,Delphin 08,
+096,Clara,Zhang,w,Neptun Köln,
+097,Emma-Maria,Krüger,m,,
+098,Åsa,Svensson,m,TSV Schwimmclub,
+099,Chloé,Lemoine,w,Delphin 08,2013
+100,Clara,Zhang,m,Wasserfreunde,2008
+101,Emma-Maria,Krüger,w,SV Poseidon,
+102,Tim,Méndez,m,Neptun Köln,2009
+103,Zoë,Schmidt,w,SV Poseidon,2006
+104,Emma,Müller,m,TSV Schwimmclub,2010
+105,Anna-Lena,Schneider,w,Delphin 08,
+106,Clàra,Méndez,m,SV Delphin,
+107,Tim,Méndez,w,,
+108,José,García,m,,
+109,José,García,m,Delphin 08,2013
+110,Paul,Šimić,w,TSV Schwimmclub,2009
+111,Zoë,Schmidt,m,Delphin 08,2013
+112,Clàra,Méndez,m,SV Delphin,
+113,Tim,Méndez,w,Wasserfreunde,2011
+114,Lisa,Weiß,m,Delphin 08,
+115,Tim,Méndez,w,Neptun Köln,
+116,Noah,Zhang,w,Wasserfreunde,2012
+117,László,Nagy,m,SV Delphin,2007
+118,Ole-Jørgen,Berg,m,TSV Schwimmclub,2007
+119,Noah,Zhang,w,Delphin 08,
+120,Chloé,Lemoine,m,,
+121,José,García,m,Wasserfreunde,2009
+122,Džesika,Kalniņa,w,Wasserfreunde,
+123,Džesika,Kalniņa,w,Neptun Köln,
+124,Lisa,Weiß,m,Neptun Köln,
+125,Mia,Méndez,m,SV Poseidon,
+126,Tom,O'Connor,m,SV Poseidon,2010
+127,Lina,Schneider,w,TSV Schwimmclub,
+128,Lisa,Weiß,m,SV Delphin,2008
+129,Lina,Schneider,w,,2007
+130,Anna-Lena,Schneider,w,Delphin 08,
+131,Paul,Šimić,w,SV Delphin,2006
+132,Tom,O'Connor,m,SV Poseidon,
+133,Ben,Müller,m,Neptun Köln,2006
+134,Åsa,Svensson,w,Wasserfreunde,2007
+135,Mārtiņš,Bērziņš,w,TSV Schwimmclub,
+136,Chloé,Lemoine,m,SV Poseidon,
+137,Clàra,Méndez,m,,
+138,Zoë,Schmidt,m,TSV Schwimmclub,
+139,Mārtiņš,Bērziņš,m,Wasserfreunde,2008
+140,Chloé,Lemoine,w,Wasserfreunde,2010
+141,Chloé,Lemoine,w,TSV Schwimmclub,
+142,Clàra,Méndez,m,SV Delphin,
+143,José,García,m,Neptun Köln,
+144,Džesika,Kalniņa,m,SV Poseidon,
+145,Léa,Dubois,m,Delphin 08,2010
+146,László,Nagy,w,TSV Schwimmclub,
+147,José,García,w,Delphin 08,
+148,Tim,Méndez,m,SV Poseidon,2008
+149,Jiří,Novák,m,TSV Schwimmclub,2009
+150,Lina,Schneider,m,Neptun Köln,
+151,Emma-Maria,Krüger,m,SV Poseidon,
+152,Clara,Zhang,w,Delphin 08,2008
+153,José,García,w,,2009
+154,Paul,Šimić,m,,2013
+155,Anna-Lena,Schneider,w,TSV Schwimmclub,
+156,Chloé,Lemoine,w,SV Poseidon,2007
+157,Džesika,Kalniņa,m,Wasserfreunde,
+158,Léa,Dubois,w,TSV Schwimmclub,
+159,Tim,Méndez,w,Delphin 08,2009
+160,Clara,Zhang,w,Delphin 08,2007
+161,Maximilian,,m,Delphin 08,
+162,Mārtiņš,Bērziņš,w,SV Delphin,
+163,Jiří,Novák,w,Delphin 08,2008
+164,Emma-Maria,Krüger,m,Delphin 08,2010
+165,Emma-Maria,Krüger,w,Wasserfreunde,
+166,José,García,w,Neptun Köln,2006
+167,Léa,Dubois,m,Neptun Köln,
+168,Tim,Méndez,w,,
+169,Mārtiņš,Bērziņš,m,,
+170,José,García,m,SV Delphin,2008
+171,Léa,Dubois,m,Neptun Köln,
+172,Clàra,Méndez,m,SV Poseidon,2006
+173,Anna-Lena,Schneider,w,SV Delphin,2012
+174,Anna-Lena,Schneider,w,Neptun Köln,
+175,László,Nagy,w,SV Delphin,
+176,Lina,Schneider,m,Wasserfreunde,
+177,Tim,Méndez,m,TSV Schwimmclub,2010
+178,Džesika,Kalniņa,w,,
+179,László,Nagy,w,TSV Schwimmclub,
+180,Mia,Méndez,w,Neptun Köln,
+181,Tim,Méndez,m,Wasserfreunde,2008
+182,Ben,Müller,w,SV Delphin,
+183,Léa,Dubois,w,Neptun Köln,2008
+184,Åsa,Svensson,m,SV Poseidon,
+185,Jiří,Novák,m,Neptun Köln,2012
+186,José,García,w,TSV Schwimmclub,2013
+187,László,Nagy,w,TSV Schwimmclub,
+188,Tom,O'Connor,w,Delphin 08,2010
+189,Clàra,Méndez,m,Wasserfreunde,2012
+190,Džesika,Kalniņa,m,SV Delphin,2006
+191,Chloé,Lemoine,w,SV Poseidon,
+192,Léa,Dubois,w,SV Delphin,2010
+193,Anna-Lena,Schneider,w,SV Delphin,
+194,Tom,O'Connor,m,SV Poseidon,
+195,Lina,Schneider,m,SV Poseidon,
+196,Zoë,Schmidt,m,Neptun Köln,2012
+197,José,García,m,,
+198,Åsa,Svensson,w,TSV Schwimmclub,
+199,Clara,Zhang,m,SV Poseidon,
+200,Åsa,Svensson,m,SV Delphin,2008
+201,Chloé,Lemoine,m,SV Delphin,
+202,Anna-Lena,Schneider,w,Delphin 08,
+203,Léa,Dubois,w,SV Poseidon,
+204,Noah,Zhang,w,SV Delphin,
+205,Jiří,Novák,w,TSV Schwimmclub,2010
+206,Ole-Jørgen,Berg,w,Neptun Köln,2011
+207,Tim,Méndez,m,SV Poseidon,
+208,Mārtiņš,Bērziņš,m,TSV Schwimmclub,
+209,Anna-Lena,Schneider,w,Neptun Köln,
+210,Jiří,Novák,m,Delphin 08,
+211,Lisa,Weiß,w,SV Delphin,2012
+212,László,Nagy,m,SV Delphin,
+213,Jiří,Novák,w,Delphin 08,2013
+214,Clara,Zhang,m,TSV Schwimmclub,2006
+215,Noah,Zhang,m,Wasserfreunde,2006
+216,Léa,Dubois,m,Wasserfreunde,
+217,Emma-Maria,Krüger,w,,2011
+218,Tom,O'Connor,m,SV Poseidon,
+219,Lina,Schneider,m,TSV Schwimmclub,2013
+220,Maximilian,,m,,
+221,Noah,Zhang,m,,2008
+222,Jiří,Novák,m,TSV Schwimmclub,
+223,Noah,Zhang,w,SV Delphin,2011
+224,Jiří,Novák,w,Delphin 08,
+225,Chloé,Lemoine,w,Wasserfreunde,
+226,Åsa,Svensson,m,SV Poseidon,
+227,Maximilian,,w,Wasserfreunde,2010
+228,Clàra,Méndez,w,,
+229,José,García,m,TSV Schwimmclub,
+230,Paul,Šimić,m,Neptun Köln,
+231,Clara,Zhang,w,SV Delphin,
+232,Paul,Šimić,m,,2013
+233,Åsa,Svensson,m,Delphin 08,2011
+234,Åsa,Svensson,w,TSV Schwimmclub,2013
+235,Emma-Maria,Krüger,w,Neptun Köln,2012
+236,Maximilian,,w,Wasserfreunde,
+237,Tom,O'Connor,w,SV Poseidon,
+238,Maximilian,,m,Wasserfreunde,2012
+239,Jiří,Novák,w,TSV Schwimmclub,2012
+240,Ben,Müller,m,SV Delphin,
+241,Mārtiņš,Bērziņš,m,Wasserfreunde,
+242,Džesika,Kalniņa,w,Neptun Köln,2010
+243,José,García,m,Neptun Köln,
+244,Zoë,Schmidt,w,TSV Schwimmclub,
+245,László,Nagy,m,SV Delphin,
+246,Lisa,Weiß,w,TSV Schwimmclub,2011
+247,Noah,Zhang,m,Neptun Köln,
+248,Léa,Dubois,w,SV Delphin,2009
+249,Paul,Šimić,w,Delphin 08,2007
+250,Noah,Zhang,w,,2013
+251,László,Nagy,w,SV Poseidon,
+252,Džesika,Kalniņa,w,SV Delphin,2006
+253,Džesika,Kalniņa,m,Neptun Köln,
+254,Džesika,Kalniņa,m,SV Delphin,
+255,José,García,w,Neptun Köln,2006
+256,Paul,Šimić,w,SV Delphin,2013
+257,Lina,Schneider,m,Neptun Köln,
+258,Noah,Zhang,w,Delphin 08,
+259,Tim,Méndez,m,Neptun Köln,
+260,Paul,Šimić,m,SV Poseidon,2008
+261,Paul,Šimić,m,Neptun Köln,
+262,László,Nagy,w,SV Delphin,2013
+263,Emma-Maria,Krüger,m,Wasserfreunde,2008
+264,Džesika,Kalniņa,m,Neptun Köln,2011
+265,Paul,Šimić,m,Neptun Köln,
+266,Chloé,Lemoine,w,Neptun Köln,
+267,Mārtiņš,Bērziņš,w,SV Delphin,2006
+268,Jiří,Novák,w,Wasserfreunde,2006
+269,Jiří,Novák,m,SV Poseidon,
+270,Emma-Maria,Krüger,w,Delphin 08,2009
+271,Åsa,Svensson,m,TSV Schwimmclub,
+272,Jiří,Novák,w,,2009
+273,Mārtiņš,Bērziņš,w,Wasserfreunde,
+274,Chloé,Lemoine,w,,2013
+275,Ben,Müller,m,SV Poseidon,2006
+276,Zoë,Schmidt,m,,2013
+277,Maximilian,,w,SV Poseidon,
+278,Mārtiņš,Bērziņš,w,,
+279,Clàra,Méndez,w,Delphin 08,
+280,Emma-Maria,Krüger,w,Neptun Köln,2007
+281,Léa,Dubois,w,TSV Schwimmclub,
+282,Ole-Jørgen,Berg,w,SV Poseidon,2007
+283,Noah,Zhang,m,Delphin 08,2011
+284,László,Nagy,m,TSV Schwimmclub,2012
+285,Mārtiņš,Bērziņš,w,SV Poseidon,
+286,Tom,O'Connor,m,SV Delphin,
+287,Noah,Zhang,w,Delphin 08,
+288,Clàra,Méndez,m,TSV Schwimmclub,
+289,Lisa,Weiß,w,,
+290,Ben,Müller,w,,
+291,Emma,Müller,m,,
+292,Clàra,Méndez,m,SV Poseidon,2007
+293,Emma,Müller,w,Neptun Köln,
+294,Mia,Méndez,m,,2008
+295,Džesika,Kalniņa,m,,
+296,Emma,Müller,w,Wasserfreunde,2008
+297,Emma-Maria,Krüger,m,SV Delphin,2010
+298,Ole-Jørgen,Berg,w,SV Delphin,
+299,Lina,Schneider,m,SV Poseidon,
+300,Džesika,Kalniņa,w,SV Poseidon,2010
+301,Anna-Lena,Schneider,m,Wasserfreunde,2006
+302,José,García,w,SV Delphin,2013
+303,Paul,Šimić,m,TSV Schwimmclub,
+304,Noah,Zhang,w,TSV Schwimmclub,
+305,Léa,Dubois,w,Neptun Köln,2006
+306,Chloé,Lemoine,w,TSV Schwimmclub,
+307,László,Nagy,w,SV Poseidon,
+308,Clàra,Méndez,m,TSV Schwimmclub,
+309,José,García,m,Wasserfreunde,2006
+310,Ole-Jørgen,Berg,m,Neptun Köln,2011
+311,Chloé,Lemoine,m,SV Poseidon,2012
+312,Džesika,Kalniņa,m,Wasserfreunde,
+313,Tim,Méndez,w,SV Delphin,2012
+314,Noah,Zhang,m,Delphin 08,2011
+315,Noah,Zhang,w,TSV Schwimmclub,
+316,José,García,w,SV Delphin,2009
+317,Ole-Jørgen,Berg,w,,2009
+318,László,Nagy,m,SV Delphin,
+319,Anna-Lena,Schneider,m,Delphin 08,
+320,László,Nagy,m,Wasserfreunde,
+321,Lina,Schneider,w,Wasserfreunde,2010
+322,Mia,Méndez,m,,2012
+323,Ole-Jørgen,Berg,m,SV Delphin,
+324,Mia,Méndez,w,Neptun Köln,
+325,Paul,Šimić,m,SV Poseidon,2009
+326,Noah,Zhang,m,Wasserfreunde,2012
+327,Clara,Zhang,m,TSV Schwimmclub,
+328,Džesika,Kalniņa,w,Wasserfreunde,2006
+329,Mia,Méndez,w,Delphin 08,2012
+330,Emma,Müller,m,TSV Schwimmclub,
+331,Emma,Müller,w,TSV Schwimmclub,
+332,Maximilian,,m,TSV Schwimmclub,2012
+333,Chloé,Lemoine,w,SV Poseidon,
+334,Anna-Lena,Schneider,w,Wasserfreunde,2007
+335,Léa,Dubois,m,SV Delphin,
+336,Paul,Šimić,m,Delphin 08,
+337,Noah,Zhang,m,Wasserfreunde,
+338,Emma,Müller,m,,
+339,Emma,Müller,w,,
+340,Clàra,Méndez,m,Delphin 08,
+341,Džesika,Kalniņa,w,TSV Schwimmclub,2012
+342,Lisa,Weiß,m,Neptun Köln,2007
+343,Chloé,Lemoine,m,Wasserfreunde,2009
+344,Zoë,Schmidt,m,Neptun Köln,
+345,Mia,Méndez,m,,2010
+346,Emma-Maria,Krüger,w,Neptun Köln,2008
+347,Tim,Méndez,m,Wasserfreunde,2011
+348,Tim,Méndez,w,Delphin 08,2006
+349,Noah,Zhang,m,Delphin 08,2013
+350,Mia,Méndez,m,Wasserfreunde,2012
+351,Zoë,Schmidt,w,Delphin 08,
+352,Tim,Méndez,w,TSV Schwimmclub,
+353,Zoë,Schmidt,w,,2013
+354,Lisa,Weiß,w,Delphin 08,
+355,Ben,Müller,m,,
+356,Clara,Zhang,w,Neptun Köln,2010
+357,Mia,Méndez,m,TSV Schwimmclub,2012
+358,José,García,m,SV Poseidon,2009
+359,Maximilian,,m,SV Delphin,
+360,Léa,Dubois,m,SV Poseidon,
+361,Zoë,Schmidt,w,Delphin 08,2008
+362,Zoë,Schmidt,w,SV Delphin,2010
+363,Mia,Méndez,m,SV Poseidon,2011
+364,Åsa,Svensson,w,TSV Schwimmclub,2009
+365,Mārtiņš,Bērziņš,w,,2009
+366,Mia,Méndez,w,Delphin 08,
+367,Paul,Šimić,w,Wasserfreunde,
+368,Ole-Jørgen,Berg,m,Wasserfreunde,
+369,Ole-Jørgen,Berg,m,Delphin 08,2008
+370,Maximilian,,m,Wasserfreunde,2007
+371,Tim,Méndez,w,Neptun Köln,2012
+372,Léa,Dubois,m,TSV Schwimmclub,
+373,Åsa,Svensson,m,TSV Schwimmclub,
+374,Džesika,Kalniņa,w,Delphin 08,
+375,Mia,Méndez,m,,
+376,Noah,Zhang,m,Delphin 08,
+377,José,García,w,,2013
+378,Tim,Méndez,w,SV Delphin,
+379,Ben,Müller,m,SV Poseidon,2006
+380,Anna-Lena,Schneider,w,TSV Schwimmclub,2010
+381,Maximilian,,w,Delphin 08,
+382,Mia,Méndez,m,SV Poseidon,
+383,Chloé,Lemoine,m,SV Delphin,2012
+384,László,Nagy,w,,
+385,Chloé,Lemoine,w,SV Poseidon,2007
+386,Mārtiņš,Bērziņš,m,TSV Schwimmclub,
+387,Emma,Müller,m,Delphin 08,
+388,Léa,Dubois,m,Wasserfreunde,2007
+389,Léa,Dubois,w,Neptun Köln,
+390,Anna-Lena,Schneider,m,Wasserfreunde,2007
+391,Anna-Lena,Schneider,m,Neptun Köln,
+392,José,García,m,Neptun Köln,2006
+393,Tom,O'Connor,w,Delphin 08,
+394,Jiří,Novák,w,Delphin 08,
+395,Léa,Dubois,w,Delphin 08,2013
+396,Clara,Zhang,w,SV Delphin,2007
+397,Tim,Méndez,w,Wasserfreunde,
+398,Džesika,Kalniņa,m,SV Delphin,
+399,Mia,Méndez,m,TSV Schwimmclub,
+400,Lina,Schneider,w,Wasserfreunde,2006
+401,Tom,O'Connor,w,SV Poseidon,2008
+402,László,Nagy,m,Wasserfreunde,
+403,Clara,Zhang,m,,
+404,Anna-Lena,Schneider,w,Wasserfreunde,2012
+405,Emma,Müller,w,SV Delphin,
+406,Ben,Müller,w,SV Delphin,
+407,Mia,Méndez,m,SV Poseidon,2010
+408,Åsa,Svensson,m,Delphin 08,2007
+409,Maximilian,,w,Neptun Köln,
+410,Chloé,Lemoine,m,Neptun Köln,2011
+411,Maximilian,,m,Neptun Köln,
+412,Emma-Maria,Krüger,m,Wasserfreunde,
+413,Tim,Méndez,w,Neptun Köln,
+414,Anna-Lena,Schneider,w,Neptun Köln,
+415,Ole-Jørgen,Berg,w,Neptun Köln,2007
+416,Lina,Schneider,m,Neptun Köln,
+417,Lisa,Weiß,w,SV Poseidon,2009
+418,Emma,Müller,m,Delphin 08,
+419,Léa,Dubois,m,SV Delphin,
+420,Zoë,Schmidt,w,Wasserfreunde,
+421,Jiří,Novák,m,SV Delphin,
+422,Clàra,Méndez,m,SV Poseidon,2008
+423,Clàra,Méndez,m,Delphin 08,
+424,Lisa,Weiß,w,Neptun Köln,2012
+425,Chloé,Lemoine,w,TSV Schwimmclub,2012
+426,Maximilian,,w,Delphin 08,2008
+427,Noah,Zhang,w,Wasserfreunde,2010
+428,Lina,Schneider,w,Delphin 08,2008
+429,Emma-Maria,Krüger,m,,
+430,José,García,m,Neptun Köln,2009
+431,Noah,Zhang,m,Neptun Köln,
+432,Mia,Méndez,m,TSV Schwimmclub,2013
+433,Lina,Schneider,m,SV Delphin,2013
+434,Tom,O'Connor,w,SV Poseidon,
+435,László,Nagy,w,,
+436,Noah,Zhang,m,SV Delphin,
+437,Noah,Zhang,m,Wasserfreunde,
+438,Paul,Šimić,m,,2008
+439,Jiří,Novák,w,TSV Schwimmclub,2009
+440,Chloé,Lemoine,w,Delphin 08,
+441,Maximilian,,m,,2012
+442,Emma-Maria,Krüger,m,Neptun Köln,2006
+443,Mia,Méndez,m,SV Poseidon,
+444,Anna-Lena,Schneider,m,TSV Schwimmclub,
+445,José,García,w,SV Poseidon,2010
+446,Emma,Müller,w,SV Delphin,
+447,Ben,Müller,w,,2008
+448,Chloé,Lemoine,m,TSV Schwimmclub,
+449,László,Nagy,w,,
+450,Tom,O'Connor,w,Neptun Köln,2010
+451,Tom,O'Connor,m,Neptun Köln,
+452,Clara,Zhang,m,SV Poseidon,2006
+453,Mia,Méndez,w,Neptun Köln,2012
+454,Lisa,Weiß,m,,2013
+455,Ole-Jørgen,Berg,m,SV Poseidon,
+456,Léa,Dubois,w,Wasserfreunde,
+457,Paul,Šimić,w,SV Poseidon,2009
+458,Paul,Šimić,m,SV Delphin,2012
+459,Paul,Šimić,w,TSV Schwimmclub,2007
+460,Paul,Šimić,w,SV Delphin,2008
+461,Paul,Šimić,m,Delphin 08,
+462,Emma,Müller,w,,2010
+463,Lina,Schneider,w,Delphin 08,
+464,Åsa,Svensson,m,,2009
+465,Zoë,Schmidt,m,Delphin 08,
+466,Maximilian,,w,Delphin 08,
+467,Chloé,Lemoine,w,Delphin 08,2013
+468,Anna-Lena,Schneider,m,TSV Schwimmclub,
+469,Clàra,Méndez,w,SV Poseidon,2013
+470,Tom,O'Connor,m,TSV Schwimmclub,
+471,Lisa,Weiß,w,,2006
+472,Lisa,Weiß,w,SV Delphin,2007
+473,Džesika,Kalniņa,w,,
+474,Zoë,Schmidt,m,,
+475,José,García,m,Delphin 08,
+476,Lina,Schneider,w,Delphin 08,
+477,László,Nagy,m,TSV Schwimmclub,
+478,Ole-Jørgen,Berg,m,SV Delphin,2012
+479,Ben,Müller,w,Wasserfreunde,
+480,Tim,Méndez,w,,
+481,Noah,Zhang,w,SV Poseidon,
+482,Noah,Zhang,w,TSV Schwimmclub,
+483,Maximilian,,w,Delphin 08,
+484,Emma,Müller,m,SV Poseidon,
+485,José,García,m,,2010
+486,Mia,Méndez,w,SV Poseidon,2006
+487,Léa,Dubois,w,Wasserfreunde,
+488,Tom,O'Connor,m,,
+489,Lina,Schneider,m,SV Delphin,
+490,Džesika,Kalniņa,m,SV Poseidon,
+491,Emma,Müller,w,TSV Schwimmclub,2008
+492,Lisa,Weiß,w,,2008
+493,László,Nagy,m,Wasserfreunde,2006
+494,Clàra,Méndez,m,SV Delphin,
+495,José,García,w,Neptun Köln,
+496,Anna-Lena,Schneider,w,Wasserfreunde,2008
+497,Ben,Müller,m,,
+498,Tim,Méndez,w,TSV Schwimmclub,
+499,Ben,Müller,m,Wasserfreunde,
+500,Clara,Zhang,w,,2008
+501,Léa,Dubois,m,SV Poseidon,
+502,Lina,Schneider,m,Neptun Köln,
+503,Chloé,Lemoine,m,,
+504,Lisa,Weiß,m,SV Poseidon,2011
+505,Léa,Dubois,w,,
+506,Tom,O'Connor,m,,
+507,Anna-Lena,Schneider,m,TSV Schwimmclub,
+508,Džesika,Kalniņa,w,TSV Schwimmclub,2011
+509,Mia,Méndez,w,SV Delphin,2009
+510,Clàra,Méndez,w,Neptun Köln,2012
+511,Lisa,Weiß,w,,2007
+512,Tom,O'Connor,w,,2007
+513,Anna-Lena,Schneider,w,TSV Schwimmclub,2013
+514,Zoë,Schmidt,m,Neptun Köln,2008
+515,Tim,Méndez,m,SV Poseidon,
+516,Mārtiņš,Bērziņš,m,,2008
+517,José,García,w,Neptun Köln,2008
+518,Maximilian,,m,,
+519,László,Nagy,w,SV Poseidon,
+520,Ole-Jørgen,Berg,w,TSV Schwimmclub,2008
+521,Anna-Lena,Schneider,m,Neptun Köln,
+522,Mia,Méndez,m,TSV Schwimmclub,
+523,László,Nagy,w,Neptun Köln,2009
+524,Clàra,Méndez,w,,2011
+525,Chloé,Lemoine,m,TSV Schwimmclub,
+526,Åsa,Svensson,w,,2009
+527,Clàra,Méndez,m,SV Delphin,2007
+528,Maximilian,,m,TSV Schwimmclub,2008
+529,José,García,m,TSV Schwimmclub,
+530,Mia,Méndez,m,TSV Schwimmclub,
+531,Mia,Méndez,m,SV Delphin,2010
+532,Paul,Šimić,w,SV Poseidon,2006
+533,Emma-Maria,Krüger,w,,
+534,László,Nagy,m,Delphin 08,
+535,José,García,m,,
+536,Tim,Méndez,w,Neptun Köln,
+537,Mārtiņš,Bērziņš,m,SV Poseidon,
+538,Lisa,Weiß,w,Wasserfreunde,2008
+539,Zoë,Schmidt,m,Delphin 08,
+540,Džesika,Kalniņa,w,SV Poseidon,
+541,Emma,Müller,m,TSV Schwimmclub,2011
+542,Lisa,Weiß,m,SV Poseidon,
+543,Anna-Lena,Schneider,m,,2007
+544,Jiří,Novák,w,TSV Schwimmclub,
+545,Maximilian,,w,,2008
+546,Ole-Jørgen,Berg,m,Neptun Köln,
+547,Lina,Schneider,w,,2009
+548,Zoë,Schmidt,m,TSV Schwimmclub,
+549,Lina,Schneider,w,SV Delphin,2009
+550,Lina,Schneider,m,SV Delphin,
+551,Clara,Zhang,m,Neptun Köln,2008
+552,Paul,Šimić,m,SV Poseidon,
+553,Emma-Maria,Krüger,w,SV Delphin,
+554,Tim,Méndez,m,SV Delphin,2006
+555,Maximilian,,w,Delphin 08,2008
+556,Léa,Dubois,w,TSV Schwimmclub,2011
+557,Åsa,Svensson,w,,
+558,Tom,O'Connor,m,SV Delphin,2006
+559,Mārtiņš,Bērziņš,m,Delphin 08,2006
+560,László,Nagy,w,Delphin 08,2012
+561,Clara,Zhang,w,TSV Schwimmclub,2006
+562,Chloé,Lemoine,w,SV Poseidon,2013
+563,Léa,Dubois,m,TSV Schwimmclub,2009
+564,Lina,Schneider,m,SV Delphin,
+565,Clara,Zhang,m,SV Poseidon,2006
+566,Clara,Zhang,m,,
+567,Lina,Schneider,m,Neptun Köln,
+568,László,Nagy,w,SV Delphin,2013
+569,Zoë,Schmidt,w,Neptun Köln,
+570,Tom,O'Connor,m,Wasserfreunde,2012
+571,Åsa,Svensson,w,Delphin 08,2008
+572,Ben,Müller,w,Delphin 08,
+573,László,Nagy,m,SV Poseidon,
+574,Léa,Dubois,w,Wasserfreunde,2010
+575,Clàra,Méndez,w,Delphin 08,2006
+576,Clàra,Méndez,w,TSV Schwimmclub,2006
+577,Léa,Dubois,w,Wasserfreunde,2011
+578,Maximilian,,w,SV Poseidon,2010
+579,Chloé,Lemoine,w,Wasserfreunde,
+580,Anna-Lena,Schneider,m,TSV Schwimmclub,
+581,Jiří,Novák,m,TSV Schwimmclub,
+582,Zoë,Schmidt,m,,
+583,Chloé,Lemoine,w,SV Poseidon,
+584,Chloé,Lemoine,w,Delphin 08,
+585,Clàra,Méndez,m,,
+586,Chloé,Lemoine,m,SV Poseidon,2007
+587,Tom,O'Connor,w,SV Delphin,2009
+588,Lina,Schneider,m,SV Delphin,2012
+589,Anna-Lena,Schneider,m,Wasserfreunde,2013
+590,Paul,Šimić,m,Neptun Köln,
+591,Anna-Lena,Schneider,w,SV Poseidon,2006
+592,Anna-Lena,Schneider,w,Neptun Köln,
+593,Lina,Schneider,m,Delphin 08,2012
+594,Chloé,Lemoine,w,SV Poseidon,
+595,Maximilian,,m,Wasserfreunde,
+596,Ole-Jørgen,Berg,w,Wasserfreunde,2006
+597,Emma,Müller,w,,2006
+598,Ben,Müller,w,Neptun Köln,
+599,Tim,Méndez,m,SV Poseidon,
+600,Ole-Jørgen,Berg,m,Neptun Köln,2007
+601,Zoë,Schmidt,w,TSV Schwimmclub,
+602,Léa,Dubois,w,Neptun Köln,2011
+603,Lina,Schneider,w,SV Poseidon,
+604,Clara,Zhang,m,SV Poseidon,
+605,László,Nagy,m,,2010
+606,Tim,Méndez,m,SV Delphin,
+607,Emma-Maria,Krüger,m,SV Poseidon,
+608,José,García,w,,2011
+609,Léa,Dubois,w,Neptun Köln,2010
+610,Chloé,Lemoine,w,TSV Schwimmclub,
+611,Chloé,Lemoine,w,Delphin 08,
+612,Lisa,Weiß,w,,2007
+613,José,García,w,Delphin 08,
+614,Tim,Méndez,m,SV Poseidon,2013
+615,José,García,w,,2008
+616,Mārtiņš,Bērziņš,w,SV Poseidon,
+617,Lisa,Weiß,w,Wasserfreunde,
+618,Maximilian,,w,Delphin 08,
+619,Maximilian,,m,Neptun Köln,2009
+620,Åsa,Svensson,m,,
+621,Léa,Dubois,w,TSV Schwimmclub,2006
+622,László,Nagy,w,Wasserfreunde,
+623,Anna-Lena,Schneider,w,Neptun Köln,2007
+624,Paul,Šimić,w,SV Poseidon,
+625,Mārtiņš,Bērziņš,w,Wasserfreunde,2010
+626,Džesika,Kalniņa,w,TSV Schwimmclub,
+627,Emma,Müller,w,SV Delphin,2010
+628,Jiří,Novák,m,TSV Schwimmclub,
+629,László,Nagy,w,SV Delphin,2006
+630,Tim,Méndez,w,TSV Schwimmclub,
+631,Emma-Maria,Krüger,m,,2007
+632,Mārtiņš,Bērziņš,w,,2009
+633,Tom,O'Connor,m,SV Delphin,
+634,Åsa,Svensson,w,SV Poseidon,
+635,Clara,Zhang,w,Neptun Köln,2011
+636,Noah,Zhang,w,Delphin 08,2008
+637,Clara,Zhang,w,Wasserfreunde,
+638,Åsa,Svensson,m,TSV Schwimmclub,
+639,Åsa,Svensson,w,Wasserfreunde,2007
+640,Chloé,Lemoine,w,Neptun Köln,2013
+641,Tom,O'Connor,m,,2006
+642,Paul,Šimić,w,SV Poseidon,
+643,Mārtiņš,Bērziņš,m,,
+644,Chloé,Lemoine,m,,2011
+645,Jiří,Novák,m,TSV Schwimmclub,
+646,Noah,Zhang,m,,
+647,Chloé,Lemoine,w,SV Poseidon,
+648,Chloé,Lemoine,w,SV Poseidon,
+649,Ben,Müller,m,SV Delphin,2006
+650,Džesika,Kalniņa,m,Delphin 08,
+651,Anna-Lena,Schneider,m,Delphin 08,
+652,Emma-Maria,Krüger,w,SV Delphin,2013
+653,Jiří,Novák,w,,
+654,Ben,Müller,w,SV Poseidon,
+655,Lina,Schneider,m,Neptun Köln,2008
+656,Chloé,Lemoine,m,SV Delphin,2007
+657,Tom,O'Connor,w,SV Poseidon,
+658,Tom,O'Connor,m,Neptun Köln,
+659,Mārtiņš,Bērziņš,m,SV Poseidon,
+660,Noah,Zhang,w,,
+661,Tim,Méndez,m,Neptun Köln,
+662,Åsa,Svensson,m,Wasserfreunde,
+663,Åsa,Svensson,m,SV Poseidon,2006
+664,Noah,Zhang,m,Delphin 08,
+665,Noah,Zhang,m,,
+666,Léa,Dubois,w,Wasserfreunde,2008
+667,Maximilian,,w,TSV Schwimmclub,
+668,Anna-Lena,Schneider,m,SV Delphin,
+669,Léa,Dubois,w,SV Poseidon,
+670,Mia,Méndez,m,Neptun Köln,2013
+671,Anna-Lena,Schneider,w,,2007
+672,Ben,Müller,w,SV Delphin,
+673,Maximilian,,w,Delphin 08,2011
+674,Mārtiņš,Bērziņš,m,SV Poseidon,
+675,Åsa,Svensson,w,,2006
+676,Mia,Méndez,w,Delphin 08,
+677,Clàra,Méndez,w,Delphin 08,2011
+678,Ben,Müller,m,,2007
+679,Anna-Lena,Schneider,m,TSV Schwimmclub,
+680,Chloé,Lemoine,m,SV Poseidon,2010
+681,Ole-Jørgen,Berg,w,SV Delphin,2009
+682,Paul,Šimić,m,SV Delphin,2013
+683,Emma,Müller,m,Neptun Köln,
+684,José,García,w,Delphin 08,
+685,Lina,Schneider,m,Delphin 08,
+686,Emma,Müller,m,Neptun Köln,2008
+687,Džesika,Kalniņa,m,SV Delphin,2011
+688,Emma-Maria,Krüger,w,Delphin 08,2010
+689,László,Nagy,w,,2012
+690,Tom,O'Connor,m,SV Poseidon,2011
+691,Lina,Schneider,w,SV Poseidon,
+692,Emma,Müller,m,SV Delphin,2009
+693,Mia,Méndez,w,SV Delphin,
+694,José,García,w,TSV Schwimmclub,
+695,José,García,w,,
+696,José,García,m,,
+697,Ole-Jørgen,Berg,w,SV Delphin,
+698,Chloé,Lemoine,w,Delphin 08,
+699,László,Nagy,m,SV Poseidon,2010
+700,Lisa,Weiß,w,,
+701,Lina,Schneider,m,Neptun Köln,
+702,Clara,Zhang,m,Wasserfreunde,
+703,Chloé,Lemoine,w,Wasserfreunde,
+704,Maximilian,,m,SV Poseidon,2013
+705,Lisa,Weiß,m,SV Delphin,
+706,Mārtiņš,Bērziņš,w,SV Delphin,2010
+707,Džesika,Kalniņa,m,Neptun Köln,2007
+708,Emma-Maria,Krüger,w,,2010
+709,Lina,Schneider,m,Wasserfreunde,2009
+710,Clara,Zhang,m,Wasserfreunde,
+711,Noah,Zhang,m,Delphin 08,2010
+712,Åsa,Svensson,w,SV Poseidon,
+713,Léa,Dubois,w,SV Poseidon,
+714,Chloé,Lemoine,w,SV Poseidon,
+715,Zoë,Schmidt,w,SV Delphin,2006
+716,Mia,Méndez,m,TSV Schwimmclub,2010
+717,Džesika,Kalniņa,w,Wasserfreunde,
+718,Ole-Jørgen,Berg,m,SV Poseidon,
+719,Lina,Schneider,m,SV Poseidon,2013
+720,Mārtiņš,Bērziņš,w,Wasserfreunde,2006
+721,Ben,Müller,m,Wasserfreunde,
+722,Tim,Méndez,w,,2008
+723,Åsa,Svensson,w,SV Poseidon,2007
+724,Paul,Šimić,m,Neptun Köln,2010
+725,Maximilian,,w,Neptun Köln,
+726,László,Nagy,w,Delphin 08,
+727,Tim,Méndez,m,SV Delphin,
+728,José,García,w,Delphin 08,
+729,José,García,m,TSV Schwimmclub,
+730,Emma-Maria,Krüger,w,TSV Schwimmclub,
+731,Lisa,Weiß,m,SV Poseidon,
+732,Åsa,Svensson,m,Neptun Köln,
+733,Åsa,Svensson,m,Wasserfreunde,
+734,Anna-Lena,Schneider,m,TSV Schwimmclub,2011
+735,Clara,Zhang,m,,2008
+736,Emma,Müller,m,,
+737,Clàra,Méndez,m,Wasserfreunde,2008
+738,Maximilian,,m,SV Poseidon,2006
+739,László,Nagy,w,Wasserfreunde,2008
+740,Ole-Jørgen,Berg,m,Neptun Köln,2007
+741,Anna-Lena,Schneider,m,Neptun Köln,2012
+742,Ole-Jørgen,Berg,m,SV Poseidon,2012
+743,Emma-Maria,Krüger,w,Delphin 08,
+744,Ole-Jørgen,Berg,m,Delphin 08,2012
+745,Noah,Zhang,w,TSV Schwimmclub,2012
+746,Ben,Müller,m,SV Delphin,2009
+747,Maximilian,,m,Neptun Köln,
+748,Džesika,Kalniņa,m,,
+749,Léa,Dubois,w,SV Delphin,
+750,Clara,Zhang,m,SV Delphin,2006
+751,Clàra,Méndez,m,SV Delphin,2011
+752,Mārtiņš,Bērziņš,m,SV Poseidon,2006
+753,José,García,m,SV Delphin,2008
+754,Zoë,Schmidt,m,SV Poseidon,2009
+755,Clara,Zhang,m,SV Delphin,
+756,Paul,Šimić,m,TSV Schwimmclub,
+757,Ole-Jørgen,Berg,w,Wasserfreunde,2006
+758,László,Nagy,m,SV Poseidon,2008
+759,Anna-Lena,Schneider,w,SV Poseidon,
+760,Tim,Méndez,w,TSV Schwimmclub,2007
+761,Emma,Müller,m,Delphin 08,
+762,Ole-Jørgen,Berg,m,Neptun Köln,
+763,Jiří,Novák,m,SV Poseidon,
+764,Paul,Šimić,w,SV Delphin,
+765,Anna-Lena,Schneider,m,,
+766,Tim,Méndez,m,Neptun Köln,2009
+767,Ben,Müller,m,Delphin 08,2011
+768,Mārtiņš,Bērziņš,w,Wasserfreunde,
+769,Zoë,Schmidt,m,Delphin 08,
+770,Lina,Schneider,w,Wasserfreunde,
+771,Ole-Jørgen,Berg,w,Wasserfreunde,2010
+772,Paul,Šimić,m,SV Delphin,
+773,Ben,Müller,m,,2007
+774,Emma,Müller,m,SV Poseidon,2011
+775,Tim,Méndez,w,SV Delphin,
+776,Mia,Méndez,w,,2010
+777,Mia,Méndez,m,Neptun Köln,
+778,László,Nagy,m,,2006
+779,Emma,Müller,w,SV Delphin,2013
+780,Ole-Jørgen,Berg,m,Neptun Köln,
+781,Jiří,Novák,w,SV Poseidon,2007
+782,Tim,Méndez,w,,2012
+783,Clàra,Méndez,w,SV Poseidon,
+784,Ole-Jørgen,Berg,w,Wasserfreunde,
+785,Noah,Zhang,m,Wasserfreunde,2012
+786,Ole-Jørgen,Berg,w,Wasserfreunde,
+787,Jiří,Novák,m,SV Poseidon,
+788,José,García,w,SV Delphin,
+789,Maximilian,,m,,2010
+790,Tim,Méndez,m,Wasserfreunde,
+791,Zoë,Schmidt,m,Neptun Köln,2011
+792,Emma,Müller,m,SV Poseidon,2007
+793,Ben,Müller,m,Wasserfreunde,
+794,Emma-Maria,Krüger,m,SV Delphin,2008
+795,Noah,Zhang,m,,
+796,Paul,Šimić,m,SV Poseidon,
+797,Clàra,Méndez,w,TSV Schwimmclub,2007
+798,László,Nagy,w,SV Delphin,2007
+799,Lisa,Weiß,m,Delphin 08,2007
+800,Mārtiņš,Bērziņš,m,SV Poseidon,2008
+801,Ole-Jørgen,Berg,m,TSV Schwimmclub,2011
+802,Clara,Zhang,m,Wasserfreunde,
+803,Ben,Müller,w,SV Delphin,2011
+804,Tim,Méndez,w,TSV Schwimmclub,2012
+805,Zoë,Schmidt,w,Wasserfreunde,2010
+806,Chloé,Lemoine,w,SV Delphin,2008
+807,Maximilian,,w,Neptun Köln,2010
+808,Chloé,Lemoine,m,SV Delphin,
+809,Mia,Méndez,m,Neptun Köln,2011
+810,Léa,Dubois,w,TSV Schwimmclub,2012
+811,Clàra,Méndez,m,SV Delphin,2006
+812,Ben,Müller,m,SV Delphin,
+813,Ben,Müller,w,Delphin 08,2011
+814,Clàra,Méndez,w,,
+815,Maximilian,,m,SV Poseidon,2006
+816,Ben,Müller,w,SV Poseidon,2006
+817,Maximilian,,w,,2009
+818,Jiří,Novák,w,SV Delphin,
+819,Džesika,Kalniņa,m,Delphin 08,2013
+820,Ole-Jørgen,Berg,w,Neptun Köln,
+821,Emma,Müller,m,SV Delphin,
+822,Tim,Méndez,m,Delphin 08,2008
+823,José,García,w,Neptun Köln,2009
+824,Chloé,Lemoine,m,,
+825,Jiří,Novák,m,Delphin 08,
+826,Noah,Zhang,w,SV Poseidon,
+827,Mārtiņš,Bērziņš,w,Neptun Köln,
+828,Chloé,Lemoine,w,TSV Schwimmclub,
+829,Mārtiņš,Bērziņš,w,TSV Schwimmclub,2008
+830,Emma,Müller,m,TSV Schwimmclub,2011
+831,Tom,O'Connor,m,SV Poseidon,
+832,Lisa,Weiß,w,Neptun Köln,
+833,Clara,Zhang,w,TSV Schwimmclub,2012
+834,Zoë,Schmidt,m,,2013
+835,László,Nagy,m,SV Poseidon,2012
+836,Léa,Dubois,w,Wasserfreunde,
+837,László,Nagy,w,Wasserfreunde,
+838,Džesika,Kalniņa,w,Neptun Köln,
+839,Léa,Dubois,w,SV Delphin,
+840,Paul,Šimić,w,,2010
+841,Chloé,Lemoine,m,,
+842,Jiří,Novák,m,Neptun Köln,
+843,Chloé,Lemoine,w,Delphin 08,2006
+844,Clàra,Méndez,w,SV Poseidon,
+845,Zoë,Schmidt,w,Neptun Köln,
+846,Tom,O'Connor,w,Delphin 08,
+847,Emma-Maria,Krüger,m,SV Delphin,
+848,Ben,Müller,w,Neptun Köln,2013
+849,Tim,Méndez,w,TSV Schwimmclub,
+850,László,Nagy,w,Wasserfreunde,2008
+851,Jiří,Novák,m,,2007
+852,Mia,Méndez,m,,
+853,Clara,Zhang,m,Neptun Köln,2008
+854,Noah,Zhang,m,Neptun Köln,2013
+855,Mārtiņš,Bērziņš,m,Delphin 08,2008
+856,László,Nagy,w,SV Delphin,
+857,Léa,Dubois,m,Delphin 08,2013
+858,Léa,Dubois,m,,2011
+859,Tim,Méndez,m,Delphin 08,2008
+860,Lisa,Weiß,m,TSV Schwimmclub,
+861,Noah,Zhang,m,Delphin 08,
+862,Ole-Jørgen,Berg,m,,
+863,Jiří,Novák,m,SV Delphin,
+864,Džesika,Kalniņa,m,,2012
+865,Lina,Schneider,w,TSV Schwimmclub,2011
+866,Lisa,Weiß,w,Neptun Köln,2013
+867,László,Nagy,w,Neptun Köln,2010
+868,Mia,Méndez,m,SV Delphin,2009
+869,Léa,Dubois,m,Neptun Köln,2007
+870,Clàra,Méndez,m,SV Delphin,2011
+871,Ben,Müller,w,,
+872,Anna-Lena,Schneider,m,Wasserfreunde,2009
+873,Léa,Dubois,m,Wasserfreunde,
+874,Chloé,Lemoine,w,Neptun Köln,2008
+875,Paul,Šimić,m,SV Poseidon,
+876,Åsa,Svensson,m,,2008
+877,Zoë,Schmidt,m,SV Poseidon,
+878,Paul,Šimić,w,Wasserfreunde,
+879,Jiří,Novák,m,TSV Schwimmclub,
+880,José,García,m,Wasserfreunde,2013
+881,Lina,Schneider,w,Wasserfreunde,
+882,Åsa,Svensson,w,Neptun Köln,
+883,Paul,Šimić,m,Delphin 08,2013
+884,Jiří,Novák,w,Wasserfreunde,2012
+885,Maximilian,,w,,
+886,Maximilian,,m,Wasserfreunde,
+887,Paul,Šimić,w,TSV Schwimmclub,2012
+888,Mārtiņš,Bērziņš,w,Wasserfreunde,2010
+889,Anna-Lena,Schneider,m,TSV Schwimmclub,2011
+890,Åsa,Svensson,w,,
+891,Mārtiņš,Bērziņš,w,TSV Schwimmclub,
+892,László,Nagy,w,Delphin 08,
+893,Mia,Méndez,m,Delphin 08,2008
+894,Emma-Maria,Krüger,m,TSV Schwimmclub,
+895,Džesika,Kalniņa,m,SV Poseidon,
+896,Ben,Müller,m,Delphin 08,
+897,Chloé,Lemoine,m,Neptun Köln,2013
+898,Anna-Lena,Schneider,m,SV Delphin,2008
+899,Clara,Zhang,w,Wasserfreunde,2009
+900,Džesika,Kalniņa,w,TSV Schwimmclub,2013

@@ -3,7 +3,7 @@ import os
 import subprocess
 
 # Basisnamen
-release_name = "swim24v0.2"
+release_name = "swim24v0.3"
 dist_dir = "dist"
 release_path = os.path.join(dist_dir, release_name)
 zip_path = os.path.join(dist_dir, f"{release_name}.zip")

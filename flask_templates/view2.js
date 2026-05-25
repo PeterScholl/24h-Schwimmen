@@ -1,6 +1,7 @@
 const { useState, useEffect, useRef } = React;
 
 const PAGE_INTERVAL_DEFAULT_MS = {{page_interval}} * 1000;
+const SWIMMER_LIST_INTERVAL_MS = {{swimmer_list_interval}} * 1000;
 const bahnLaenge = parseInt("{{bahnlaenge}}");
 
 let lastupdate = new Date("2000-01-01T00:00:00Z").toISOString();
@@ -126,23 +127,30 @@ function App() {
             curSwimmerMap[schwimmerID] = s;
             setSwimmerMap({ ...curSwimmerMap });
             const lzeit = new Date((new Date(zeit)).getTime() + offsetInMillis);
-            setLapLog((prev) => [{ schwimmer: schwimmerID, zeit: lzeit.toISOString(), laps: s.bahnanzahl, vorname: s.vorname }, ...prev.slice(0, 19)]);
+            setLapLog((prev) => [{ schwimmer: schwimmerID, zeit: lzeit.toISOString(), laps: s.bahnanzahl, vorname: s.vorname }, ...prev.slice(0, 49)]);
         }
     }
 
-    function holeNeueDaten(since) {
+    function holeNeueDaten(since, nurSchwimmer = false) {
+        const parameter = nurSchwimmer ? ["update_swimmer"] : (since ? [since] : []);
         fetch('/action', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify([{ 'kommando': "VIEW", 'parameter': (since ? [since] : []), 'timestamp': new Date().toISOString() }])
+            body: JSON.stringify([{ 'kommando': "VIEW", 'parameter': parameter, 'timestamp': new Date().toISOString() }])
         })
             .then((res) => res.json())
             .then((data) => {
                 if (data.swimmerMap) {
+                    const isInitialLoad = curActions.length === 0;
                     data.swimmerMap.forEach(s => {
-                        s.bahnanzahl = 0;
-                        spezialzeiten.forEach(szeit => s[szeit.name] = 0);
-                        curSwimmerMap[s.nummer] = s;
+                        if (isInitialLoad || !curSwimmerMap[s.nummer]) {
+                            s.bahnanzahl = 0;
+                            spezialzeiten.forEach(szeit => s[szeit.name] = 0);
+                            curSwimmerMap[s.nummer] = s;
+                        } else {
+                            const existing = curSwimmerMap[s.nummer];
+                            curSwimmerMap[s.nummer] = { ...existing, vorname: s.vorname, nachname: s.nachname, gruppe: s.gruppe, aktiv: s.aktiv };
+                        }
                     });
                     setSwimmerMap({ ...curSwimmerMap });
                 }
@@ -154,10 +162,14 @@ function App() {
                     neueElemente.forEach(element => {
                         curActions.push(element);
                         const parameter = JSON.parse(element.parameter);
-                        if (curSwimmerMap[parameter[0]]) {
-                            if (lastupdate < element.zeitstempel) lastupdate = element.zeitstempel;
-                            updateBahnen(parseInt(parameter[0]), parseInt(parameter[1]), element.zeitstempel);
+                        const nummer = parseInt(parameter[0]);
+                        if (!curSwimmerMap[nummer]) {
+                            const placeholder = { nummer, vorname: `Schwimmer ${nummer}`, nachname: '', gruppe: '', bahnanzahl: 0, aktiv: 1 };
+                            spezialzeiten.forEach(szeit => placeholder[szeit.name] = 0);
+                            curSwimmerMap[nummer] = placeholder;
                         }
+                        if (lastupdate < element.zeitstempel) lastupdate = element.zeitstempel;
+                        updateBahnen(nummer, parseInt(parameter[1]), element.zeitstempel);
                     });
                 }
                 if (data.filter) setFilter(data.filter);
@@ -183,6 +195,8 @@ function App() {
                 setNachnameAnzeigenAktiv((prev) => !prev);
             } else if (e.shiftKey && e.key === "U") {
                 setUnitMeterAktiv((prev) => !prev);
+            } else if (e.shiftKey && e.key === "S") {
+                holeNeueDaten(null, true);
             } else if (e.shiftKey && e.key === "B") {
                 downloadJSON();
             } else if (e.ctrlKey && e.key === '+') {
@@ -227,6 +241,15 @@ function App() {
             holeNeueDaten(date);
         }, 10000);
         return () => clearInterval(interval10);
+    }, []);
+
+    // Periodische Schwimmerlistenaktualisierung (neue Schwimmer integrieren)
+    useEffect(() => {
+        if (SWIMMER_LIST_INTERVAL_MS <= 0) return;
+        const intervalSwimmer = setInterval(() => {
+            holeNeueDaten(null, true);
+        }, SWIMMER_LIST_INTERVAL_MS);
+        return () => clearInterval(intervalSwimmer);
     }, []);
 
     // Automatischer Seitenwechsel bei aktivem Shift-Lock.
