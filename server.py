@@ -191,10 +191,11 @@ def admin():
             if not nummer:
                 return "Keine Schwimmernummer angegeben", 400
             felder = {}
-            if 'vorname'  in data: felder['vorname']  = data.get('vorname', '').strip()
-            if 'nachname' in data: felder['nachname'] = data.get('nachname', '').strip()
-            if 'gruppe'   in data: felder['gruppe']   = data.get('gruppe', '').strip()
-            if 'istKind'  in data: felder['istKind']  = 1 if data.get('istKind') in (True, 1, '1', 'true', 'True') else 0
+            if 'vorname'     in data: felder['vorname']     = data.get('vorname', '').strip()
+            if 'nachname'    in data: felder['nachname']    = data.get('nachname', '').strip()
+            if 'gruppe'      in data: felder['gruppe']      = data.get('gruppe', '').strip()
+            if 'istKind'     in data: felder['istKind']     = 1 if data.get('istKind') in (True, 1, '1', 'true', 'True') else 0
+            if 'bahnanzahl'  in data: felder['bahnanzahl']  = int(data.get('bahnanzahl'))
             if not felder:
                 return "Keine Felder zum Ändern angegeben", 400
             logging.info(f"Schwimmer {nummer} wird bearbeitet: {felder}")
@@ -289,7 +290,7 @@ def admin():
             logging.info(f"Importiert wurden {len(validierte)} Schwimmer")
             db.db.setBegin(False)
 
-            print("Validierte", validierte)
+            print("Validierte [0:10]", validierte[0:10])
 
             return jsonify({"status": "ok", "importiert": len(validierte)}), 200
         elif action == 'import_benutzer':

@@ -172,7 +172,8 @@ function showUserTable() {
                 url: '/admin',
                 action: 'import_benutzer',
                 knownHeaders: ['', 'benutzername', 'name', 'passwort', 'admin'],
-                importLabel: 'Benutzer'
+                importLabel: 'Benutzer',
+                onSuccess: () => showUserTable()
             });
             renderTable(userData, 'userTable', ['id', 'name', 'benutzername', 'admin'], { 'Del': delUser, 'Edit': editUser });
         })
@@ -344,8 +345,10 @@ function showSwimmerTable() {
             button.innerText = 'Importieren';
             section.appendChild(button);
             initCSVImport('#csvInput', '#csvPreviewContainer', '#csvSend', { url: '/admin',
+                action: 'import_schwimmer',
                 knownHeaders: ['', 'nummer', 'vorname', 'nachname', 'istKind', 'istErw', 'gruppe'],
-                importLabel: 'Schwimmer'
+                importLabel: 'Schwimmer',
+                onSuccess: () => showSwimmerTable()
             });
 
             const swimmerHeader = ['nummer', 'vorname', 'nachname', 'istKind', 'gruppe', 'bahnanzahl', 'auf_bahn', 'aktiv'];
@@ -737,7 +740,85 @@ function showChecksSection() {
     checkSection.innerHTML = ''; // erst leeren 
     let button = document.createElement('button');
     button.innerText = "Anzahlen Prüfen";
-    button.addEventListener('click', (e) => fetchAndFillTable(null, 'checkAnzahlenTable', 'get_checkAnzahlTable', 'Anzahlen'));
+    button.addEventListener('click', () => {
+        fetch('/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ action: 'get_checkAnzahlTable' })
+        })
+            .then(r => r.json())
+            .then(data => {
+                const table = document.getElementById('checkAnzahlenTable');
+                table.innerHTML = '';
+                if (data.length === 0) {
+                    table.innerHTML = '<tr><th>Keine Abweichungen gefunden</th></tr>';
+                    return;
+                }
+                // "Alle übernehmen"-Button (ggf. alten ersetzen)
+                document.getElementById('checkAllBtn')?.remove();
+                const allBtn = document.createElement('button');
+                allBtn.id = 'checkAllBtn';
+                allBtn.textContent = 'Alle übernehmen';
+                allBtn.style.cssText = 'margin-bottom:8px;';
+                table.insertAdjacentElement('beforebegin', allBtn);
+
+                const rowMeta = []; // { entry, row, btn } – für "Alle übernehmen"
+
+                const applyEntry = async (e) => {
+                    const res = await fetch('/admin', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'edit_swimmer', nummer: e.schwimmerID, bahnanzahl: e.ActionAnzErwartet })
+                    });
+                    return res.ok;
+                };
+
+                const headerRow = document.createElement('tr');
+                [...Object.keys(data[0]), 'Aktion'].forEach(k => {
+                    const th = document.createElement('th');
+                    th.textContent = k.charAt(0).toUpperCase() + k.slice(1);
+                    headerRow.appendChild(th);
+                });
+                table.appendChild(headerRow);
+                data.forEach(entry => {
+                    const row = document.createElement('tr');
+                    Object.values(entry).forEach(value => {
+                        const td = document.createElement('td');
+                        td.textContent = value;
+                        row.appendChild(td);
+                    });
+                    const tdBtn = document.createElement('td');
+                    const btn = document.createElement('button');
+                    btn.textContent = 'Übernehmen';
+                    btn.title = `ActionAnzErwartet (${entry.ActionAnzErwartet}) als Bahnanzahl speichern`;
+                    btn.addEventListener('click', async () => {
+                        if (await applyEntry(entry)) {
+                            row.style.opacity = '0.4';
+                            btn.disabled = true;
+                            showStatusMessage(`Schwimmer ${entry.schwimmerID}: Bahnanzahl auf ${entry.ActionAnzErwartet} gesetzt`);
+                        } else {
+                            showStatusMessage(`Fehler bei Schwimmer ${entry.schwimmerID}`, false);
+                        }
+                    });
+                    rowMeta.push({ entry, row, btn });
+                    tdBtn.appendChild(btn);
+                    row.appendChild(tdBtn);
+                    table.appendChild(row);
+                });
+
+                allBtn.addEventListener('click', async () => {
+                    allBtn.disabled = true;
+                    const results = await Promise.all(rowMeta.map(m => applyEntry(m.entry).then(ok => ({ ...m, ok }))));
+                    const failed = results.filter(r => !r.ok);
+                    results.filter(r => r.ok).forEach(r => { r.row.style.opacity = '0.4'; r.btn.disabled = true; });
+                    if (failed.length === 0) {
+                        showStatusMessage(`Alle ${results.length} Schwimmer aktualisiert`);
+                    } else {
+                        showStatusMessage(`${results.length - failed.length} aktualisiert, ${failed.length} Fehler`, false);
+                    }
+                });
+            });
+    });
     checkSection.appendChild(button);
     const info = document.createElement('span');
     info.innerText = "Gibt Schwimmer aus, bei denen die Anzahlen in Actions nicht denen in der Schwimmer-Tabelle entspricht"

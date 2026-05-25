@@ -32,7 +32,7 @@ export function initCSVImport(fileInputSelector, previewContainerSelector, sendB
         if (options.knownHeaders) {
             showHeaderMappingModal(headers, mapping => {
                 parsedData = lines.slice(1).map(line => {
-                    const values = line.split(separator).map(v => 
+                    const values = line.split(separator).map(v =>
                         v.trim().replace(/^"(.*)"$/, '$1')
                     );
                     const entry = {};
@@ -42,7 +42,7 @@ export function initCSVImport(fileInputSelector, previewContainerSelector, sendB
                     return entry;
                 });
                 renderPreview(Object.values(mapping).filter(k => k), parsedData, previewContainer);
-            }, options.knownHeaders, () => { fileInput.value = ''; previewContainer.innerHTML = ''; parsedData = []; });
+            }, options.knownHeaders, () => { fileInput.value = ''; previewContainer.innerHTML = ''; parsedData = []; }, options.action);
         } else {
 
             parsedData = lines.slice(1).map(line => {
@@ -74,6 +74,7 @@ export function initCSVImport(fileInputSelector, previewContainerSelector, sendB
                 ? `${result['neu']} neu, ${result['aktualisiert']} aktualisiert`
                 : `${result['importiert']} importiert bzw. aktualisiert`;
             showStatusMessage(`${label}: ${detail}`);
+            if (options.onSuccess) options.onSuccess();
         } catch (error) {
             showStatusMessage(`Fehler beim Import`, false);
         }
@@ -206,9 +207,11 @@ function renderPreview(headers, data, container) {
     document.getElementById("pageInfo").textContent = `Seite ${currentPage + 1} / ${totalPages}`;
 }
 
-function showHeaderMappingModal(headers, onConfirm, knownHeaders, onCancel) {
+function showHeaderMappingModal(headers, onConfirm, knownHeaders, onCancel, cookieKey) {
+    const storageKey = cookieKey ? `csvMapping_${cookieKey}` : null;
+    const savedMapping = storageKey ? JSON.parse(localStorage.getItem(storageKey) || '{}') : {};
+
     const modal = document.createElement('div');
-    console.log("in showHeaderMappingModal");
     modal.innerHTML = `
         <div class="modal" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
         background: white; border: 1px solid #ccc; padding: 1em; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
@@ -227,19 +230,22 @@ function showHeaderMappingModal(headers, onConfirm, knownHeaders, onCancel) {
                         </tr>
                     </thead>
                     <tbody>
-                        ${headers.map((h, i) => `
+                        ${headers.map((h, i) => {
+                            const saved = savedMapping[h] ?? '';
+                            return `
                             <tr>
                                 <td style="padding:4px 6px;"><strong>${h}</strong></td>
                                 <td style="padding:4px 6px;">
-                                    <select data-index="${i}" style="width:100%;">
-                                        ${knownHeaders.map(opt => `<option value="${opt}">${opt || 'Ignorieren'}</option>`).join('')}
+                                    <select data-index="${i}" data-csvcol="${h}" style="width:100%;">
+                                        ${knownHeaders.map(opt => `<option value="${opt}" ${opt === saved ? 'selected' : ''}>${opt || 'Ignorieren'}</option>`).join('')}
                                     </select>
                                 </td>
-                            </tr>
-                        `).join('')}
+                            </tr>`;
+                        }).join('')}
                     </tbody>
                 </table>
-                <div style="display:flex;gap:8px;margin-top:1em;">
+                <div id="mappingError" style="color:red;font-size:0.85rem;min-height:1.2em;margin-top:0.5em;"></div>
+                <div style="display:flex;gap:8px;margin-top:0.5em;">
                     <button type="submit">Importieren</button>
                     <button type="button" id="headerMappingCancel">Abbrechen</button>
                 </div>
@@ -247,9 +253,32 @@ function showHeaderMappingModal(headers, onConfirm, knownHeaders, onCancel) {
         </div>`;
     document.body.appendChild(modal);
 
+    function checkDuplicates() {
+        const selects = Array.from(modal.querySelectorAll('select'));
+        const values = selects.map(sel => sel.value).filter(v => v !== '');
+        const dupes = values.filter((v, i) => values.indexOf(v) !== i);
+        selects.forEach(sel => {
+            sel.style.outline = (sel.value !== '' && dupes.includes(sel.value)) ? '2px solid red' : '';
+        });
+        const errEl = modal.querySelector('#mappingError');
+        errEl.textContent = dupes.length > 0
+            ? `Doppelte Zuordnung: ${[...new Set(dupes)].join(', ')}`
+            : '';
+        return dupes.length === 0;
+    }
+
+    modal.querySelectorAll('select').forEach(sel => sel.addEventListener('change', checkDuplicates));
+
     document.getElementById('headerMappingForm').onsubmit = e => {
         e.preventDefault();
-        const mapping = Array.from(modal.querySelectorAll('select')).map(sel => sel.value);
+        if (!checkDuplicates()) return;
+        const selects = Array.from(modal.querySelectorAll('select'));
+        const mapping = selects.map(sel => sel.value);
+        if (storageKey) {
+            const toSave = {};
+            selects.forEach(sel => { toSave[sel.dataset.csvcol] = sel.value; });
+            localStorage.setItem(storageKey, JSON.stringify(toSave));
+        }
         modal.remove();
         onConfirm(mapping);
     };

@@ -76,8 +76,8 @@ Im Admin-Bereich unter **Schwimmer** können Schwimmerdaten per CSV-Datei import
 
 Existiert ein Schwimmer mit der importierten Nummer bereits in der Datenbank, wird er **aktualisiert**, nicht doppelt angelegt:
 
-- **Aktualisiert:** `vorname`, `nachname`, `gruppe`, `istKind`
-- **Unverändert bleiben:** `bahnanzahl` (geschwommene Bahnen), `aktiv`-Status, Bahneinteilung
+* **Aktualisiert:** `vorname`, `nachname`, `gruppe`, `istKind`
+* **Unverändert bleiben:** `bahnanzahl` (geschwommene Bahnen), `aktiv`-Status, Bahneinteilung
 
 So können Stammdaten (z. B. nach einer Namenskorrektur) gefahrlos neu importiert werden, ohne Bahndaten zu verlieren.
 
@@ -85,14 +85,14 @@ So können Stammdaten (z. B. nach einer Namenskorrektur) gefahrlos neu importier
 
 Im Admin-Bereich unter **Benutzer** können Zugangsdaten per CSV-Datei importiert werden.
 
-### Vorgehensweise
+### Schritte
 
 1. CSV-Datei auswählen — die erste Zeile muss Spaltenüberschriften enthalten.
 2. Im Dialog wird jede **CSV-Spalte** einem **Datenbankfeld** zugeordnet. Nicht benötigte Spalten auf *Ignorieren* lassen.
 3. Pflichtfeld ist `benutzername`. Alle anderen Felder sind optional.
 4. Klick auf **Importieren** überträgt die Daten.
 
-### Unterstützte Felder
+### Felder
 
 | Datenbankfeld | Bedeutung |
 | --- | --- |
@@ -105,9 +105,9 @@ Im Admin-Bereich unter **Benutzer** können Zugangsdaten per CSV-Datei importier
 
 Existiert ein Benutzer mit dem importierten `benutzername` bereits, wird er **aktualisiert**, nicht doppelt angelegt:
 
-- **Aktualisiert:** `name`, `admin`-Status
-- **Passwort:** wird nur geändert, wenn in der CSV-Datei angegeben; sonst unverändert
-- **Neu angelegte Benutzer ohne Passwort** erhalten ein zufällig generiertes Passwort — dieses sollte nach dem Import manuell geändert werden
+* **Aktualisiert:** `name`, `admin`-Status
+* **Passwort:** wird nur geändert, wenn in der CSV-Datei angegeben; sonst unverändert
+* **Neu angelegte Benutzer ohne Passwort** erhalten ein zufällig generiertes Passwort — dieses sollte nach dem Import manuell geändert werden
 
 ## Datenexport am Ende des Wettkampfes
 
@@ -156,11 +156,43 @@ Speichert den lokalen Zustand des Erfassungsgeräts (aktive Schwimmer, zwischeng
 
 Lädt die vollständige SQLite-Datenbank als `backup.sql` herunter (nur für Admin-Benutzer). Enthält alle Schwimmer, Aktionen und Clients. Geeignet als Vollsicherung vor dem Abschalten des Servers.
 
+## Notizen für Notfall-Recovery
+
+### Szenario: Server ausgefallen, Erfassungsgeräte laufen noch
+
+Fällt der Server während des Wettkampfs aus, können die Erfassungsgeräte (`/v2`) weiter lokal klicken — die Actions werden im Browser zwischengespeichert und beim nächsten erfolgreichen Senden automatisch nachübertragen. Sobald der Server wieder erreichbar ist, ist in der Regel keine manuelle Aktion nötig.
+
+Sollte ein Endgerät nach dem Server-Ausfall neu geladen oder der Browser geschlossen worden sein, gehen die noch nicht übertragenen lokalen Actions verloren — **außer** es wurde vorher ein Backup erstellt (siehe unten).
+
+### Actions von einem Endgerät sichern und wiederherstellen
+
+Auf der **View-Seite** (`/view` oder `/view2`) kann jederzeit ein vollständiges Actions-Backup erzeugt werden:
+
+* **`Shift+B`** → speichert `view_backup.json` auf dem Gerät
+
+Diese Datei enthält alle bis dahin empfangenen Actions. Sie kann jederzeit wieder eingespielt werden — **Duplikate entstehen nicht**, da der Server jede Action anhand von Zeitstempel, Kommando und Parametern dedupliziert.
+
+**Empfohlenes Vorgehen nach einem Ausfall:**
+
+1. Auf dem Gerät, das als View läuft (oder dem aktuellsten View), `/view` bzw. `/view2` öffnen und `Shift+B` drücken — die Datei `view_backup.json` wird lokal gespeichert.
+2. Wenn die Verbindung zum Server wieder hergestellt ist, auf demselben Gerät `/admin` aufrufen und sich einloggen.
+3. Im Admin-Bereich unter **Aktionen → JSON-Import** die gesicherte `view_backup.json` importieren.
+4. Unter **Checks → Anzahlen Prüfen** kontrollieren, ob die Bahnanzahlen in der Schwimmer-Tabelle mit den Actions übereinstimmen. Mit **Alle übernehmen** können alle Abweichungen auf einmal korrigiert werden.
+
+### Szenario: Kompletter Datenverlust (neuer Server, leere Datenbank)
+
+Muss der Server komplett neu aufgesetzt werden, sind folgende Schritte nötig:
+
+1. **Schwimmer neu importieren** — Admin-Bereich → **Schwimmer → CSV-Import** (Stammdaten-CSV mit Nummern, Namen, Gruppen).
+2. **Benutzer neu einrichten** — Admin-Bereich → **Benutzer anlegen** oder **Benutzer → CSV-Import**. Passwörter müssen neu vergeben werden, da sie nicht im Backup enthalten sind.
+3. **Actions sichern und importieren** — auf dem View-Gerät (möglichst dem aktuellsten) `Shift+B` drücken, dann im Admin-Bereich unter **Aktionen → JSON-Import** einspielen. Reihenfolge und Mehrfach-Import sind unkritisch (Duplikate werden ignoriert).
+4. **Bahnanzahlen angleichen** — Admin-Bereich → **Checks → Anzahlen Prüfen** → **Alle übernehmen**. Dieser Schritt überträgt die aus den Actions berechneten Zählstände in die Schwimmer-Tabelle.
+
 ## Bahnkorrektur durch den Admin
 
 Meldet ein Schwimmer, dass eine Bahn fälschlicherweise nicht oder zu oft gezählt wurde, kann der Admin im Admin-Bereich unter **Checks → Korrektur-ADD** manuell einen Korrekturbefehl absetzen.
 
-### Schritte
+### Durchführung
 
 1. Admin-Bereich öffnen und **Checks** in der Navigationsleiste auswählen.
 1. Im Abschnitt **Korrektur-ADD** die Felder ausfüllen:

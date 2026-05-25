@@ -67,32 +67,22 @@
         <!-- Die Tabelle wird hier dynamisch gefüllt -->
       </table>
 
-      <body>
         <h2>Benutzer löschen</h2>
         <form action="/admin" method="post">
-          <!-- Wenn du die Aktion per verstecktem Feld steuerst -->
           <input type="hidden" name="action" value="delete_user">
-
-          <label for="benutzername">Benutzername:</label>
-          <input type="text" id="benutzername" name="benutzername" required>
-
+          <label for="del_benutzername">Benutzername:</label>
+          <input type="text" id="del_benutzername" name="benutzername" required>
           <button type="submit">Benutzer löschen</button>
         </form>
         <h2>Neues Passwort</h2>
         <form id="new_password_form">
-          <!-- Wenn du die Aktion per verstecktem Feld steuerst -->
           <input type="hidden" name="action" value="new_passwort">
-
-          <label for="benutzername">Benutzername:</label>
-          <input type="text" id="benutzername" name="benutzername" required>
-
-          <label for="passwort">Neues Passwort:</label>
+          <label for="pw_benutzername">Benutzername:</label>
+          <input type="text" id="pw_benutzername" name="benutzername" required>
+          <label for="new_pass">Neues Passwort:</label>
           <input type="text" id="new_pass" name="new_pass" required>
-
-
           <button type="submit">Neues Passwort festlegen</button>
         </form>
-      </body>
 
     </section>
 
@@ -177,7 +167,7 @@
       vorbehalten.</div>
     <form action="/logout" style="margin-left: auto">
       <button type="submit" title="Logout"
-        style="font-size: 30px; color: inherit; background: none; border: none; cursor: pointer"><i class="fa-solid fa-right-from-bracket"></i>
+        style="font-size: 30px; color: inherit; background: none; border: none; cursor: pointer"><i class="fa-solid fa-right-from-bracket"></i></button>
     </form>
   </footer>
 
