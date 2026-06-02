@@ -265,7 +265,7 @@ def admin():
                 istErw = s.get("istErw")
                 if (istKind and (istKind not in [0, '0'])):
                     istKind = 1
-                if (istErw and istKind != 1 and (istErw==0 or istErw == '0')):
+                if (istErw and istKind != 1 and (istErw==0 or istErw == '0' or istErw == 'Nein')):
                     istKind = 1
                 gruppe = s.get("gruppe",None)
                 if (gruppe == 0 or gruppe == '0'): gruppe = None
