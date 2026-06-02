@@ -9,7 +9,7 @@ release_path = os.path.join(dist_dir, release_name)
 zip_path = os.path.join(dist_dir, f"{release_name}.zip")
 
 # Schritt 1: PyInstaller ausführen
-#TODO Linux-Version - bzw. prüfen ob Linux, dann : statt ; bei den add-data-Optionen
+DDDNN#TODO Linux-Version - bzw. prüfen ob Linux, dann : statt ; bei den add-data-Optionen
 subprocess.run(["pyinstaller", "--noconfirm", "--onedir", "wsgiserverwin.py", "--add-data", 'flask_templates;flask_templates', "--add-data", 'static;static'], check=True)
 #subprocess.run(["pyinstaller", "--onedir", "gui.py"])
                 

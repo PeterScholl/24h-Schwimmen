@@ -53,7 +53,7 @@ def get_db():
 
 # Benutzer admin prüfen
 with app.app_context():
-    db.db = get_db()
+    db.use(get_db())
     if not db.finde_benutzer_by_username("admin"):
         passwort = config["default_admin_pass"]
         db.init_db()
@@ -85,7 +85,7 @@ def before_request():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    db.db = get_db()
+    db.use(get_db())
     if request.method == 'POST':
         benutzername = request.form.get('benutzername', '').lower()
         passwort = request.form['passwort']
@@ -120,7 +120,7 @@ def logout():
 
 @app.route('/backupsql', methods=['GET', 'POST'])
 def backupsql():
-    db.db = get_db()
+    db.use(get_db())
     if session.get('user_role') != 'admin':
         return "Zugriff verweigert", 403
     return Response(db.dump(), mimetype="text/plain", headers={"Content-Disposition": "attachment;filename=backup.sql"
@@ -132,7 +132,7 @@ def admin():
     if session.get('user_role') != 'admin':
         return "Zugriff verweigert", 403
 
-    db.db = get_db()
+    db.use(get_db())
     if request.method == 'POST':
         if request.is_json:
             data = request.get_json()
@@ -253,7 +253,7 @@ def admin():
             if not isinstance(schwimmer_liste, list):
                 return jsonify({"error": "Datenformat ungültig"}), 400
 
-            db.db.setBegin(True)
+            db.current().setBegin(True)
             # Beispiel: Daten durchgehen und validieren
             validierte = []
             for s in schwimmer_liste:
@@ -288,7 +288,7 @@ def admin():
                     validierte.append(filtered_args)
 
             logging.info(f"Importiert wurden {len(validierte)} Schwimmer")
-            db.db.setBegin(False)
+            db.current().setBegin(False)
 
             print("Validierte [0:10]", validierte[0:10])
 
@@ -431,7 +431,7 @@ def show_qr():
 @app.route("/action", methods=["POST"])
 def action():
     try:
-        db.db = get_db()
+        db.use(get_db())
         clientid = session.get("clientID",-1)
         user = session.get("user","unknown")
         actions = request.get_json()
@@ -440,7 +440,7 @@ def action():
         results = []
         updates = []
 
-        db.db.setBegin(True)
+        db.current().setBegin(True)
 
         for action in actions:
             kommando = action.get("kommando")
@@ -521,7 +521,7 @@ def action():
                 logging.debug(f"Unbekanntes Kommando: {kommando}")
                 print(f"Unbekanntes Kommando: {kommando}")
 
-        db.db.setBegin(False)
+        db.current().setBegin(False)
         return jsonify({"results": results, "updates": updates}), 200
 
     except Exception as e:
