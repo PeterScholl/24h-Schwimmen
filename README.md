@@ -27,6 +27,68 @@ Die Erfassung soll auf möglichst vielen verschiedenen Endgeräten möglich sein
 
 Eine Basisdatenbank mit dem Benutzer ``admin`` und dem Passwort ``swim24`` wird automatisch angelegt.
 
+## Normale Verwendung und Test
+
+### 1. Konfiguration einrichten
+
+Vor dem ersten Live-Einsatz die `config.json` anpassen (Details: [Konfiguration](#konfiguration-configjson)):
+
+* **`startzeit`** — Startzeit des Wettkampfs als UTC-ISO-Timestamp. **Wichtig:** Der Wert muss in UTC angegeben werden. Ein Wettkampfstart um 9:00 Uhr Ortszeit (MESZ = UTC+2) wird als `"2025-06-21T07:00:00Z"` eingetragen.
+* **`laenge_bahn_m`** — Bahnlänge in Metern prüfen (Standard: `100`). Dieser Wert beeinflusst die gesamte Streckenberechnung und den CSV-Export.
+* **`flask_secret_key`** — Vor dem Live-Betrieb auf einen langen, zufälligen Wert ändern.
+
+Änderungen werden erst nach einem Neustart des Servers wirksam.
+
+### 2. Benutzer anlegen
+
+Für jeden Bahnbetreuer wird ein eigener Benutzer-Account benötigt. Dies kann im Admin-Bereich manuell oder per CSV-Datei erfolgen (siehe [Benutzer-Import](#benutzer-import-csv)).
+
+Das Standard-Passwort des `admin`-Benutzers (`swim24`) sollte vor dem Live-Betrieb geändert werden (Admin-Bereich → **Benutzer** → Benutzer `admin` auswählen → Passwort ändern).
+
+### 3. Schwimmer importieren
+
+Im Admin-Bereich unter **Schwimmer → CSV-Import** die Schwimmerdaten laden (siehe [Schwimmer-Import](#schwimmer-import-csv)).
+
+### 4. Netzwerk einrichten
+
+Alle Erfassungsgeräte müssen im selben Netzwerk wie der Server erreichbar sein:
+
+* IP-Adresse des Servers ermitteln (unter Windows: `ipconfig` in der Eingabeaufforderung)
+* Unter Windows ggf. Port 8080 in der Firewall freigeben (Details: [Windows-Firewall](#windows-firewall))
+* WLAN-Zugangspunkt bereitstellen, dem alle Tablets und Smartphones beitreten können
+
+### 5. Clients anmelden (QR-Code)
+
+Im Admin-Bereich gibt es die Schaltfläche **QR-Code anzeigen**, die die Seite `/show_qr` öffnet. Der dort gezeigte QR-Code enthält die Serveradresse. Jedes Erfassungsgerät scannt diesen Code, öffnet die Webseite und meldet sich mit den zuvor angelegten Zugangsdaten an.
+
+### 6. Test vor dem Wettkampf
+
+Um die Erfassung ohne echte Schwimmer zu testen, gibt es eine automatische Klick-Simulation:
+
+1. Erfassungsseite mit dem URL-Parameter `?dbgfkt=true` laden:
+
+   ```text
+   http://<server>:8080/v2?dbgfkt=true
+   ```
+
+2. Auf die Überschrift **24h-Schwimmen** klicken — die Seite beginnt dann, Bahnen automatisch zu registrieren und an den Server zu senden.
+3. Auf der View-Seite (`/view` oder `/view2`) lässt sich beobachten, wie die Bahnzähler hochlaufen.
+
+Zum Beenden die Überschrift erneut anklicken oder die Seite neu laden.
+
+### 7. Nach dem Test: Zurück in den Ausgangszustand
+
+Um nach einem Testlauf mit einem leeren Datenbestand zu starten:
+
+1. Server beenden.
+2. Die Datei `data.sqlite` löschen (oder umbenennen, falls man die Testdaten später noch braucht).
+3. Server neu starten — eine leere Datenbank mit dem Standard-`admin`-Benutzer wird automatisch angelegt.
+4. Schwimmer erneut importieren (Admin-Bereich → **Schwimmer → CSV-Import**).
+5. Benutzer erneut importieren oder anlegen (Admin-Bereich → **Benutzer**).
+6. Auf allen Erfassungsgeräten die Seite neu laden, damit auch der lokale Browser-Zustand (zwischengespeicherte Actions, Schwimmerliste) zurückgesetzt wird.
+
+Optional: Die Logdatei `data/serverlog.log` löschen, damit das Log beim Live-Betrieb sauber beginnt.
+
 ## Wichtiges für den Live-Betrieb
 
 * Der Rechner auf dem der Server läuft, sollte angepasste Energiesparmodi haben, d.h. nicht in den Standby-Wechseln und auch die Festplatte soll nicht abgeschaltet werden. Dazu z.B. unter Windows ``Energiesparplaneinstellungen ändern`` -> ``Erweiterte Einstellungen ändern`` und dort enstprechende Einstellungen vornehmen

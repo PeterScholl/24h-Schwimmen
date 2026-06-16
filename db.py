@@ -1,10 +1,21 @@
 import sqlite3
 import atexit
 import random
+import threading
 from datetime import datetime
 import logging
 from logging_config import configure_logging
 from werkzeug.security import generate_password_hash, check_password_hash
+
+_local = threading.local()
+
+def use(database):
+    """Setzt die Datenbankverbindung für den aktuellen Thread."""
+    _local.instance = database
+
+def current():
+    """Gibt die Datenbankverbindung des aktuellen Threads zurück."""
+    return _local.instance
 
 
 # Konfiguration des Loggings
@@ -41,7 +52,7 @@ class Database:
         """
         try:
             #TODO: Darüber nachdenken, wie man same thread-Problematik dauerhaft löst
-            self.conn = sqlite3.connect(self.db_name, check_same_thread=True)
+            self.conn = sqlite3.connect(self.db_name, check_same_thread=False)
             self.conn.row_factory = sqlite3.Row  # Für dict-ähnliche Zeilen
             self.cursor = self.conn.cursor()
             self.begin = False
@@ -174,7 +185,7 @@ def init_db():
             admin BOOLEAN NOT NULL DEFAULT 0
         )
     '''
-    db.execute(query_benutzer)
+    _local.instance.execute(query_benutzer)
 
     query_clients = '''
         CREATE TABLE IF NOT EXISTS clients (
@@ -185,7 +196,7 @@ def init_db():
             FOREIGN KEY (benutzer_id) REFERENCES benutzer(id)
         )
     '''
-    db.execute(query_clients)
+    _local.instance.execute(query_clients)
 
     query_schwimmer = '''
         CREATE TABLE IF NOT EXISTS schwimmer (
@@ -202,7 +213,7 @@ def init_db():
             FOREIGN KEY (erstellt_von_client_id) REFERENCES clients(id)
         )
     '''
-    db.execute(query_schwimmer)
+    _local.instance.execute(query_schwimmer)
 
     query_actions = '''
         CREATE TABLE IF NOT EXISTS actions (
@@ -216,7 +227,7 @@ def init_db():
             FOREIGN KEY (client_id) REFERENCES clients(id)
         )
     '''
-    db.execute(query_actions)
+    _local.instance.execute(query_actions)
 
 def dict_from_table_row(row, table_name):
     """
@@ -245,7 +256,7 @@ def liste_tabelle(table_name):
     Gibt eine Liste aller Einträge aus der angegebenen Tabelle zurück, mit Spaltennamen aus der DB.
     """
     try:
-        cursor = db.execute(f"SELECT * FROM {table_name}")
+        cursor = _local.instance.execute(f"SELECT * FROM {table_name}")
         columns = [desc[0] for desc in cursor.description]
         rows = cursor.fetchall()
         return [dict_from_row(row, columns) for row in rows]
@@ -257,7 +268,7 @@ def liste_tabelle(table_name):
 def count_tabelle(table_name):
     """Gibt die Gesamtanzahl der Zeilen in der angegebenen Tabelle zurück."""
     try:
-        cursor = db.execute(f"SELECT COUNT(*) FROM {table_name}")
+        cursor = _local.instance.execute(f"SELECT COUNT(*) FROM {table_name}")
         return cursor.fetchone()[0]
     except Exception as e:
         print(f"Fehler beim Zählen in Tabelle {table_name}: {e}")
@@ -270,7 +281,7 @@ def liste_tabelle_paged(table_name, limit, offset):
     offset: Übersprungene Zeilen (= (Seite-1) * limit)
     """
     try:
-        cursor = db.execute(
+        cursor = _local.instance.execute(
             f"SELECT * FROM {table_name} ORDER BY rowid DESC LIMIT ? OFFSET ?",
             (limit, offset)
         )
@@ -286,8 +297,8 @@ def dump():
     """
     gibt einen Dump der Datenbank zurück, der per Flask zum Download angeboten werden kann
     """
-    dump = "\n".join(db.conn.iterdump())
-    db.conn.commit()
+    dump = "\n".join(_local.instance.conn.iterdump())
+    _local.instance.conn.commit()
     return dump;
 
 
@@ -310,7 +321,7 @@ def finde_schwimmer(name):
     """
     query = "SELECT * FROM schwimmer WHERE name = ?"
     params = (name,)
-    return dict_from_table_row(db.fetchone(query, params),"schwimmer")
+    return dict_from_table_row(_local.instance.fetchone(query, params),"schwimmer")
 
 
 # Liest einen Schwimmer anhand seiner ID aus der Datenbank
@@ -320,7 +331,7 @@ def lies_schwimmer(schwimmer_id):
     """
     query = "SELECT * FROM schwimmer WHERE nummer = ?"
     params = (schwimmer_id,)
-    return dict_from_table_row(db.fetchone(query, params),"schwimmer")
+    return dict_from_table_row(_local.instance.fetchone(query, params),"schwimmer")
 
 # Liest alle Schwimmer von der Bahn
 def lies_schwimmer_vonBahn(bahnnr):
@@ -329,7 +340,7 @@ def lies_schwimmer_vonBahn(bahnnr):
     """
     try:
         
-        cursor = db.execute(f"SELECT * FROM schwimmer WHERE auf_bahn == ?", [int(bahnnr)])
+        cursor = _local.instance.execute(f"SELECT * FROM schwimmer WHERE auf_bahn == ?", [int(bahnnr)])
         columns = [desc[0] for desc in cursor.description]
         rows = cursor.fetchall()
         return [dict_from_row(row, columns) for row in rows]
@@ -372,7 +383,7 @@ def update_schwimmer(schwimmer_id, **kwargs):
     keys = ', '.join([f"{k}=?" for k in kwargs])
     values = list(kwargs.values()) + [schwimmer_id]
     query = f"UPDATE schwimmer SET {keys} WHERE nummer = ?"
-    cursor = db.execute(query, values)
+    cursor = _local.instance.execute(query, values)
     if (cursor and cursor.rowcount == 0): return None
     return cursor
 
@@ -386,10 +397,10 @@ def erstelle_schwimmer(nummer, erstellt_von_client_id, vorname, nachname, istKin
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
     params = (nummer, erstellt_von_client_id, vorname, nachname, istKind, gruppe, bahnanzahl, strecke, auf_bahn, aktiv)
-    return db.execute(query, params)
+    return _local.instance.execute(query, params)
 
 def get_bahnanzahl(nummer):
-    result=db.fetchone("SELECT bahnanzahl FROM schwimmer WHERE nummer = ?", (nummer,))
+    result=_local.instance.fetchone("SELECT bahnanzahl FROM schwimmer WHERE nummer = ?", (nummer,))
     
     if result is None:
         return None  # Schwimmer existiert nicht
@@ -442,7 +453,7 @@ def loesche_schwimmer(schwimmerID):
         WHERE nummer = ?
     '''
     params = (int(schwimmerID),)
-    cursor =  db.execute(query, params)
+    cursor =  _local.instance.execute(query, params)
     if (cursor):
         rows_affected = cursor.rowcount
         if rows_affected == 0:
@@ -469,9 +480,9 @@ def erstelle_client(ip, benutzer_id=None):
         VALUES (?, ?, ?)
     '''
     params = (ip, benutzer_id, datetime.now().isoformat())
-    db.execute(query, params)
-    #print("LASTID:",db.cursor.lastrowid)
-    return db.cursor.lastrowid
+    _local.instance.execute(query, params)
+    #print("LASTID:",_local.instance.cursor.lastrowid)
+    return _local.instance.cursor.lastrowid
 
 def finde_client(ip):
     """
@@ -479,7 +490,7 @@ def finde_client(ip):
     """
     query = 'SELECT * FROM clients WHERE ip = ?'
     params = (ip,)
-    client = dict(db.fetchone(query, params))
+    client = dict(_local.instance.fetchone(query, params))
     return client
 
 
@@ -489,7 +500,7 @@ def update_client_aktion(client_id):
     """
     query = 'UPDATE clients SET zeitpunkt_letzte_aktion = ? WHERE id = ?'
     params = (datetime.now().isoformat(), client_id)
-    db.execute(query, params)
+    _local.instance.execute(query, params)
 
 #========================
 #    Abschnitt: Benutzer
@@ -505,14 +516,14 @@ def erstelle_benutzer(name, benutzername, passwort, admin=False):
         VALUES (?, ?, ?, ?)
     '''
     params = (name, benutzername, generate_password_hash(passwort), int(admin))
-    return db.execute(query, params)
+    return _local.instance.execute(query, params)
 
 
 def update_benutzer_by_id(user_id, **kwargs):
     keys = ', '.join(f'{k}=?' for k in kwargs)
     values = list(kwargs.values()) + [int(user_id)]
     query = f'UPDATE benutzer SET {keys} WHERE id = ?'
-    cursor = db.execute(query, values)
+    cursor = _local.instance.execute(query, values)
     if cursor and cursor.rowcount == 0: return None
     return cursor
 
@@ -525,7 +536,7 @@ def update_benutzer(benutzername, name=None, admin=None):
         return 0
     set_clause = ', '.join(f'{k} = ?' for k in felder)
     query = f'UPDATE benutzer SET {set_clause} WHERE benutzername = ?'
-    cursor = db.execute(query, list(felder.values()) + [benutzername])
+    cursor = _local.instance.execute(query, list(felder.values()) + [benutzername])
     return cursor.rowcount if cursor else 0
 
 
@@ -535,7 +546,7 @@ def passwort_aendern(benutzername, neues_passwort):
     """
     neues_gehashtes_passwort = generate_password_hash(neues_passwort)
     update_query = "UPDATE benutzer SET passwort = ? WHERE benutzername = ?"
-    cursor = db.execute(update_query, (neues_gehashtes_passwort, benutzername))
+    cursor = _local.instance.execute(update_query, (neues_gehashtes_passwort, benutzername))
     if (cursor):
         rows_affected = cursor.rowcount
         if rows_affected == 0:
@@ -554,7 +565,7 @@ def loesche_userID(userID):
         WHERE id = ?
     '''
     params = (int(userID),)
-    cursor =  db.execute(query, params)
+    cursor =  _local.instance.execute(query, params)
     if (cursor):
         rows_affected = cursor.rowcount
         if rows_affected == 0:
@@ -574,7 +585,7 @@ def loesche_benutzername(benutzername):
         WHERE benutzername = ?
     '''
     params = (benutzername,)
-    return db.execute(query, params)
+    return _local.instance.execute(query, params)
 
 
 def finde_benutzer_by_username(benutzername):
@@ -583,7 +594,7 @@ def finde_benutzer_by_username(benutzername):
     """
     query = 'SELECT * FROM benutzer WHERE benutzername = ?'
     params = (benutzername,)
-    row = db.fetchone(query, params)
+    row = _local.instance.fetchone(query, params)
     return dict_from_table_row(row,'benutzer') if row else None
 
 #========================
@@ -602,7 +613,7 @@ def erstelle_action(benutzer_id, client_id, zeitstempel, kommando, parameter):
     LIMIT 1
     '''
     params = (zeitstempel, kommando, parameter)
-    cursor = db.execute(query, params)
+    cursor = _local.instance.execute(query, params)
     exists = cursor.fetchone() is not None
     if (exists): return 0 #Kein neuer Eintrag
     query = '''
@@ -610,7 +621,7 @@ def erstelle_action(benutzer_id, client_id, zeitstempel, kommando, parameter):
         VALUES (?, ?, ?, ?, ?)
     '''
     params = (benutzer_id, client_id, zeitstempel, kommando, parameter)
-    cursor = db.execute(query, params) 
+    cursor = _local.instance.execute(query, params) 
     return (cursor.rowcount if cursor else 0)
 
 def erstelle_actions(actionliste):
@@ -622,9 +633,9 @@ def erstelle_actions(actionliste):
         INSERT INTO actions (benutzer_id, client_id, zeitstempel, kommando, parameter)
         VALUES (?, ?, ?, ?, ?)
     '''
-    db.cursor.executemany(query, actionliste)
-    if (not db.begin): db.conn.commit()
-    return db.cursor
+    _local.instance.cursor.executemany(query, actionliste)
+    if (not _local.instance.begin): _local.instance.conn.commit()
+    return _local.instance.cursor
 
 
 
@@ -634,7 +645,7 @@ def finde_actions_by_benutzer_id(benutzer_id):
     """
     query = 'SELECT * FROM actions WHERE benutzer_id = ?'
     params = (benutzer_id,)
-    rows = db.fetchall(query, params)
+    rows = _local.instance.fetchall(query, params)
     return [dict_from_table_row(row, 'actions') for row in rows]
 
 def finde_actions_by_client_id(client_id):
@@ -643,7 +654,7 @@ def finde_actions_by_client_id(client_id):
     """
     query = 'SELECT * FROM actions WHERE client_id = ?'
     params = (client_id,)
-    rows = db.fetchall(query, params)
+    rows = _local.instance.fetchall(query, params)
     return [dict_from_table_row(row, 'actions') for row in rows]
 
 def finde_action_by_id(action_id):
@@ -652,7 +663,7 @@ def finde_action_by_id(action_id):
     """
     query = 'SELECT * FROM actions WHERE id = ?'
     params = (action_id,)
-    row = db.fetchone(query, params)
+    row = _local.instance.fetchone(query, params)
     return dict_from_table_row(row, 'actions') if row else None
 
 def finde_actions_after_timestamp(timestamp):
@@ -661,7 +672,7 @@ def finde_actions_after_timestamp(timestamp):
     """
     query = 'SELECT * FROM actions WHERE zeitstempel > ?'
     params = (timestamp,)
-    rows = db.fetchall(query, params)
+    rows = _local.instance.fetchall(query, params)
     return [dict_from_table_row(row, 'actions') for row in rows]
 
 def finde_actions_by_schwimmer_nummer(nummer):
@@ -675,7 +686,7 @@ def finde_actions_by_schwimmer_nummer(nummer):
         ORDER BY zeitstempel ASC
     '''
     try:
-        cursor = db.execute(query, (int(nummer),))
+        cursor = _local.instance.execute(query, (int(nummer),))
         columns = [desc[0] for desc in cursor.description]
         rows = cursor.fetchall()
         return [dict(zip(columns, row)) for row in rows]
@@ -715,7 +726,7 @@ def checkBahnenAnzahlen():
     ORDER BY schwimmerID ASC;
     """
     try:
-        cursor = db.execute(query)
+        cursor = _local.instance.execute(query)
         columns = [desc[0] for desc in cursor.description]
         rows = cursor.fetchall()
         return [dict_from_row(row, columns) for row in rows]
