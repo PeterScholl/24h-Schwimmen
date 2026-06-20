@@ -505,6 +505,7 @@ def action():
                     }
                     return jsonify(data), 200
             elif kommando == "ACT": # Status Aktiv ändern
+                #raise RuntimeError("Absichtlicher Testfehler für Rollback-Test")
                 try:
                     nummer = int(parameter[0])
                     value = int(parameter[1])
@@ -525,9 +526,9 @@ def action():
         return jsonify({"results": results, "updates": updates}), 200
 
     except Exception as e:
-        print(f"Fehler beim Verarbeiten der Actions: {e}")
         logging.error(f"Fehler beim Verarbeiten der Actions - rollback: {e}")
         if db.current().begin:
+            logging.info("Rollback der DB-Veränderungen aufgrund eines Fehlers")
             db.current().conn.rollback()
             db.current().begin = False
         return "Fehler", 400
