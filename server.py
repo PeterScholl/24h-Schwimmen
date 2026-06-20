@@ -526,6 +526,7 @@ def action():
 
     except Exception as e:
         print(f"Fehler beim Verarbeiten der Actions: {e}")
+        logging.error(f"Fehler beim Verarbeiten der Actions - rollback: {e}")
         if db.current().begin:
             db.current().conn.rollback()
             db.current().begin = False
