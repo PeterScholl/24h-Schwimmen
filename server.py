@@ -526,6 +526,9 @@ def action():
 
     except Exception as e:
         print(f"Fehler beim Verarbeiten der Actions: {e}")
+        if db.current().begin:
+            db.current().conn.rollback()
+            db.current().begin = False
         return "Fehler", 400
 
 def run_server(reloader = False):
