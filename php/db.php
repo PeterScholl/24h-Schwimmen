@@ -20,7 +20,7 @@ class Database {
             $stmt->execute();
             return $stmt;
         } catch (PDOException $e) {
-            error_log(sprintf('[DB ERROR] %s | Query: %s | Params: %s',
+            Logger::error(sprintf('DB-Fehler: %s | Query: %s | Params: %s',
                 $e->getMessage(),
                 preg_replace('/\s+/', ' ', $query),
                 json_encode($params, JSON_UNESCAPED_UNICODE)

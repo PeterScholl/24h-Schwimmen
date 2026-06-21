@@ -1,17 +1,17 @@
 <?php
 session_start();
 
-// Ausführliches Logging im PHP-Entwicklungsserver (php -S)
 if (php_sapi_name() === 'cli-server') {
     error_reporting(E_ALL);
     ini_set('log_errors', '1');
-    ini_set('display_errors', '0'); // Fehler ins Terminal, nicht in die HTTP-Antwort
-    $user = $_SESSION['user'] ?? '-';
-    error_log(sprintf('[%s] %s %s  (user=%s)', date('H:i:s'), $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $user));
+    ini_set('display_errors', '0');
 }
 
+require_once __DIR__ . '/logger.php';
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
+
+Logger::init(__DIR__ . '/../data/serverlog_php.log');
 
 $db = getDb();
 init_db();
@@ -97,7 +97,7 @@ function ensure_admin_user(): void {
         if (!$passwort) {
             $passwort = generiere_passwort();
         }
-        error_log("Benutzer 'admin' wird angelegt");
+        Logger::info("Benutzer 'admin' wird angelegt mit Passwort: $passwort");
         erstelle_benutzer('Administrator', 'admin', $passwort, true);
     }
 }
@@ -164,6 +164,9 @@ function handle_login(): void {
             $_SESSION['clientID']  = erstelle_client($_SERVER['REMOTE_ADDR'], $benutzer['id']);
             if ($benutzer['admin']) {
                 $_SESSION['user_role'] = 'admin';
+                Logger::info("Admin-Benutzer $benutzername angemeldet");
+            } else {
+                Logger::info("Benutzer $benutzername angemeldet");
             }
             header('Location: /');
             exit;
@@ -202,12 +205,14 @@ function handle_admin(): void {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data   = request_data();
         $action = $data['action'] ?? null;
+        Logger::info("admin-POST-request: action=$action");
 
         if ($action === 'create_user') {
             $realname = trim($data['realname'] ?? '');
             $username = strtolower(trim($data['username'] ?? ''));
             $password = $data['password'] ?? '';
             if (!preg_match('/^[A-Za-zÄÖÜäöüß\s]+$/u', $realname)) {
+                Logger::error("Versuch Benutzer mit ungültigem Real-Namen anzulegen: $realname");
                 http_response_code(400); echo 'Ungültiger Name'; return;
             }
             if (!preg_match('/^[A-Za-z0-9]+$/', $username)) {
@@ -237,6 +242,7 @@ function handle_admin(): void {
         } elseif ($action === 'delete_user') {
             $nummer = $data['nummer'] ?? null;
             if (!$nummer) { http_response_code(400); echo 'Keine Nutzernummer angegeben'; return; }
+            Logger::info("Action delete_user: ID=$nummer");
             if (!loesche_userID((int)$nummer)) { http_response_code(400); echo 'DB - Fehler'; return; }
             echo 'Erfolg';
             return;
@@ -244,6 +250,7 @@ function handle_admin(): void {
         } elseif ($action === 'delete_swimmer') {
             $nummer = $data['nummer'] ?? null;
             if (!$nummer) { http_response_code(400); echo 'Keine Schwimmernummer angegeben'; return; }
+            Logger::info("Action delete_swimmer: Nummer=$nummer");
             if (!loesche_schwimmer((int)$nummer)) { http_response_code(400); echo 'DB - Fehler'; return; }
             echo 'Erfolg';
             return;
@@ -258,6 +265,7 @@ function handle_admin(): void {
             if (isset($data['istKind']))    $felder['istKind']    = in_array($data['istKind'], [true, 1, '1', 'true', 'True'], true) ? 1 : 0;
             if (isset($data['bahnanzahl'])) $felder['bahnanzahl'] = (int)$data['bahnanzahl'];
             if (empty($felder)) { http_response_code(400); echo 'Keine Felder zum Ändern angegeben'; return; }
+            Logger::info("Schwimmer $nummer wird bearbeitet: " . json_encode($felder, JSON_UNESCAPED_UNICODE));
             if (!update_schwimmer((int)$nummer, $felder)) { http_response_code(400); echo 'DB - Fehler'; return; }
             echo 'Erfolg';
             return;
@@ -272,20 +280,26 @@ function handle_admin(): void {
                 $felder['passwort'] = password_hash(trim($data['passwort']), PASSWORD_DEFAULT);
             }
             if (empty($felder)) { http_response_code(400); echo 'Keine Felder zum Ändern angegeben'; return; }
+            $logFelder = array_filter($felder, fn($k) => $k !== 'passwort', ARRAY_FILTER_USE_KEY);
+            Logger::info("Benutzer $user_id wird bearbeitet: " . json_encode($logFelder, JSON_UNESCAPED_UNICODE));
             if (!update_benutzer_by_id((int)$user_id, $felder)) { http_response_code(400); echo 'DB - Fehler'; return; }
             echo 'Erfolg';
             return;
 
         } elseif ($action === 'get_table_benutzer') {
+            Logger::info("Tabelle benutzer wird abgerufen");
             json_response(liste_tabelle('benutzer'));
             return;
         } elseif ($action === 'get_table_clients') {
+            Logger::info("Tabelle clients wird abgerufen");
             json_response(liste_tabelle('clients'));
             return;
         } elseif ($action === 'get_table_swimmer') {
+            Logger::info("Tabelle schwimmer wird abgerufen");
             json_response(liste_tabelle('schwimmer'));
             return;
         } elseif ($action === 'get_table_actions') {
+            Logger::info("Tabelle actions wird abgerufen");
             json_response(liste_tabelle('actions'));
             return;
 
@@ -293,6 +307,7 @@ function handle_admin(): void {
             $limit  = (int)($data['limit'] ?? 50);
             $page   = (int)($data['page']  ?? 1);
             $offset = ($page - 1) * $limit;
+            Logger::info("Tabelle actions paginiert: Seite $page, Limit $limit, Offset $offset");
             $rows   = liste_tabelle_paged('actions', $limit, $offset);
             $total  = count_tabelle('actions');
             json_response(['data' => $rows, 'total' => $total, 'page' => $page, 'limit' => $limit]);
@@ -306,6 +321,7 @@ function handle_admin(): void {
             return;
 
         } elseif ($action === 'get_checkAnzahlTable') {
+            Logger::info("Tabelle checkAnzahlen wird abgerufen");
             json_response(checkBahnenAnzahlen());
             return;
 
@@ -315,6 +331,7 @@ function handle_admin(): void {
             if (!is_array($schwimmer_liste)) {
                 json_response(['error' => 'Datenformat ungültig'], 400); return;
             }
+            Logger::info("Schwimmer werden importiert - Daten enthalten " . count($schwimmer_liste) . " Schwimmer");
             $db->setBegin(true);
             $validierte = [];
             foreach ($schwimmer_liste as $s) {
@@ -341,6 +358,7 @@ function handle_admin(): void {
                 }
             }
             $db->setBegin(false);
+            Logger::info("Importiert wurden " . count($validierte) . " Schwimmer");
             json_response(['status' => 'ok', 'importiert' => count($validierte)]);
             return;
 
@@ -349,6 +367,7 @@ function handle_admin(): void {
             if (!is_array($benutzer_liste)) {
                 json_response(['error' => 'Datenformat ungültig'], 400); return;
             }
+            Logger::info("Benutzer werden importiert - " . count($benutzer_liste) . " Einträge");
             $neu = 0; $aktualisiert = 0;
             foreach ($benutzer_liste as $b) {
                 $benutzername = strtolower(trim($b['benutzername'] ?? ''));
@@ -367,10 +386,12 @@ function handle_admin(): void {
                     $neu++;
                 }
             }
+            Logger::info("Benutzer-Import: $neu neu, $aktualisiert aktualisiert");
             json_response(['status' => 'ok', 'importiert' => $neu + $aktualisiert, 'neu' => $neu, 'aktualisiert' => $aktualisiert]);
             return;
 
         } elseif ($action) {
+            Logger::error("Unbekannte Admin-Action: $action");
             http_response_code(400); echo "Unknown Action $action";
             return;
         }
@@ -489,19 +510,24 @@ function handle_action(): void {
 
             if ($kommando === 'ADD') {
                 $anz = erstelle_action($user_id, (int)$clientid, (string)$timestamp, 'ADD', json_encode($parameter));
+                Logger::debug("Aktion ist eingetragen: " . ($anz > 0 ? 'NEW' : 'EXISTED'));
                 if ($anz > 0) {
                     try {
                         $nummer  = (int)$parameter[0];
                         $anzahl  = (int)$parameter[1];
                         $bahnnr  = isset($parameter[2]) ? (int)$parameter[2] : 0;
                         if ($nummer > 0) {
+                            Logger::info("ADD wird ausgeführt: Schwimmer $nummer, Anzahl $anzahl, BahnNr $bahnnr");
                             aendere_bahnanzahl_um($nummer, $anzahl, (int)$clientid, $bahnnr);
+                            Logger::debug("ADD ist ausgeführt");
                             $results[] = ['kommando' => 'ADD', 'status' => 'erfolgreich', 'nummer' => $nummer, 'anzahl' => $anzahl];
                         } else {
+                            Logger::error("ADD nicht ausgeführt für ungültige Schwimmernummer $nummer");
                             $results[] = ['kommando' => 'ADD', 'status' => "ungültige Schwimmernummer: $nummer", 'nummer' => $nummer, 'anzahl' => $anzahl];
                         }
                         $updates[] = lies_schwimmer($nummer);
                     } catch (Exception $e) {
+                        Logger::info("Fehler bei ADD-Parametern: " . $e->getMessage());
                         $results[] = ['kommando' => 'ADD', 'status' => 'ungültige Parameter: ' . $e->getMessage()];
                     }
                 } else {
@@ -510,15 +536,18 @@ function handle_action(): void {
 
             } elseif ($kommando === 'GETB') {
                 try {
+                    Logger::info("Schwimmer der Bahnen " . json_encode($parameter) . " werden von Client-ID: $clientid abgerufen");
                     foreach ($parameter as $bahnnr) {
                         $updates = array_merge($updates, lies_schwimmer_vonBahn((int)$bahnnr));
                     }
                     $results[] = ['kommando' => 'GETB', 'status' => 'erfolgreich', 'bahnen' => $parameter];
                 } catch (Exception $e) {
+                    Logger::info("Fehler bei GETB-Parametern: " . $e->getMessage());
                     $results[] = ['kommando' => 'GETB', 'status' => 'ungültige Parameter: ' . $e->getMessage()];
                 }
 
             } elseif ($kommando === 'GET') {
+                Logger::info("Tabelle schwimmer wird von Client-ID: $clientid abgerufen");
                 if ($parameter === []) {
                     $updates = liste_tabelle('schwimmer');
                 } else {
@@ -545,13 +574,17 @@ function handle_action(): void {
                     $value  = (int)$parameter[1];
                     erstelle_action($user_id, (int)$clientid, (string)$timestamp, 'ACT', json_encode($parameter));
                     if (update_schwimmer($nummer, ['aktiv' => $value])) {
+                        Logger::info("ACT ausgeführt: Schwimmer $nummer erhält Aktivitätswert $value");
                         $results[] = ['kommando' => 'ACT', 'status' => 'erfolgreich', 'nummer' => $nummer, 'value' => $value];
                     } else {
                         $results[] = ['kommando' => 'ACT', 'status' => 'FEHLER', 'nummer' => $nummer, 'value' => $value];
                     }
                 } catch (Exception $e) {
+                    Logger::info("Fehler bei ACT-Parametern: " . $e->getMessage());
                     $results[] = ['kommando' => 'ACT', 'status' => 'ungültige Parameter: ' . $e->getMessage()];
                 }
+            } else {
+                Logger::debug("Unbekanntes Kommando: $kommando");
             }
         }
 
@@ -559,8 +592,9 @@ function handle_action(): void {
         json_response(['results' => $results, 'updates' => $updates]);
 
     } catch (Exception $e) {
-        error_log("Fehler beim Verarbeiten der Actions: " . $e->getMessage());
+        Logger::error("Fehler beim Verarbeiten der Actions - rollback: " . $e->getMessage());
         $db->rollback();
+        Logger::info("Rollback der DB-Veränderungen aufgrund eines Fehlers");
         http_response_code(400);
         echo 'Fehler';
     }

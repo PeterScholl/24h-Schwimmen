@@ -277,6 +277,74 @@ Beim ersten Aufruf von `https://24schwimmen.unterrichtsportal.org/` erstellt PHP
 
 ---
 
+## Logging
+
+Das PHP-Backend verwendet dasselbe Logging-Konzept wie die Python-Version: zwei Ausgabekanäle, drei Schweregrade.
+
+### Ausgabekanäle
+
+| Kanal | Wo | Was |
+|---|---|---|
+| **Datei** | `data/serverlog_php.log` | alle Meldungen ab DEBUG |
+| **Konsole / Terminal** | stderr (sichtbar im Terminal bei `php -S`, im Apache-Error-Log auf dem Server) | INFO und ERROR |
+
+### Schweregrade
+
+| Level | Bedeutung | Beispiele |
+|---|---|---|
+| `DEBUG` | Detailinfos für Entwicklung | „ADD ist ausgeführt", „Aktion eingetragen: NEW" |
+| `INFO` | Normaler Betrieb | Login, ADD/ACT-Kommandos, Admin-Aktionen, Importe |
+| `ERROR` | Fehler | DB-Fehler, ungültige Parametern, Rollback |
+
+### Log-Format
+
+Identisch zur Python-Version:
+
+```text
+2026-06-21 17:08:09 - INFO - ADD wird ausgeführt: Schwimmer 222, Anzahl 1, BahnNr 1
+2026-06-21 17:08:09 - DEBUG - ADD ist ausgeführt
+2026-06-21 17:08:12 - ERROR - DB-Fehler: SQLSTATE[42000]: ...
+```
+
+### Einstellungen anpassen
+
+Die Konfiguration steht am Anfang der Klasse in `php/logger.php`:
+
+```php
+private static int $fileLevel    = self::DEBUG;  // ab hier in Datei schreiben
+private static int $consoleLevel = self::INFO;   // ab hier ins Terminal/Apache-Log
+```
+
+**Mögliche Kombinationen:**
+
+| Ziel | `$fileLevel` | `$consoleLevel` |
+|---|---|---|
+| Alles überall (Maximum) | `self::DEBUG` | `self::DEBUG` |
+| Standard (wie Python) | `self::DEBUG` | `self::INFO` |
+| Nur Fehler im Terminal | `self::DEBUG` | `self::ERROR` |
+| Nur Fehler, keine Datei | `self::ERROR` | `self::ERROR` |
+
+### Log-Datei ansehen
+
+```bash
+# Live mitlesen
+tail -f data/serverlog_php.log
+
+# Nur Fehler
+grep ERROR data/serverlog_php.log
+
+# Nur heutige Einträge
+grep "$(date +%Y-%m-%d)" data/serverlog_php.log
+```
+
+Auf dem Webserver landet die Konsolen-Ausgabe (INFO+) im Apache-Error-Log:
+
+```bash
+tail -f /var/log/apache2/24schwimmen_error.log
+```
+
+---
+
 ## Häufige Probleme
 
 **„RewriteEngine not allowed here" / `.htaccess` wird ignoriert**
