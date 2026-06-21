@@ -551,7 +551,12 @@ function handle_action(): void {
                 if ($parameter === []) {
                     $updates = liste_tabelle('schwimmer');
                 } else {
-                    $updates = [lies_schwimmer((int)$parameter[0])];
+                    $swimmer = lies_schwimmer((int)$parameter[0]);
+                    if ($swimmer !== null) {
+                        $updates = [$swimmer];
+                    } else {
+                        Logger::info("GET: Schwimmer " . (int)$parameter[0] . " nicht gefunden");
+                    }
                 }
 
             } elseif ($kommando === 'VIEW') {
@@ -576,10 +581,15 @@ function handle_action(): void {
                     if (update_schwimmer($nummer, ['aktiv' => $value])) {
                         Logger::info("ACT ausgeführt: Schwimmer $nummer erhält Aktivitätswert $value");
                         $results[] = ['kommando' => 'ACT', 'status' => 'erfolgreich', 'nummer' => $nummer, 'value' => $value];
+                    } elseif (lies_schwimmer($nummer) === null) {
+                        $status = ($value === 0) ? 'erfolgreich' : 'nicht gefunden';
+                        Logger::info("ACT: Schwimmer $nummer nicht gefunden – status=$status (value=$value)");
+                        $results[] = ['kommando' => 'ACT', 'status' => $status, 'nummer' => $nummer, 'value' => $value];
                     } else {
+                        Logger::error("ACT: Schwimmer $nummer konnte nicht aktualisiert werden");
                         $results[] = ['kommando' => 'ACT', 'status' => 'FEHLER', 'nummer' => $nummer, 'value' => $value];
                     }
-                } catch (Exception $e) {
+                } catch (\Throwable $e) {
                     Logger::info("Fehler bei ACT-Parametern: " . $e->getMessage());
                     $results[] = ['kommando' => 'ACT', 'status' => 'ungültige Parameter: ' . $e->getMessage()];
                 }
@@ -591,7 +601,7 @@ function handle_action(): void {
         $db->setBegin(false);
         json_response(['results' => $results, 'updates' => $updates]);
 
-    } catch (Exception $e) {
+    } catch (\Throwable $e) {
         Logger::error("Fehler beim Verarbeiten der Actions - rollback: " . $e->getMessage());
         $db->rollback();
         Logger::info("Rollback der DB-Veränderungen aufgrund eines Fehlers");
