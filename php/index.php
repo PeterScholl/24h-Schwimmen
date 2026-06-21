@@ -1,6 +1,15 @@
 <?php
 session_start();
 
+// Ausführliches Logging im PHP-Entwicklungsserver (php -S)
+if (php_sapi_name() === 'cli-server') {
+    error_reporting(E_ALL);
+    ini_set('log_errors', '1');
+    ini_set('display_errors', '0'); // Fehler ins Terminal, nicht in die HTTP-Antwort
+    $user = $_SESSION['user'] ?? '-';
+    error_log(sprintf('[%s] %s %s  (user=%s)', date('H:i:s'), $_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $user));
+}
+
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
 
@@ -101,7 +110,25 @@ function serve_static(string $path): void {
         echo 'Nicht gefunden';
         return;
     }
-    $mime = mime_content_type($file) ?: 'application/octet-stream';
+    $ext   = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+    $mimes = [
+        'css'   => 'text/css',
+        'js'    => 'application/javascript',
+        'html'  => 'text/html',
+        'json'  => 'application/json',
+        'png'   => 'image/png',
+        'jpg'   => 'image/jpeg',
+        'jpeg'  => 'image/jpeg',
+        'gif'   => 'image/gif',
+        'svg'   => 'image/svg+xml',
+        'ico'   => 'image/x-icon',
+        'woff'  => 'font/woff',
+        'woff2' => 'font/woff2',
+        'ttf'   => 'font/ttf',
+        'eot'   => 'application/vnd.ms-fontobject',
+        'map'   => 'application/json',
+    ];
+    $mime = $mimes[$ext] ?? 'application/octet-stream';
     header("Content-Type: $mime");
     readfile($file);
 }

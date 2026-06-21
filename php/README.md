@@ -90,6 +90,57 @@ Beide Backends bieten exakt dieselben URLs:
 
 ---
 
+## Lokaler Test ohne Apache
+
+Für lokale Entwicklung und Tests reicht PHPs eingebauter Entwicklungsserver — kein Apache nötig. Die `.htaccess` wird dabei ignoriert, funktioniert aber trotzdem korrekt, weil `index.php` als direkter Router angegeben wird und alle Anfragen selbst verarbeitet (inklusive statischer Dateien aus `../static/`).
+
+### Voraussetzungen lokal
+
+- PHP 8.1+ mit `pdo_mysql` (`php -m | grep pdo_mysql`)
+- MariaDB oder MySQL läuft lokal (`systemctl status mariadb`)
+
+### Einmalig: Datenbank anlegen
+
+```bash
+sudo mysql -u root
+```
+
+```sql
+CREATE DATABASE 24h_schwimmen CHARACTER SET utf8mb4;
+CREATE USER 'schwimmen'@'localhost' IDENTIFIED BY 'swim_lokal';
+GRANT ALL PRIVILEGES ON 24h_schwimmen.* TO 'schwimmen'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+### `config.json` ergänzen
+
+Im Projektwurzelverzeichnis (nicht in `php/`) die DB-Verbindung eintragen:
+
+```json
+"db_host": "localhost",
+"db_name": "24h_schwimmen",
+"db_user": "schwimmen",
+"db_pass": "swim_lokal"
+```
+
+### Server starten
+
+```bash
+cd /pfad/zum/projekt/php
+php -S localhost:8080 index.php
+```
+
+Dann im Browser: **`http://localhost:8080`**
+
+Login: `admin` / Passwort aus `config.json` → `default_admin_pass` (Standard: `swim24`)
+
+Beim ersten Aufruf legt PHP automatisch alle Tabellen und den Admin-Benutzer an.
+
+> **Hinweis:** Der PHP-Entwicklungsserver ist nur für lokale Tests gedacht, nicht für den produktiven Betrieb.
+
+---
+
 ## Installation auf einem Webserver
 
 ### Voraussetzungen

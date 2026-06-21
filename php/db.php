@@ -7,7 +7,6 @@ class Database {
         $this->pdo = new PDO($dsn, $user, $pass, [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4",
         ]);
     }
 
@@ -17,7 +16,11 @@ class Database {
             $stmt->execute($params);
             return $stmt;
         } catch (PDOException $e) {
-            error_log("DB Error: " . $e->getMessage() . " | Query: $query");
+            error_log(sprintf('[DB ERROR] %s | Query: %s | Params: %s',
+                $e->getMessage(),
+                preg_replace('/\s+/', ' ', $query),
+                json_encode($params, JSON_UNESCAPED_UNICODE)
+            ));
             return null;
         }
     }
@@ -76,7 +79,7 @@ function getDb(): Database {
 // ===================================================
 
 function init_db(): void {
-    global $db;
+    $db = getDb();
     $db->execute("CREATE TABLE IF NOT EXISTS benutzer (
         id          INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
         name        TEXT NOT NULL,
@@ -120,18 +123,18 @@ function init_db(): void {
 }
 
 function liste_tabelle(string $table): array {
-    global $db;
+    $db = getDb();
     return $db->fetchAll("SELECT * FROM `$table`");
 }
 
 function count_tabelle(string $table): int {
-    global $db;
+    $db = getDb();
     $row = $db->fetchOne("SELECT COUNT(*) AS cnt FROM `$table`");
     return $row ? (int)$row['cnt'] : 0;
 }
 
 function liste_tabelle_paged(string $table, int $limit, int $offset): array {
-    global $db;
+    $db = getDb();
     return $db->fetchAll(
         "SELECT * FROM `$table` ORDER BY id DESC LIMIT ? OFFSET ?",
         [$limit, $offset]
@@ -139,7 +142,7 @@ function liste_tabelle_paged(string $table, int $limit, int $offset): array {
 }
 
 function dump(): string {
-    global $db;
+    $db = getDb();
     $tables = ['benutzer', 'clients', 'schwimmer', 'actions'];
     $sql  = "-- 24h-Schwimmen MySQL Backup\n-- " . date('Y-m-d H:i:s') . "\n\n";
     $sql .= "SET FOREIGN_KEY_CHECKS=0;\n\n";
@@ -166,17 +169,17 @@ function dump(): string {
 // =======================================
 
 function lies_schwimmer(int $nummer): ?array {
-    global $db;
+    $db = getDb();
     return $db->fetchOne("SELECT * FROM schwimmer WHERE nummer = ?", [$nummer]);
 }
 
 function lies_schwimmer_vonBahn(int $bahnnr): array {
-    global $db;
+    $db = getDb();
     return $db->fetchAll("SELECT * FROM schwimmer WHERE auf_bahn = ?", [$bahnnr]);
 }
 
 function update_schwimmer(int $schwimmer_id, array $kwargs): bool {
-    global $db;
+    $db = getDb();
     if (empty($kwargs)) return false;
     $sets   = implode(', ', array_map(fn($k) => "`$k` = ?", array_keys($kwargs)));
     $values = array_values($kwargs);
@@ -190,7 +193,7 @@ function erstelle_schwimmer(
     ?string $nachname, int $istKind, ?string $gruppe,
     int $bahnanzahl, int $strecke, int $auf_bahn, int $aktiv
 ): bool {
-    global $db;
+    $db = getDb();
     $stmt = $db->execute(
         "INSERT INTO schwimmer
             (nummer, erstellt_von_client_id, vorname, nachname, istKind, gruppe, bahnanzahl, strecke, auf_bahn, aktiv)
@@ -219,7 +222,7 @@ function insertOrUpdateSchwimmer(int $nummer, array $kwargs): bool {
 }
 
 function get_bahnanzahl(int $nummer): ?int {
-    global $db;
+    $db = getDb();
     $row = $db->fetchOne("SELECT bahnanzahl FROM schwimmer WHERE nummer = ?", [$nummer]);
     return $row !== null ? (int)$row['bahnanzahl'] : null;
 }
@@ -237,7 +240,7 @@ function aendere_bahnanzahl_um(int $nummer, int $anzahl, int $client_id, int $ba
 }
 
 function loesche_schwimmer(int $schwimmerID): ?int {
-    global $db;
+    $db = getDb();
     $stmt = $db->execute("DELETE FROM schwimmer WHERE nummer = ?", [$schwimmerID]);
     if (!$stmt) return null;
     $rows = $stmt->rowCount();
@@ -249,7 +252,7 @@ function loesche_schwimmer(int $schwimmerID): ?int {
 // ========================
 
 function erstelle_client(string $ip, ?int $benutzer_id = null): int {
-    global $db;
+    $db = getDb();
     $db->execute(
         "INSERT INTO clients (ip, benutzer_id, zeitpunkt_letzte_aktion) VALUES (?, ?, ?)",
         [$ip, $benutzer_id, date('c')]
@@ -258,7 +261,7 @@ function erstelle_client(string $ip, ?int $benutzer_id = null): int {
 }
 
 function update_client_aktion(int $client_id): void {
-    global $db;
+    $db = getDb();
     $db->execute("UPDATE clients SET zeitpunkt_letzte_aktion = ? WHERE id = ?", [date('c'), $client_id]);
 }
 
@@ -267,7 +270,7 @@ function update_client_aktion(int $client_id): void {
 // ========================
 
 function erstelle_benutzer(string $name, string $benutzername, string $passwort, bool $admin = false): bool {
-    global $db;
+    $db = getDb();
     $stmt = $db->execute(
         "INSERT INTO benutzer (name, benutzername, passwort, admin) VALUES (?, ?, ?, ?)",
         [$name, $benutzername, password_hash($passwort, PASSWORD_DEFAULT), (int)$admin]
@@ -276,7 +279,7 @@ function erstelle_benutzer(string $name, string $benutzername, string $passwort,
 }
 
 function update_benutzer_by_id(int $user_id, array $kwargs): bool {
-    global $db;
+    $db = getDb();
     if (empty($kwargs)) return false;
     $sets   = implode(', ', array_map(fn($k) => "`$k` = ?", array_keys($kwargs)));
     $values = array_values($kwargs);
@@ -286,7 +289,7 @@ function update_benutzer_by_id(int $user_id, array $kwargs): bool {
 }
 
 function update_benutzer(string $benutzername, ?string $name = null, ?int $admin = null): int {
-    global $db;
+    $db = getDb();
     $felder = [];
     if ($name  !== null) $felder['name']  = $name;
     if ($admin !== null) $felder['admin'] = $admin;
@@ -299,7 +302,7 @@ function update_benutzer(string $benutzername, ?string $name = null, ?int $admin
 }
 
 function passwort_aendern(string $benutzername, string $neues_passwort): bool {
-    global $db;
+    $db = getDb();
     $stmt = $db->execute(
         "UPDATE benutzer SET passwort = ? WHERE benutzername = ?",
         [password_hash($neues_passwort, PASSWORD_DEFAULT), $benutzername]
@@ -308,7 +311,7 @@ function passwort_aendern(string $benutzername, string $neues_passwort): bool {
 }
 
 function loesche_userID(int $userID): ?int {
-    global $db;
+    $db = getDb();
     $stmt = $db->execute("DELETE FROM benutzer WHERE id = ?", [$userID]);
     if (!$stmt) return null;
     $rows = $stmt->rowCount();
@@ -316,7 +319,7 @@ function loesche_userID(int $userID): ?int {
 }
 
 function finde_benutzer_by_username(string $benutzername): ?array {
-    global $db;
+    $db = getDb();
     return $db->fetchOne("SELECT * FROM benutzer WHERE benutzername = ?", [$benutzername]);
 }
 
@@ -325,7 +328,7 @@ function finde_benutzer_by_username(string $benutzername): ?array {
 // ========================
 
 function erstelle_action(string $benutzer_id, int $client_id, string $zeitstempel, string $kommando, string $parameter): int {
-    global $db;
+    $db = getDb();
     $exists = $db->fetchOne(
         "SELECT 1 FROM actions WHERE zeitstempel = ? AND kommando = ? AND parameter = ? LIMIT 1",
         [$zeitstempel, $kommando, $parameter]
@@ -339,12 +342,12 @@ function erstelle_action(string $benutzer_id, int $client_id, string $zeitstempe
 }
 
 function finde_actions_after_timestamp(string $timestamp): array {
-    global $db;
+    $db = getDb();
     return $db->fetchAll("SELECT * FROM actions WHERE zeitstempel > ?", [$timestamp]);
 }
 
 function finde_actions_by_schwimmer_nummer(int $nummer): array {
-    global $db;
+    $db = getDb();
     return $db->fetchAll(
         "SELECT * FROM actions
          WHERE CAST(JSON_EXTRACT(parameter, '\$[0]') AS SIGNED) = ?
@@ -354,7 +357,7 @@ function finde_actions_by_schwimmer_nummer(int $nummer): array {
 }
 
 function checkBahnenAnzahlen(): array {
-    global $db;
+    $db = getDb();
     $query = "
         SELECT
             a.schwimmerID,
