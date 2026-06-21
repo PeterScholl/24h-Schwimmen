@@ -159,6 +159,7 @@ function handle_login(): void {
         $benutzer     = finde_benutzer_by_username($benutzername);
         if ($benutzer && password_verify($passwort, $benutzer['passwort'])) {
             $_SESSION['user']      = $benutzername;
+            $_SESSION['user_id']   = (int)$benutzer['id'];
             $_SESSION['realname']  = $benutzer['name'];
             $_SESSION['clientID']  = erstelle_client($_SERVER['REMOTE_ADDR'], $benutzer['id']);
             if ($benutzer['admin']) {
@@ -472,7 +473,7 @@ function handle_action(): void {
     }
     try {
         $clientid = $_SESSION['clientID'] ?? -1;
-        $user     = $_SESSION['user']     ?? 'unknown';
+        $user_id  = (int)($_SESSION['user_id'] ?? 0);
         $actions  = json_decode(file_get_contents('php://input'), true);
         if (!is_array($actions)) { http_response_code(400); echo 'Ungültige JSON-Daten'; return; }
 
@@ -487,7 +488,7 @@ function handle_action(): void {
             $timestamp = $action['timestamp'] ?? '';
 
             if ($kommando === 'ADD') {
-                $anz = erstelle_action($user, (int)$clientid, (string)$timestamp, 'ADD', json_encode($parameter));
+                $anz = erstelle_action($user_id, (int)$clientid, (string)$timestamp, 'ADD', json_encode($parameter));
                 if ($anz > 0) {
                     try {
                         $nummer  = (int)$parameter[0];
@@ -542,7 +543,7 @@ function handle_action(): void {
                 try {
                     $nummer = (int)$parameter[0];
                     $value  = (int)$parameter[1];
-                    erstelle_action($user, (int)$clientid, (string)$timestamp, 'ACT', json_encode($parameter));
+                    erstelle_action($user_id, (int)$clientid, (string)$timestamp, 'ACT', json_encode($parameter));
                     if (update_schwimmer($nummer, ['aktiv' => $value])) {
                         $results[] = ['kommando' => 'ACT', 'status' => 'erfolgreich', 'nummer' => $nummer, 'value' => $value];
                     } else {

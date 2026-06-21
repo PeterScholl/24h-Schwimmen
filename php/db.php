@@ -13,7 +13,11 @@ class Database {
     public function execute(string $query, array $params = []): ?PDOStatement {
         try {
             $stmt = $this->pdo->prepare($query);
-            $stmt->execute($params);
+            foreach ($params as $i => $v) {
+                $type = is_int($v) ? PDO::PARAM_INT : PDO::PARAM_STR;
+                $stmt->bindValue($i + 1, $v, $type);
+            }
+            $stmt->execute();
             return $stmt;
         } catch (PDOException $e) {
             error_log(sprintf('[DB ERROR] %s | Query: %s | Params: %s',
@@ -327,7 +331,7 @@ function finde_benutzer_by_username(string $benutzername): ?array {
 // Actions
 // ========================
 
-function erstelle_action(string $benutzer_id, int $client_id, string $zeitstempel, string $kommando, string $parameter): int {
+function erstelle_action(int $benutzer_id, int $client_id, string $zeitstempel, string $kommando, string $parameter): int {
     $db = getDb();
     $exists = $db->fetchOne(
         "SELECT 1 FROM actions WHERE zeitstempel = ? AND kommando = ? AND parameter = ? LIMIT 1",
