@@ -337,11 +337,17 @@ grep ERROR data/serverlog_php.log
 grep "$(date +%Y-%m-%d)" data/serverlog_php.log
 ```
 
-Auf dem Webserver landet die Konsolen-Ausgabe (INFO+) im Apache-Error-Log:
+Auf dem Webserver landet die Konsolen-Ausgabe (INFO+) im Apache-Error-Log — es gibt also zwei aktive Log-Orte gleichzeitig:
 
 ```bash
+# Anwendungs-Log (DEBUG+, alle Meldungen)
+tail -f /var/www/24hschwimmen/data/serverlog_php.log
+
+# Apache-Error-Log (INFO+, via error_log())
 tail -f /var/log/apache2/24schwimmen_error.log
 ```
+
+Wer auf dem Server nur einen Log-Ort möchte, setzt in `php/logger.php` `$consoleLevel = self::ERROR` — dann erscheinen im Apache-Log nur noch Fehler, alles andere landet ausschließlich in der Datei.
 
 ---
 
