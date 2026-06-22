@@ -154,7 +154,7 @@ function App() {
             spezialzeiten.forEach((t) => {
                 if (zeitD >= t.start && zeitD < t.end) {
                     //console.log(`${t.name} bei Schwimmer ${schwimmerID} - Zeit: ${zeit}`);
-                    s[t.name] = (s[t.name] ? s[t.name] + anzahl : 1); // Mit 1 initialisieren - erste Bahn dieses Typs
+                    s[t.name] = (s[t.name] ? s[t.name] + anzahl : anzahl);
                 }
             })
             curSwimmerMap[schwimmerID] = s;

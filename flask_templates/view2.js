@@ -122,7 +122,7 @@ function App() {
             const zeitD = new Date(zeit);
             spezialzeiten.forEach((t) => {
                 if (zeitD >= t.start && zeitD < t.end) {
-                    s[t.name] = (s[t.name] ? s[t.name] + anzahl : 1);
+                    s[t.name] = (s[t.name] ? s[t.name] + anzahl : anzahl);
                 }
             });
             curSwimmerMap[schwimmerID] = s;
