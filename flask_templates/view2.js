@@ -67,17 +67,18 @@ function App() {
         ];
     }
 
-    function downloadCSV(headers = ["vorname", "nachname", "gruppe", "bahnanzahl"]) {
+    function downloadCSV(headers = ["vorname", "nachname", "istKind", "gruppe", "bahnanzahl"]) {
         const maxID = Math.max(...Object.keys(curSwimmerMap).map(s => parseInt(s)));
         const headersspezial = spezialzeiten.map((szeit) => szeit.name);
         headers = headers.concat(headersspezial);
+        const noScale = new Set(['istKind']);
         let csvRows = ["nummer," + headers.join(',')];
         for (let i = 0; i < maxID; i++) {
             if (curSwimmerMap[i + 1]) {
                 csvRows.push(`${i + 1},` +
                     headers.map(header => {
                         let value = curSwimmerMap[i + 1][header] ?? '';
-                        const isNumeric = typeof value === 'number' || !isNaN(value);
+                        const isNumeric = !noScale.has(header) && (typeof value === 'number' || !isNaN(value));
                         if (isNumeric) value *= bahnLaenge;
                         const stringValue = value.toString().replace(/"/g, '""');
                         return isNumeric ? stringValue : `"${stringValue}"`;
@@ -149,7 +150,7 @@ function App() {
                             curSwimmerMap[s.nummer] = s;
                         } else {
                             const existing = curSwimmerMap[s.nummer];
-                            curSwimmerMap[s.nummer] = { ...existing, vorname: s.vorname, nachname: s.nachname, gruppe: s.gruppe, aktiv: s.aktiv };
+                            curSwimmerMap[s.nummer] = { ...existing, vorname: s.vorname, nachname: s.nachname, gruppe: s.gruppe, aktiv: s.aktiv, istKind: s.istKind };
                         }
                     });
                     setSwimmerMap({ ...curSwimmerMap });
