@@ -1319,7 +1319,7 @@ function renderSchwimmerLog(data, resultDiv) {
             lastAddTime = ts;
         }
 
-        [timeStr, a.kommando, bahnNr, wert, delta].forEach((val, ci) => {
+        [timeStr, `${a.kommando} ${a.parameter}`, bahnNr, wert, delta].forEach((val, ci) => {
             const td = document.createElement('td');
             td.textContent = val;
             if (ci === 4) td.style.cssText = tdDeltaStyle;
