@@ -109,6 +109,7 @@ function App() {
                 csvRows.push(`${i + 1},` +
                     headers.map(header => {
                         let value = spezialNames.has(header) ? (spezialWerte[header] ?? 0) : (swimmer[header] ?? '');
+                        if (header === 'bahnanzahl' && typeof value === 'number' && value < 0) value = 0;
                         const isNumeric = !noScale.has(header) && (typeof value === 'number' || !isNaN(value));
                         if (isNumeric) value *= bahnLaenge;
                         const stringValue = value.toString().replace(/"/g, '""');
