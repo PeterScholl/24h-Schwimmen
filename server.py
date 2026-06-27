@@ -538,5 +538,9 @@ def run_server(reloader = False):
     #app.run(ssl_context=('cert.pem', 'key.pem'), debug=True)
 
 if __name__ == "__main__":
+    print("\033[91m" + "=" * 60)
+    print("  ACHTUNG: Entwicklungsmodus!")
+    print("  Fuer den Produktivbetrieb bitte wsgiserverwin.py starten.")
+    print("=" * 60 + "\033[0m")
     run_server(True) #Reloader aktivieren - lädt Flask bei Dateiänderungen neu - super für Testmodus
     
