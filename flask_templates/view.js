@@ -86,17 +86,29 @@ function App() {
         for (let i = 0; i < maxID; i++) {
             if (curSwimmerMap[i + 1]) {
                 const swimmer = curSwimmerMap[i + 1];
-                // Summe negativer Spezialzeiten-Werte → wird von bahnanzahl abgezogen
-                let negativKorrektur = 0;
+                // Negative Spezialzeiten auf 0 setzen; Differenz von den größten positiven abziehen
+                const spezialWerte = {};
+                spezialzeiten.forEach(szeit => { spezialWerte[szeit.name] = swimmer[szeit.name] ?? 0; });
+                let negativSumme = 0;
                 spezialzeiten.forEach(szeit => {
-                    const val = swimmer[szeit.name] ?? 0;
-                    if (typeof val === 'number' && val < 0) negativKorrektur += val;
+                    if (spezialWerte[szeit.name] < 0) {
+                        negativSumme += spezialWerte[szeit.name];
+                        spezialWerte[szeit.name] = 0;
+                    }
                 });
+                if (negativSumme < 0) {
+                    const sorted = Object.keys(spezialWerte).sort((a, b) => spezialWerte[b] - spezialWerte[a]);
+                    let restAbzug = -negativSumme;
+                    for (const name of sorted) {
+                        if (restAbzug <= 0) break;
+                        const abzug = Math.min(spezialWerte[name], restAbzug);
+                        spezialWerte[name] -= abzug;
+                        restAbzug -= abzug;
+                    }
+                }
                 csvRows.push(`${i + 1},` +
                     headers.map(header => {
-                        let value = swimmer[header] ?? '';
-                        if (spezialNames.has(header) && typeof value === 'number' && value < 0) value = 0;
-                        if (header === 'bahnanzahl') value = Math.max(0, (typeof value === 'number' ? value : 0) + negativKorrektur);
+                        let value = spezialNames.has(header) ? (spezialWerte[header] ?? 0) : (swimmer[header] ?? '');
                         const isNumeric = !noScale.has(header) && (typeof value === 'number' || !isNaN(value));
                         if (isNumeric) value *= bahnLaenge;
                         const stringValue = value.toString().replace(/"/g, '""');
