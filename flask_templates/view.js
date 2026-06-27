@@ -77,6 +77,7 @@ function App() {
         headers = headers.concat(headersspezial);
         console.log("curSwimmerMap", curSwimmerMap);
         const noScale = new Set(['istKind']);
+        const spezialNames = new Set(spezialzeiten.map(s => s.name));
 
         let csvRows = [
             "nummer," + headers.join(',') // Kopfzeile
@@ -84,9 +85,18 @@ function App() {
 
         for (let i = 0; i < maxID; i++) {
             if (curSwimmerMap[i + 1]) {
+                const swimmer = curSwimmerMap[i + 1];
+                // Summe negativer Spezialzeiten-Werte → wird von bahnanzahl abgezogen
+                let negativKorrektur = 0;
+                spezialzeiten.forEach(szeit => {
+                    const val = swimmer[szeit.name] ?? 0;
+                    if (typeof val === 'number' && val < 0) negativKorrektur += val;
+                });
                 csvRows.push(`${i + 1},` +
                     headers.map(header => {
-                        let value = curSwimmerMap[i + 1][header] ?? '';
+                        let value = swimmer[header] ?? '';
+                        if (spezialNames.has(header) && typeof value === 'number' && value < 0) value = 0;
+                        if (header === 'bahnanzahl') value = Math.max(0, (typeof value === 'number' ? value : 0) + negativKorrektur);
                         const isNumeric = !noScale.has(header) && (typeof value === 'number' || !isNaN(value));
                         if (isNumeric) value *= bahnLaenge;
                         const stringValue = value.toString().replace(/"/g, '""');
