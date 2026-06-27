@@ -7,6 +7,11 @@
     "mobile_cards_col": 2,
     "view2_page_interval_s": 10,
     "startzeit": "2026-06-20T10:00:00Z",
-    "swimmer_list_update_interval_s": 600
+    "swimmer_list_update_interval_s": 600,
+
+    "db_host": "localhost",
+    "db_name": "24h_schwimmen",
+    "db_user": "schwimmen",
+    "db_pass": "swim_lokal"
  }
   

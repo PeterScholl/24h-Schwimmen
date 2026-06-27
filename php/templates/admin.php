@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Admin-Bereich</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/main.css" />
+  <link rel="stylesheet" href="/all.min.css" />
+  <style>
+    #adminMenu ul li { padding: 8px 12px; cursor: pointer; transition: background-color 0.2s; }
+    #adminMenu ul li:hover { background-color: #007acc; color: white; }
+  </style>
+</head>
+<body>
+  <header>
+    <div id="infoBar">
+      <span style="display: inline-block; text-align: left">
+        <span id="serverStatus" style="height: 10px; width: 10px; background-color: green; border-radius: 50%; display: inline-block; margin-right: 5px"></span>
+        Verbunden
+      </span>
+      <span style="display: inline-block; text-align: center"> Angemeldet als: <strong><?= htmlspecialchars($userrealname) ?> (<?= htmlspecialchars($username) ?>)</strong></span>
+      <span style="display: inline-block; text-align: right"> Client-ID: <strong><?= htmlspecialchars($clientID) ?></strong></span>
+    </div>
+    <div id="header">
+      <button id="adminAktionen" style="font-size: 30px; cursor: pointer; color: white; background: none; border: none">&#9776;</button>
+      <div style="display: flex; flex-direction: column; position: absolute; left: 50%; transform: translateX(-50%); font-size: 24px; color: white; text-align: center">
+        <h1>Admin-Bereich</h1>
+      </div>
+      <div>
+        <button id="downloadBackupBtn" style="font-size: 30px; cursor: pointer; color: white; background: none; border: none">
+          <i class="fa-solid fa-download"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <nav id="navbar" style="text-align: center; margin-bottom: 20px"></nav>
+
+  <main>
+    <section id="user" class="admin-section">
+      <h2>Benutzertabelle</h2>
+      <table id="userTable"></table>
+      <h2>Benutzer löschen</h2>
+      <form action="/admin" method="post">
+        <input type="hidden" name="action" value="delete_user">
+        <label for="del_benutzername">Benutzername:</label>
+        <input type="text" id="del_benutzername" name="benutzername" required>
+        <button type="submit">Benutzer löschen</button>
+      </form>
+      <h2>Neues Passwort</h2>
+      <form id="new_password_form">
+        <input type="hidden" name="action" value="new_passwort">
+        <label for="pw_benutzername">Benutzername:</label>
+        <input type="text" id="pw_benutzername" name="benutzername" required>
+        <label for="new_pass">Neues Passwort:</label>
+        <input type="text" id="new_pass" name="new_pass" required>
+        <button type="submit">Neues Passwort festlegen</button>
+      </form>
+    </section>
+
+    <section id="client" class="admin-section">
+      <h2>Clients</h2>
+      <table id="clientTable"></table>
+    </section>
+
+    <section id="swimmer" class="admin-section" style="display: none">
+      <h2>Schwimmer</h2>
+      <table id="swimmerTable"></table>
+    </section>
+
+    <section id="actions" class="admin-section" style="display: none">
+      <h2>Aktionen</h2>
+      <table id="actionsTable"></table>
+    </section>
+
+    <section id="checks" class="admin-section" style="display: none"></section>
+    <section id="view"   class="admin-section" style="display: none"></section>
+    <section id="qr"     class="admin-section" style="display: none"></section>
+    <section id="swimmerlog" class="admin-section" style="display: none"></section>
+
+    <section id="adduser" class="admin-section">
+      <h2>Benutzer anlegen</h2>
+      <form onsubmit="createUser(event)">
+        <div class="form-group">
+          <label for="realname">Name:</label>
+          <input type="text" id="realname" required />
+        </div>
+        <div class="form-group">
+          <label for="username">Benutzername:</label>
+          <input type="text" id="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Passwort:</label>
+          <input type="password" id="password" required />
+        </div>
+        <div class="form-group">
+          <input type="checkbox" id="admin" />
+          <label for="admin"> Administrator </label>
+        </div>
+        <button type="submit">Erstellen</button>
+      </form>
+    </section>
+  </main>
+
+  <div id="adminMenu" style="display: none; position: absolute; background: white; border: 1px solid #ccc; z-index: 100">
+    <ul style="list-style: none; padding: 10px; margin: 0"></ul>
+  </div>
+
+  <footer style="display: flex; justify-content: space-between; align-items: center; padding: 10px">
+    <form action="/v2" method="get">
+      <button type="submit" title="Nutzerbereich" style="font-size: 30px; color: inherit; background: none; border: none; cursor: pointer">⬅️</button>
+    </form>
+    <div style="position: absolute; left: 50%; transform: translateX(-50%)">&copy; 2025 Schwimmen 24h. Alle Rechte vorbehalten.</div>
+    <form action="/logout" style="margin-left: auto">
+      <button type="submit" title="Logout" style="font-size: 30px; color: inherit; background: none; border: none; cursor: pointer">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </button>
+    </form>
+  </footer>
+
+  <script>const schwimmerNrLen = <?= (int)$schwimmerNrLen ?>;</script>
+  <script type="module" src="/admin.js"></script>
+</body>
+</html>
