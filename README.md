@@ -18,14 +18,22 @@ Die Erfassung soll auf möglichst vielen verschiedenen Endgeräten möglich sein
 * Benutzer anlegen
 * Zur *normalen* Webseite wechseln und ausprobieren (wieder unten links)
 
-### Linux bzw. Source
+### Linux bzw. Source (Python/SQLite)
 
 * Repository clonen.
 * Dann mit ``pip install -r requirements.txt`` die benötigten Pakete installieren und
-* die Datei ``wsgiserverwin.py`` oder ``wsgiserver.py`` bzw ausführen.
+* die Datei ``wsgiserverwin.py`` ausführen.
 * Dies startet einen Web-Server auf dem Port 8080, der in der Regel unter ``http://localhost:8080`` mit dem Browser zu erreichen ist.
 
 Eine Basisdatenbank mit dem Benutzer ``admin`` und dem Passwort ``swim24`` wird automatisch angelegt.
+
+### Apache/PHP/MySQL (Alternative für Webserver-Betrieb)
+
+Als Alternative zum Python-Backend gibt es eine vollständige PHP/MySQL-Implementierung im Verzeichnis `php/`. Sie ist als Drop-in-Ersatz konzipiert und teilt sich die gleichen JS-Frontends mit der Python-Version.
+
+Voraussetzungen: Apache mit `mod_rewrite`, PHP und MySQL/MariaDB.
+
+Weitere Details zur Einrichtung, Konfiguration und den Unterschieden zur Python-Version: [`php/README.md`](php/README.md)
 
 ## Normale Verwendung und Test
 

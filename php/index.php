@@ -13,9 +13,26 @@ require_once __DIR__ . '/db.php';
 
 Logger::init(__DIR__ . '/../data/serverlog_php.log');
 
-$db = getDb();
-init_db();
-ensure_admin_user();
+try {
+    $db = getDb();
+    init_db();
+    ensure_admin_user();
+} catch (\Throwable $e) {
+    Logger::error('Datenbankverbindung fehlgeschlagen: ' . $e->getMessage());
+    http_response_code(503);
+    echo '<!DOCTYPE html><html lang="de"><head><meta charset="utf-8">
+        <title>Datenbankfehler</title>
+        <style>body{font-family:sans-serif;max-width:600px;margin:80px auto;padding:0 20px}
+        h1{color:#c0392b}</style></head><body>
+        <h1>&#9888; Datenbankverbindung fehlgeschlagen</h1>
+        <p>Der Server kann keine Verbindung zur Datenbank herstellen.</p>
+        <p>Bitte die Datenbankzugangsdaten in der <code>config.json</code> pr&uuml;fen
+        (<code>db_host</code>, <code>db_name</code>, <code>db_user</code>, <code>db_pass</code>)
+        und den Administrator informieren.</p>
+        <p><small>Details stehen in der Logdatei <code>data/serverlog_php.log</code>.</small></p>
+        </body></html>';
+    exit;
+}
 
 // Auth-Middleware
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
