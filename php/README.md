@@ -92,7 +92,7 @@ Beide Backends bieten exakt dieselben URLs:
 
 ## Lokaler Test ohne Apache
 
-Für lokale Entwicklung und Tests reicht PHPs eingebauter Entwicklungsserver — kein Apache nötig. Die `.htaccess` wird dabei ignoriert, funktioniert aber trotzdem korrekt, weil `index.php` als direkter Router angegeben wird und alle Anfragen selbst verarbeitet (inklusive statischer Dateien aus `../static/`).
+Für lokale Entwicklung und Tests reicht PHPs eingebauter Entwicklungsserver — kein Apache nötig. Die `.htaccess` wird dabei ignoriert, funktioniert aber trotzdem korrekt, weil `index.php` als direkter Router angegeben wird (s.u. bei Server starten) und alle Anfragen selbst verarbeitet (inklusive statischer Dateien aus `../static/`).
 
 ### Voraussetzungen lokal
 
