@@ -67,17 +67,41 @@ function App() {
         ];
     }
 
-    function downloadCSV(headers = ["vorname", "nachname", "gruppe", "bahnanzahl"]) {
+    function downloadCSV(headers = ["vorname", "nachname", "istKind", "gruppe", "bahnanzahl"]) {
         const maxID = Math.max(...Object.keys(curSwimmerMap).map(s => parseInt(s)));
         const headersspezial = spezialzeiten.map((szeit) => szeit.name);
         headers = headers.concat(headersspezial);
+        const noScale = new Set(['istKind']);
+        const spezialNames = new Set(spezialzeiten.map(s => s.name));
         let csvRows = ["nummer," + headers.join(',')];
         for (let i = 0; i < maxID; i++) {
             if (curSwimmerMap[i + 1]) {
+                const swimmer = curSwimmerMap[i + 1];
+                // Negative Spezialzeiten auf 0 setzen; Differenz von den größten positiven abziehen
+                const spezialWerte = {};
+                spezialzeiten.forEach(szeit => { spezialWerte[szeit.name] = swimmer[szeit.name] ?? 0; });
+                let negativSumme = 0;
+                spezialzeiten.forEach(szeit => {
+                    if (spezialWerte[szeit.name] < 0) {
+                        negativSumme += spezialWerte[szeit.name];
+                        spezialWerte[szeit.name] = 0;
+                    }
+                });
+                if (negativSumme < 0) {
+                    const sorted = Object.keys(spezialWerte).sort((a, b) => spezialWerte[b] - spezialWerte[a]);
+                    let restAbzug = -negativSumme;
+                    for (const name of sorted) {
+                        if (restAbzug <= 0) break;
+                        const abzug = Math.min(spezialWerte[name], restAbzug);
+                        spezialWerte[name] -= abzug;
+                        restAbzug -= abzug;
+                    }
+                }
                 csvRows.push(`${i + 1},` +
                     headers.map(header => {
-                        let value = curSwimmerMap[i + 1][header] ?? '';
-                        const isNumeric = typeof value === 'number' || !isNaN(value);
+                        let value = spezialNames.has(header) ? (spezialWerte[header] ?? 0) : (swimmer[header] ?? '');
+                        if (header === 'bahnanzahl' && typeof value === 'number' && value < 0) value = 0;
+                        const isNumeric = !noScale.has(header) && (typeof value === 'number' || !isNaN(value));
                         if (isNumeric) value *= bahnLaenge;
                         const stringValue = value.toString().replace(/"/g, '""');
                         return isNumeric ? stringValue : `"${stringValue}"`;
@@ -121,7 +145,7 @@ function App() {
             const zeitD = new Date(zeit);
             spezialzeiten.forEach((t) => {
                 if (zeitD >= t.start && zeitD < t.end) {
-                    s[t.name] = (s[t.name] ? s[t.name] + anzahl : 1);
+                    s[t.name] = (s[t.name] ? s[t.name] + anzahl : anzahl);
                 }
             });
             curSwimmerMap[schwimmerID] = s;
@@ -149,7 +173,7 @@ function App() {
                             curSwimmerMap[s.nummer] = s;
                         } else {
                             const existing = curSwimmerMap[s.nummer];
-                            curSwimmerMap[s.nummer] = { ...existing, vorname: s.vorname, nachname: s.nachname, gruppe: s.gruppe, aktiv: s.aktiv };
+                            curSwimmerMap[s.nummer] = { ...existing, vorname: s.vorname, nachname: s.nachname, gruppe: s.gruppe, aktiv: s.aktiv, istKind: s.istKind };
                         }
                     });
                     setSwimmerMap({ ...curSwimmerMap });
