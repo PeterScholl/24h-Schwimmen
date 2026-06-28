@@ -366,6 +366,19 @@ def index_v2():
     }
     return render_template("index_v2.html", **params)
 
+@app.route("/v3")
+def index_v3():
+    params = {
+        'user_role': session.get('user_role',""),
+        'userrealname': session.get('realname',"Unbekannt"),
+        'username': session.get('user',"unknown"),
+        'clientID': session.get('clientID',"--"),
+        'debugfunktion': request.args.get('dbgfkt') == 'true',
+        'card_font_size': request.args.get('size', '5'),
+        'mobile_cards_col': config.get('mobile_cards_col', 2)
+    }
+    return render_template("index_v3.html", **params)
+
 @app.route("/main.js")
 def send_mainjs():
     params = {

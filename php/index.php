@@ -50,6 +50,7 @@ switch ($path) {
     case '/backupsql': handle_backupsql(); break;
     case '/v1':        handle_v1();        break;
     case '/v2':        handle_v2();        break;
+    case '/v3':        handle_v3();        break;
     case '/main.js':       handle_main_js();    break;
     case '/main_v2.js':    handle_main_v2_js(); break;
     case '/view.js':       handle_view_js();    break;
@@ -438,6 +439,19 @@ function handle_v1(): void {
 function handle_v2(): void {
     global $config;
     render_template('index_v2', [
+        'user_role'       => $_SESSION['user_role'] ?? '',
+        'userrealname'    => $_SESSION['realname']  ?? 'Unbekannt',
+        'username'        => $_SESSION['user']       ?? 'unknown',
+        'clientID'        => $_SESSION['clientID']   ?? '--',
+        'debugfunktion'   => ($_GET['dbgfkt'] ?? '') === 'true',
+        'card_font_size'  => $_GET['size'] ?? '5',
+        'mobile_cards_col' => $config['mobile_cards_col'] ?? 2,
+    ]);
+}
+
+function handle_v3(): void {
+    global $config;
+    render_template('index_v3', [
         'user_role'       => $_SESSION['user_role'] ?? '',
         'userrealname'    => $_SESSION['realname']  ?? 'Unbekannt',
         'username'        => $_SESSION['user']       ?? 'unknown',
