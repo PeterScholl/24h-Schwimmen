@@ -413,9 +413,14 @@ function showSwimmerTable() {
             // Button um CSV herunterzuladen
             const csvbutton = document.createElement('Button');
             csvbutton.textContent = "CSV";
-            csvbutton.style.margin = "0px 20px";
+            csvbutton.style.margin = "0px 10px";
             csvbutton.addEventListener("click", () => downloadCSV(swimmerData, ["nummer", "vorname", "nachname", "istKind", "gruppe", "bahnanzahl"]));
             section.appendChild(csvbutton);
+            const addbutton = document.createElement('button');
+            addbutton.textContent = "+ Anlegen";
+            addbutton.style.margin = "0px 10px";
+            addbutton.addEventListener("click", () => addSwimmer());
+            section.appendChild(addbutton);
             // Filter
             const filterWrap = document.createElement('div');
             filterWrap.style.margin = '8px 0';
@@ -672,6 +677,69 @@ function editSwimmer(nummer) {
     };
 
     dlg.showModal();
+}
+
+function addSwimmer() {
+    let dlg = document.getElementById('editSwimmerDialog');
+    if (!dlg) {
+        dlg = document.createElement('dialog');
+        dlg.id = 'editSwimmerDialog';
+        dlg.style.cssText = 'padding:1.5rem; min-width:280px; border-radius:6px;';
+        document.body.appendChild(dlg);
+    }
+
+    dlg.innerHTML = `
+        <h3 style="margin-top:0">Neuen Schwimmer anlegen</h3>
+        <label style="display:block;margin-bottom:6px">Nummer<br>
+            <input id="esNummer" type="number" min="1" style="width:100%;box-sizing:border-box">
+        </label>
+        <label style="display:block;margin-bottom:6px">Vorname<br>
+            <input id="esVorname" type="text" style="width:100%;box-sizing:border-box">
+        </label>
+        <label style="display:block;margin-bottom:6px">Nachname<br>
+            <input id="esNachname" type="text" style="width:100%;box-sizing:border-box">
+        </label>
+        <label style="display:block;margin-bottom:6px">Gruppe<br>
+            <input id="esGruppe" type="text" style="width:100%;box-sizing:border-box">
+        </label>
+        <label style="display:block;margin-bottom:12px">
+            <input id="esIstKind" type="checkbox"> Kind
+        </label>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button id="esSave">Anlegen</button>
+            <button id="esCancel">Abbrechen</button>
+        </div>
+    `;
+
+    dlg.querySelector('#esCancel').onclick = () => dlg.close();
+    dlg.querySelector('#esSave').onclick = () => {
+        const nummer = parseInt(dlg.querySelector('#esNummer').value);
+        if (!nummer || nummer < 1) { showStatusMessage('Bitte eine gültige Nummer eingeben', false); return; }
+        const payload = {
+            action:   'create_swimmer',
+            nummer,
+            vorname:  dlg.querySelector('#esVorname').value.trim(),
+            nachname: dlg.querySelector('#esNachname').value.trim(),
+            gruppe:   dlg.querySelector('#esGruppe').value.trim(),
+            istKind:  dlg.querySelector('#esIstKind').checked ? 1 : 0,
+        };
+        fetch('/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        }).then(r => r.text().then(text => {
+            if (r.ok) {
+                showStatusMessage(`Schwimmer ${nummer} angelegt`, true);
+                dlg.close();
+                showSwimmerTable();
+            } else {
+                showStatusMessage(`Fehler: ${text}`, false);
+            }
+        }));
+    };
+
+    dlg.showModal();
+    dlg.querySelector('#esNummer').focus();
 }
 
 function deleteSwimmer(nummer) {
@@ -1311,55 +1379,6 @@ function showQRSection() {
     section.appendChild(btn);
 }
 
-function fetchAndFillTable(sectionId, tableId, actionName, titleName) {
-    if (sectionId) showSection(sectionId);
-    fetch('/admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ action: actionName })
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log(`${titleName}-Table füllen, data.length`, data.length);
-
-            if (sectionId) {
-                const sectionTitle = document.querySelector(`#${sectionId} h2`);
-                sectionTitle.textContent = `${titleName} (${data.length})`;
-            }
-            const table = document.getElementById(tableId);
-            table.innerHTML = '';
-
-            if (data.length > 0) {
-                const headerRow = document.createElement('tr');
-                Object.keys(data[0]).forEach(key => {
-                    const th = document.createElement('th');
-                    th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
-                    headerRow.appendChild(th);
-                });
-                table.appendChild(headerRow);
-
-                data.forEach(entry => {
-                    const row = document.createElement('tr');
-                    Object.values(entry).forEach(value => {
-                        const td = document.createElement('td');
-                        td.classList.add('truncated');
-                        td.textContent = value;
-                        row.appendChild(td);
-                    });
-                    table.appendChild(row);
-                });
-            } else { //Data length == 0 - leere Rückgabe
-                const headerRow = document.createElement('tr');
-                const th = document.createElement('th');
-                th.textContent = "Leere Tabelle"
-                headerRow.appendChild(th);
-                table.appendChild(headerRow);
-            }
-        })
-        .catch(error => {
-            console.error(`Fehler beim Abrufen der ${titleName}-Daten:`, error);
-        });
-}
 
 function downloadCSV(data, customHeaders = null) {
     if (!data.length) return;

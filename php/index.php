@@ -272,6 +272,18 @@ function handle_admin(): void {
             echo 'Erfolg';
             return;
 
+        } elseif ($action === 'create_swimmer') {
+            $nummer = isset($data['nummer']) ? (int)$data['nummer'] : null;
+            if (!$nummer) { http_response_code(400); echo 'Keine Schwimmernummer angegeben'; return; }
+            if (lies_schwimmer($nummer)) { http_response_code(409); echo "Schwimmer $nummer existiert bereits"; return; }
+            $vorname  = trim($data['vorname']  ?? '');
+            $nachname = trim($data['nachname'] ?? '');
+            $gruppe   = trim($data['gruppe']   ?? '');
+            $istKind  = in_array($data['istKind'] ?? 0, [true, 1, '1', 'true', 'True'], true) ? 1 : 0;
+            Logger::info("Schwimmer $nummer wird angelegt");
+            erstelle_schwimmer($nummer, 0, $vorname, $nachname, $istKind, $gruppe, 0, 0, 0, 1);
+            echo 'Erfolg';
+            return;
         } elseif ($action === 'edit_swimmer') {
             $nummer = $data['nummer'] ?? null;
             if (!$nummer) { http_response_code(400); echo 'Keine Schwimmernummer angegeben'; return; }

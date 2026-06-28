@@ -202,6 +202,20 @@ def admin():
             if not db.update_schwimmer(int(nummer), **felder):
                 return "DB - Fehler", 400
             return "Erfolg", 200
+        elif action == 'create_swimmer':
+            nummer = data.get('nummer')
+            if not nummer:
+                return "Keine Schwimmernummer angegeben", 400
+            nummer = int(nummer)
+            if db.lies_schwimmer(nummer):
+                return f"Schwimmer {nummer} existiert bereits", 409
+            vorname  = data.get('vorname', '').strip()
+            nachname = data.get('nachname', '').strip()
+            gruppe   = data.get('gruppe', '').strip()
+            istKind  = 1 if data.get('istKind') in (True, 1, '1', 'true', 'True') else 0
+            logging.info(f"Schwimmer {nummer} wird angelegt")
+            db.erstelle_schwimmer(nummer, None, vorname, nachname, istKind, gruppe, 0, 0, 0, 1)
+            return "Erfolg", 200
         elif action == 'edit_user':
             user_id = data.get('id')
             if not user_id:

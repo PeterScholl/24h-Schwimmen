@@ -156,6 +156,12 @@ Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einst
 
 Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
 
+## Schwimmer manuell anlegen
+
+Im Admin-Bereich unter **Schwimmer** befindet sich neben dem CSV-Button ein **+ Anlegen**-Button. Darüber lässt sich ein einzelner Schwimmer direkt ohne CSV-Import erfassen.
+
+Im Dialog werden Nummer (Pflicht), Vorname, Nachname, Gruppe und das Kind-Flag eingegeben. Existiert die Nummer bereits, wird eine Fehlermeldung angezeigt und kein Eintrag erzeugt.
+
 ## Schwimmer-Import (CSV)
 
 Im Admin-Bereich unter **Schwimmer** können Schwimmerdaten per CSV-Datei importiert werden.
@@ -330,6 +336,21 @@ Auf der Erfassungsseite (`/v3`) gibt es im Kontextmenü (langer Druck / Rechtskl
 3. Den betreffenden Eintrag identifizieren und auf **Korrektureintrag** klicken.
 4. Das Formular unter **Checks → Korrektur-ADD** öffnet sich vorausgefüllt: Schwimmernr., positive Umkehrmenge, Kommentar `Rücknahme Bahnreset` und der originale Zeitstempel (Checkbox „Zeitstempel manuell" ist bereits gesetzt).
 5. Klick auf **ADD senden** stellt die ursprüngliche Bahnanzahl wieder her.
+
+## Inaktive Clients löschen
+
+Jedes Gerät, das sich am Server anmeldet, wird als *Client* in der Datenbank erfasst. Nach längerer Nutzung oder bei Testläufen können sich viele veraltete Einträge ansammeln.
+
+Im Admin-Bereich unter **Clients** kann die Tabelle nach beliebigen Spalten sortiert werden (Klick auf den Spaltenkopf, nochmaliger Klick wechselt die Richtung). Standard ist `Zeitpunkt_letzte_aktion` absteigend, sodass die zuletzt aktiven Geräte oben erscheinen.
+
+**Vorgehen zum Aufräumen:**
+
+1. Auf **Inaktive Clients löschen …** klicken — alle Zeitstempel in der Spalte `Zeitpunkt_letzte_aktion` werden klickbar (blau unterstrichen).
+2. Den **zuletzt aktiven Client klicken, der noch behalten werden soll** — alle Clients, die *davor* zuletzt aktiv waren, werden gelöscht. Der angeklickte Client und alle neueren bleiben erhalten.
+3. Ein Bestätigungs-Dialog zeigt die Grenze und den verbleibenden Client, bevor die Löschung ausgeführt wird.
+4. Mit **Abbrechen** lässt sich der Modus jederzeit verlassen, ohne etwas zu löschen.
+
+> Die zugehörigen Aktions-Einträge bleiben erhalten; die Verknüpfung (`client_id`) wird auf `NULL` gesetzt.
 
 ## Logging
 
