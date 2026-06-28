@@ -85,7 +85,6 @@
       <ul>
         <li id="rundeAbziehenOption">Runde abziehen</li>
         <li id="deleteSwimmer">Schwimmer*innen entfernen</li>
-        <li id="nurEigene">Fremdbahnen entfernen</li>
       </ul>
     </div>
   </main>

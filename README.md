@@ -97,6 +97,41 @@ Um nach einem Testlauf mit einem leeren Datenbestand zu starten:
 
 Optional: Die Logdatei `data/serverlog.log` löschen, damit das Log beim Live-Betrieb sauber beginnt.
 
+## Bedienung der Erfassungsseite (v3)
+
+Die Erfassungsseite unter `/v3` ist der aktuelle Standard und für den Einsatz auf Tablets und Smartphones optimiert. Die ältere Oberfläche `/v2` ist weiterhin erreichbar, wird aber nicht mehr weiterentwickelt.
+
+### Bahnauswahl
+
+In der Kopfzeile befinden sich runde Toggle-Buttons mit den Zahlen 1 bis `max_bahnen` (konfigurierbar, Standard: 4). Ein Tipp auf einen Button wählt die entsprechende Bahn aus (weißer Hintergrund = aktiv), ein erneuter Tipp hebt die Auswahl auf. Es können mehrere Bahnen gleichzeitig betreut werden. Nach dem Einloggen ist Bahn 1 standardmäßig ausgewählt.
+
+Ist kein Button aktiv, werden keine Schwimmerkarten angezeigt.
+
+### Fremdbahnen entfernen (Besen-Symbol 🧹)
+
+Sobald Schwimmer von anderen Bahnen in der Ansicht sichtbar sind (hellblauer Hintergrund), erscheint rechts neben den Bahnbuttons ein Besen-Symbol. Ein Tipp darauf entfernt alle Schwimmerkarten von Fremdbahnen sofort aus der lokalen Ansicht.
+
+### Bahn zählen (5-Sekunden-Timer)
+
+Ein Tipp auf eine Schwimmerkarte startet einen 5-Sekunden-Timer. Die Karte färbt sich blau. Nach Ablauf wird die Bahn automatisch an den Server übertragen. Durch erneutes Antippen innerhalb dieser 5 Sekunden wird der Timer abgebrochen — die Karte wird wieder normal dargestellt, ohne dass eine Bahn gezählt wurde.
+
+### Schwimmer hinzufügen
+
+Der **+**-Button oben links öffnet einen Dialog zur Eingabe einer Schwimmernummer. Der Schwimmer erscheint danach in der Kachelansicht.
+
+### Kontextmenü
+
+Ein langer Druck (Touch) oder Rechtsklick auf eine Schwimmerkarte öffnet ein Kontextmenü:
+
+| Option | Funktion |
+| --- | --- |
+| Runde abziehen | Zieht eine bereits gezählte Bahn wieder ab |
+| Schwimmer\*innen entfernen | Setzt den Schwimmer auf inaktiv (verschwindet aus der Ansicht) |
+
+### Backup-Download
+
+Unten links neben dem ⚙️-Admin-Button befindet sich ein Download-Symbol. Darüber kann jederzeit ein JSON-Backup aller seit dem Login empfangenen Aktionen heruntergeladen werden. Dieses Backup kann im Admin-Bereich unter **Aktionen → JSON-Import** wieder eingespielt werden (siehe auch [Notizen für Notfall-Recovery](#notizen-für-notfall-recovery)).
+
 ## Wichtiges für den Live-Betrieb
 
 * Der Rechner auf dem der Server läuft, sollte angepasste Energiesparmodi haben, d.h. nicht in den Standby-Wechseln und auch die Festplatte soll nicht abgeschaltet werden. Dazu z.B. unter Windows ``Energiesparplaneinstellungen ändern`` -> ``Erweiterte Einstellungen ändern`` und dort enstprechende Einstellungen vornehmen
@@ -316,47 +351,11 @@ Im view kann man:
 
 Auf den **Erfassungsseiten** (`/v3` und `/v2`) gibt es den URL-Parameter `size`, der die Breite der Schwimmerkarten steuert (Standardwert: `5`, entspricht ca. 200 px pro Karte). Ein kleinerer Wert ist auf Smartphones hilfreich, damit zwei Karten nebeneinander in eine Zeile passen:
 
-```
+```text
 http://<server>:8080/v3?size=3
 ```
 
 Wenn man die URL mit ``?dbgfkt=true`` lädt, kann durch Anklicken der Überschrift *24h-Schwimmen* ein automatisches Klicken der vorhandenen DIVs simuliert werden.
-
-## Bedienung der Erfassungsseite (v3)
-
-Die Erfassungsseite unter `/v3` ist der aktuelle Standard und für den Einsatz auf Tablets und Smartphones optimiert. Die ältere Oberfläche `/v2` ist weiterhin erreichbar, wird aber nicht mehr weiterentwickelt.
-
-### Bahnauswahl
-
-In der Kopfzeile befinden sich runde Toggle-Buttons mit den Zahlen 1 bis `max_bahnen` (konfigurierbar, Standard: 4). Ein Tipp auf einen Button wählt die entsprechende Bahn aus (weißer Hintergrund = aktiv), ein erneuter Tipp hebt die Auswahl auf. Es können mehrere Bahnen gleichzeitig betreut werden. Nach dem Einloggen ist Bahn 1 standardmäßig ausgewählt.
-
-Ist kein Button aktiv, werden keine Schwimmerkarten angezeigt.
-
-### Fremdbahnen entfernen (Besen-Symbol 🧹)
-
-Sobald Schwimmer von anderen Bahnen in der Ansicht sichtbar sind (hellblauer Hintergrund), erscheint rechts neben den Bahnbuttons ein Besen-Symbol. Ein Tipp darauf entfernt alle Schwimmerkarten von Fremdbahnen sofort aus der lokalen Ansicht. Die Funktion ist auch über das Kontextmenü erreichbar (siehe unten).
-
-### Bahn zählen (5-Sekunden-Timer)
-
-Ein Tipp auf eine Schwimmerkarte startet einen 5-Sekunden-Timer. Die Karte färbt sich blau. Nach Ablauf wird die Bahn automatisch an den Server übertragen. Durch erneutes Antippen innerhalb dieser 5 Sekunden wird der Timer abgebrochen — die Karte wird wieder normal dargestellt, ohne dass eine Bahn gezählt wurde.
-
-### Schwimmer hinzufügen
-
-Der **+**-Button oben links öffnet einen Dialog zur Eingabe einer Schwimmernummer. Der Schwimmer erscheint danach in der Kachelansicht.
-
-### Kontextmenü
-
-Ein langer Druck (Touch) oder Rechtsklick auf eine Schwimmerkarte öffnet ein Kontextmenü:
-
-| Option | Funktion |
-| --- | --- |
-| Runde abziehen | Zieht eine bereits gezählte Bahn wieder ab |
-| Schwimmer\*innen entfernen | Setzt den Schwimmer auf inaktiv (verschwindet aus der Ansicht) |
-| Fremdbahnen entfernen | Entfernt alle Schwimmer von anderen Bahnen aus der lokalen Ansicht |
-
-### Backup-Download
-
-Unten links neben dem ⚙️-Admin-Button befindet sich ein Download-Symbol. Darüber kann jederzeit ein JSON-Backup aller seit dem Login empfangenen Aktionen heruntergeladen werden. Dieses Backup kann im Admin-Bereich unter **Aktionen → JSON-Import** wieder eingespielt werden (siehe auch [Notfall-Recovery](#notfall-recovery)).
 
 ## Datenmodell
 

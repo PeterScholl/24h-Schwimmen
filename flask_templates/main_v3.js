@@ -239,8 +239,6 @@ document.addEventListener("contextmenu", function (e) {
 });
 
 function showSchwimmerContextMenu(x, y) {
-    document.getElementById("nurEigene").style.display =
-        schwimmer.some(s => !verwaltete_bahnen.includes(s.aufBahn)) ? "block" : "none";
     const s_data = schwimmer.find(s => s.nummer == parseInt(clickedDiv.dataset.nummer));
     document.getElementById("rundeAbziehenOption").style.display =
         (!s_data || s_data.bahnen <= 0) ? "none" : "block";
@@ -606,7 +604,6 @@ document.getElementById("deleteSwimmer").addEventListener("click", function () {
     contextMenu.style.display = "none";
 });
 
-document.getElementById("nurEigene").addEventListener("click", entferneFremdbahnen);
 
 document.getElementById("toggleInfoBar").addEventListener("click", toggleInfoBar);
 initBahnButtons();
