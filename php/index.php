@@ -446,6 +446,7 @@ function handle_v3(): void {
         'debugfunktion'   => ($_GET['dbgfkt'] ?? '') === 'true',
         'card_font_size'  => $_GET['size'] ?? '5',
         'mobile_cards_col' => $config['mobile_cards_col'] ?? 2,
+        'max_bahnen'       => $config['max_bahnen'] ?? 4,
     ]);
 }
 
@@ -463,6 +464,7 @@ function handle_main_v3_js(): void {
     header('Content-Type: application/javascript; charset=utf-8');
     $js = file_get_contents(__DIR__ . '/../flask_templates/main_v3.js');
     $js = str_replace('{{schwimmerNrLen}}', $config['laenge_schwimmerNr_digits'], $js);
+    $js = str_replace('{{maxBahnen}}',      $config['max_bahnen'] ?? 4,            $js);
     echo $js;
 }
 

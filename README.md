@@ -76,7 +76,7 @@ Um die Erfassung ohne echte Schwimmer zu testen, gibt es eine automatische Klick
 1. Erfassungsseite mit dem URL-Parameter `?dbgfkt=true` laden:
 
    ```text
-   http://<server>:8080/v2?dbgfkt=true
+   http://<server>:8080/v3?dbgfkt=true
    ```
 
 2. Auf die Überschrift **24h-Schwimmen** klicken — die Seite beginnt dann, Bahnen automatisch zu registrieren und an den Server zu senden.
@@ -117,6 +117,7 @@ Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einst
 | `view2_page_interval_s` | `10` | **View2-Seite** (`/view2`): Sekunden pro Seite bei aktiviertem Auto-Weiterblättern (Shift-Lock-Modus). |
 | `startzeit` | `"2025-06-14T08:00:00Z"` | **View- und View2-Seite**: Startzeitpunkt des Schwimmens als UTC-ISO-Timestamp. Legt den Beginn der Spezialzeiten (Tag1, Geisterstunde, Gute Nacht, Frühaufsteher, Tag2) fest. |
 | `swimmer_list_update_interval_s` | `600` | **View- und View2-Seite**: Intervall in Sekunden, in dem die Schwimmerliste neu vom Server abgefragt wird. Stellt sicher, dass während des Wettkampfs neu angelegte Schwimmer automatisch in der Anzeige erscheinen, ohne manuellen Reload. `0` deaktiviert das automatische Neuladen; ein manuelles Laden der Schwimmerliste ist jederzeit per `Shift+S` möglich. |
+| `max_bahnen` | `4` | **Erfassungsseite v3** (`/v3`): Anzahl der Bahnen, die auf der Erfassungsseite als runde Toggle-Buttons angezeigt werden (Buttons 1 bis `max_bahnen`). |
 
 Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
 
@@ -214,8 +215,8 @@ Erzeugt die Datei `view_backup.json` mit allen bisher empfangenen Aktionen und d
 
 ### Lokaler JSON-Download (Erfassungsgerät)
 
-**Wo:** Haupt-Erfassungsseite (`/`)  
-**Auslöser:** Schaltfläche „Download JSON"
+**Wo:** Erfassungsseite (`/v3`), Download-Symbol unten links  
+**Auslöser:** Schaltfläche mit Download-Symbol (⬇) neben dem Admin-Button
 
 Speichert den lokalen Zustand des Erfassungsgeräts (aktive Schwimmer, zwischengespeicherte Aktionen, Statusmeldungen) als `24hschwimmen.json`. Nützlich zur Fehlerdiagnose oder als Sicherungskopie, falls Aktionen noch nicht übertragen wurden.
 
@@ -313,33 +314,49 @@ Im view kann man:
 * mit ``Shift+S`` die Schwimmerliste manuell neu vom Server laden (nützlich wenn `swimmer_list_update_interval_s` auf `0` gesetzt ist oder ein neuer Schwimmer sofort erscheinen soll)
 * mit ``Shift+B`` ein Backup der Actions machen, welches man im Admin-Fenster wieder importieren könnte
 
-Auf der **Erfassungsseite** (`/v2`) gibt es außerdem den URL-Parameter `size`, der die Breite der Schwimmerkarten steuert (Standardwert: `5`, entspricht ca. 200 px pro Karte). Ein kleinerer Wert ist auf Smartphones hilfreich, damit zwei Karten nebeneinander in eine Zeile passen:
+Auf den **Erfassungsseiten** (`/v3` und `/v2`) gibt es den URL-Parameter `size`, der die Breite der Schwimmerkarten steuert (Standardwert: `5`, entspricht ca. 200 px pro Karte). Ein kleinerer Wert ist auf Smartphones hilfreich, damit zwei Karten nebeneinander in eine Zeile passen:
 
 ```
-http://<server>:8080/v2?size=3
+http://<server>:8080/v3?size=3
 ```
 
-Wenn man die URL mit ``?dbgfkt=true`` lädt, kann durch anklicken der Überschrift *24h-Schwimmen* eine automatisches Klicken der vorhandenen DIVs simuliert werden.
+Wenn man die URL mit ``?dbgfkt=true`` lädt, kann durch Anklicken der Überschrift *24h-Schwimmen* ein automatisches Klicken der vorhandenen DIVs simuliert werden.
 
-## grobe Planung
+## Bedienung der Erfassungsseite (v3)
 
-Ein Mini-Python-Webserver liefert eine HTML-Seite mit Javascript aus und registriert per send requests Bahnen der Schwimmer die auf einem Endgerät per klick erfasst werden. Ebenso liefert der Webserver Daten an die Webseite.
+Die Erfassungsseite unter `/v3` ist der aktuelle Standard und für den Einsatz auf Tablets und Smartphones optimiert. Die ältere Oberfläche `/v2` ist weiterhin erreichbar, wird aber nicht mehr weiterentwickelt.
 
-Die Gestaltung der Ansicht auf dem Endgerät ist in etwa wie folgt:
+### Bahnauswahl
 
-<img alt="ScreenshotOberfläche" src="./images/ScreenshotOberfl.png" width="400px"></img>
+In der Kopfzeile befinden sich runde Toggle-Buttons mit den Zahlen 1 bis `max_bahnen` (konfigurierbar, Standard: 4). Ein Tipp auf einen Button wählt die entsprechende Bahn aus (weißer Hintergrund = aktiv), ein erneuter Tipp hebt die Auswahl auf. Es können mehrere Bahnen gleichzeitig betreut werden. Nach dem Einloggen ist Bahn 1 standardmäßig ausgewählt.
 
-Dabei wird im oberen Bereich die Bahnnummer, für die das Gerät genutzt wird, angezeigt bzw. geändert. Der (+)-Button links ermöglicht es einen Schwimmer (der über seine Startnummer erfasst wird) hinzuzufügen.
-In einzelnen Feldern werden die aktiv auf der Bahn schwimmenden Schwimmer angezeigt. Grün zeigt an, dass dieser Schwimmer nicht auf der eingestellten Bahn schwimmt.
-Die Anzeige erfolgt möglichst so, dass die vermutlich als nächstes eintreffenden aktiven Schwimmer ganz oben zu Beginn in der Liste geführt werden. Das heißt, dass derjenige Schwimmer für den als letztes eine erfolgreich geschwommene Bahn registriert wurde ans Ende der Liste verschoben wird.
-Nicht aktive Schwimmer werden nicht angezeigt und können über das Plus-Symbol wieder in die Liste eingefügt werden.
+Ist kein Button aktiv, werden keine Schwimmerkarten angezeigt.
 
-Durch einen Klick/Touch auf die Nummer wird eine geleistete Bahn registriert. Die Anzahl der Bahnen wird um eins erhöht und nach 3 Sekunden wird dieser Schwimmer an das Ende der Liste sortiert.
-Innerhalb der drei Sekunden kann die Bahn noch zurückgenommen werden - während der Schwimmer ausgefadet wird. Der Schwimmer bleibt dann an der Stelle der Liste.
+### Fremdbahnen entfernen (Besen-Symbol 🧹)
 
-Durch einen Rechtsklick oder langen Touch auf den Schwimmer öffnet sich ein Kontextmenü in dem der Schwimmer z.B. geändert werden kann, bzw. von aktiv zu inaktiv gewechselt werden kann oder ähnliches.
+Sobald Schwimmer von anderen Bahnen in der Ansicht sichtbar sind (hellblauer Hintergrund), erscheint rechts neben den Bahnbuttons ein Besen-Symbol. Ein Tipp darauf entfernt alle Schwimmerkarten von Fremdbahnen sofort aus der lokalen Ansicht. Die Funktion ist auch über das Kontextmenü erreichbar (siehe unten).
 
-Auf touch-basierten Endgeräten können die Schwimmer auch geswiped werden (links setzt den Schwimmer auf inaktiv - entfernt ihn von der Bahn, rechts setzt ihn ans Ende der Liste)
+### Bahn zählen (5-Sekunden-Timer)
+
+Ein Tipp auf eine Schwimmerkarte startet einen 5-Sekunden-Timer. Die Karte färbt sich blau. Nach Ablauf wird die Bahn automatisch an den Server übertragen. Durch erneutes Antippen innerhalb dieser 5 Sekunden wird der Timer abgebrochen — die Karte wird wieder normal dargestellt, ohne dass eine Bahn gezählt wurde.
+
+### Schwimmer hinzufügen
+
+Der **+**-Button oben links öffnet einen Dialog zur Eingabe einer Schwimmernummer. Der Schwimmer erscheint danach in der Kachelansicht.
+
+### Kontextmenü
+
+Ein langer Druck (Touch) oder Rechtsklick auf eine Schwimmerkarte öffnet ein Kontextmenü:
+
+| Option | Funktion |
+| --- | --- |
+| Runde abziehen | Zieht eine bereits gezählte Bahn wieder ab |
+| Schwimmer\*innen entfernen | Setzt den Schwimmer auf inaktiv (verschwindet aus der Ansicht) |
+| Fremdbahnen entfernen | Entfernt alle Schwimmer von anderen Bahnen aus der lokalen Ansicht |
+
+### Backup-Download
+
+Unten links neben dem ⚙️-Admin-Button befindet sich ein Download-Symbol. Darüber kann jederzeit ein JSON-Backup aller seit dem Login empfangenen Aktionen heruntergeladen werden. Dieses Backup kann im Admin-Bereich unter **Aktionen → JSON-Import** wieder eingespielt werden (siehe auch [Notfall-Recovery](#notfall-recovery)).
 
 ## Datenmodell
 
@@ -420,14 +437,15 @@ Hier ist eine Übersicht über die Verzeichnisstruktur des Projektes:
 ├── data/                   Verzeichnis für LOG-Dateien
 ├── flask_templates/        Vorlagen für dynamisch generierte Webseiten
 │   ├── admin.html          Administrationsseite
-│   ├── index.html          Erfassungsseite v1
-│   ├── index_v2.html       Erfassungsseite v2
+│   ├── index_v2.html       Erfassungsseite v2 (Legacy)
+│   ├── index_v3.html       Erfassungsseite v3 (aktueller Standard)
 │   ├── login.html          Anmeldeseite
-│   ├── main.js             Javascript Erfassungsseite v1
 │   ├── main_v2.js          Javascript Erfassungsseite v2
+│   ├── main_v3.js          Javascript Erfassungsseite v3
 │   ├── qr.html             QR-Code-Anzeige
 │   ├── view.js             Javascript Ergebnisseite v1
 │   └── view2.js            Javascript Ergebnisseite v2
+├── php/                    PHP/MySQL-Backend (Alternative, siehe php/README.md)
 ├── static/                 Dateien, die statisch ausgeliefert werden sollen
 │   ├── admin.js            Javascript für die Administrationsseite
 │   ├── csvImport.js        CSV- und JSON-Import-Hilfsfunktionen

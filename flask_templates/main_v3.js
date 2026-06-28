@@ -1,6 +1,7 @@
 import { schwimmerNummerErfragen, showStatusMessage } from './mymodals.js'
 
 const schwimmerNrLength = parseInt("{{schwimmerNrLen}}");
+const maxBahnen = parseInt("{{maxBahnen}}");
 const TIMER_DAUER_MS = 5000; // ms bis automatisches Senden nach Klick
 const DEBUG = false;
 
@@ -16,11 +17,8 @@ window.addEventListener('beforeunload', function (event) {
     }
 });
 
-let verwaltete_bahnen = [7];
-const input = document.getElementById("bahnen");
-if (isBahnenInputValid(input.value)) {
-    verwaltete_bahnen = input.value.split(",").map(s => parseInt(s.trim(), 10));
-}
+let verwaltete_bahnen = [0];
+const aktiveBahnen = new Set();
 
 let schwimmer = [];
 let actions = [];
@@ -115,28 +113,67 @@ function downloadJSON() {
     URL.revokeObjectURL(url);
 }
 
-function isBahnenInputValid(value) {
-    return /^(\d+(,\d+)*)$/.test(value.trim());
-}
-
-function checkBahnenInput() {
-    const input = document.getElementById("bahnen");
-    input.style.backgroundColor = isBahnenInputValid(input.value) ? "" : "#fdd";
-}
-
-function parseBahnenInput() {
-    const input = document.getElementById("bahnen");
-    if (isBahnenInputValid(input.value)) {
-        input.blur();
-        verwaltete_bahnen = input.value.split(",").map(s => parseInt(s.trim(), 10));
-        showStatusMessage("Bahnen geändert", true, 1000);
-        fetchSchwimmerVonBahnen();
-        fillSchwimmerAusMeinenBahnen();
-    } else {
-        showStatusMessage("Ungültiges Format! Bitte nur Zahlen, getrennt durch Kommas.", false);
-        input.value = verwaltete_bahnen.join(',');
-        checkBahnenInput();
+function entferneFremdbahnen() {
+    let index = schwimmer.findIndex(s => !verwaltete_bahnen.includes(s.aufBahn));
+    while (index !== -1) {
+        const div = document.querySelector(`div[data-nummer="${schwimmer[index].nummer}"]`);
+        removeSchwimmerDiv(div, false, false);
+        index = schwimmer.findIndex(s => !verwaltete_bahnen.includes(s.aufBahn));
     }
+    render();
+    contextMenu.style.display = "none";
+}
+
+function initBahnButtons() {
+    const container = document.getElementById("bahnButtons");
+    for (let i = 1; i <= maxBahnen; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.dataset.bahn = i;
+        btn.addEventListener("click", () => toggleBahn(i));
+        container.appendChild(btn);
+    }
+
+    const broomBtn = document.createElement("button");
+    broomBtn.id = "nurEigeneBtn";
+    broomBtn.title = "Fremdbahnen entfernen";
+    broomBtn.innerHTML = '<i class="fa-solid fa-broom"></i>';
+    broomBtn.style.cssText = [
+        "display: none",
+        "width: 36px", "height: 36px", "border-radius: 50%",
+        "border: 2px solid rgba(255,200,80,0.7)",
+        "background: rgba(255,200,80,0.2)",
+        "color: rgba(255,200,80,1)",
+        "cursor: pointer", "font-size: 15px", "padding: 0", "line-height: 1",
+        "margin-left: 8px",
+        "transition: background 0.15s"
+    ].join(";");
+    broomBtn.addEventListener("click", entferneFremdbahnen);
+    container.appendChild(broomBtn);
+
+    // Bahn 1 als Standardauswahl
+    aktiveBahnen.add(1);
+    verwaltete_bahnen = [1];
+    updateBahnButtonStyles();
+}
+
+function updateBahnButtonStyles() {
+    document.querySelectorAll("#bahnButtons button").forEach(btn => {
+        btn.classList.toggle("bahn-aktiv", aktiveBahnen.has(parseInt(btn.dataset.bahn)));
+    });
+}
+
+function toggleBahn(bahn) {
+    if (aktiveBahnen.has(bahn)) {
+        aktiveBahnen.delete(bahn);
+    } else {
+        aktiveBahnen.add(bahn);
+    }
+    verwaltete_bahnen = aktiveBahnen.size > 0 ? [...aktiveBahnen].sort((a, b) => a - b) : [0];
+    updateBahnButtonStyles();
+    fetchSchwimmerVonBahnen();
+    fillSchwimmerAusMeinenBahnen();
+    render();
 }
 
 const contextMenu = document.getElementById("contextMenu");
@@ -372,6 +409,11 @@ function render() {
         container.insertBefore(div, container.firstChild);
     });
 
+    const broomBtn = document.getElementById("nurEigeneBtn");
+    if (broomBtn) {
+        broomBtn.style.display = schwimmer.some(s => !verwaltete_bahnen.includes(s.aufBahn)) ? "inline-block" : "none";
+    }
+
     container.querySelectorAll(".schwimmer").forEach(div => {
         const nummer = div.dataset.nummer;
         const first = firstRects.get(nummer);
@@ -564,23 +606,10 @@ document.getElementById("deleteSwimmer").addEventListener("click", function () {
     contextMenu.style.display = "none";
 });
 
-document.getElementById("nurEigene").addEventListener("click", function () {
-    let index = schwimmer.findIndex(s => !verwaltete_bahnen.includes(s.aufBahn));
-    while (index !== -1) {
-        const div = document.querySelector(`div[data-nummer="${schwimmer[index].nummer}"]`);
-        removeSchwimmerDiv(div, false, false);
-        index = schwimmer.findIndex(s => !verwaltete_bahnen.includes(s.aufBahn));
-    }
-    render();
-    contextMenu.style.display = "none";
-});
+document.getElementById("nurEigene").addEventListener("click", entferneFremdbahnen);
 
 document.getElementById("toggleInfoBar").addEventListener("click", toggleInfoBar);
-document.getElementById("bahnen").addEventListener("input", checkBahnenInput);
-document.getElementById("bahnen").addEventListener("blur", () => parseBahnenInput());
-document.getElementById("bahnen").addEventListener("keydown", (event) => {
-    if (event.key === 'Enter') { event.preventDefault(); parseBahnenInput(); }
-});
+initBahnButtons();
 
 setInterval(transmitActions, 30000);
 

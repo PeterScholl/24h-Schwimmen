@@ -22,10 +22,29 @@
       gap: 6px;
     }
 
+    #bahnButtons button {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.15);
+      color: white;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: bold;
+      padding: 0;
+      line-height: 1;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    #bahnButtons button.bahn-aktiv {
+      background: white;
+      color: #1a237e;
+      border-color: white;
+    }
+
     @media (max-width: 600px) {
       #header { padding: 10px; }
       #header h1 { font-size: 18px; letter-spacing: 0; }
-      #header .form-group { font-size: 0.55em; }
       #container {
         display: grid;
         grid-template-columns: repeat(<?= (int)$mobile_cards_col ?>, 1fr);
@@ -50,10 +69,7 @@
       </div>
       <div style="display: flex; flex-direction: column; font-size: 24px; color: white; text-align: center; align-items: center;">
         <h1 id="mainHeading">24h&nbsp;Schwimmen</h1>
-        <div class="form-group">
-          <label for="bahnen" style="font-size: 0.7em;">Bahn(en):</label>
-          <input type="text" value="<?= htmlspecialchars($clientID) ?>" id="bahnen" style="width: 10ch;" /><br />
-        </div>
+        <div id="bahnButtons" style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 4px;"></div>
       </div>
       <div style="display: flex; align-items: center; gap: 6px;">
         <button id="toggleInfoBar" style="padding-left: 0px; font-size: 30px; cursor: pointer; color: white; background: none; border: none">

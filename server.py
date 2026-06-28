@@ -363,7 +363,8 @@ def index_v3():
         'clientID': session.get('clientID',"--"),
         'debugfunktion': request.args.get('dbgfkt') == 'true',
         'card_font_size': request.args.get('size', '5'),
-        'mobile_cards_col': config.get('mobile_cards_col', 2)
+        'mobile_cards_col': config.get('mobile_cards_col', 2),
+        'max_bahnen': config.get('max_bahnen', 4)
     }
     return render_template("index_v3.html", **params)
 
@@ -379,6 +380,7 @@ def send_mainjs_v2():
 def send_mainjs_v3():
     params = {
         'schwimmerNrLen': config["laenge_schwimmerNr_digits"],
+        'maxBahnen': config.get('max_bahnen', 4),
     }
     return render_template("main_v3.js", **params), 200, {'Content-Type': 'application/javascript'}
 

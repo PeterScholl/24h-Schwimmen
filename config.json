@@ -8,6 +8,7 @@
     "view2_page_interval_s": 10,
     "startzeit": "2026-06-20T10:00:00Z",
     "swimmer_list_update_interval_s": 600,
+    "max_bahnen": 4,
 
     "db_host": "localhost",
     "db_name": "24h_schwimmen",
