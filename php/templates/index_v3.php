@@ -56,9 +56,6 @@
         </div>
       </div>
       <div style="display: flex; align-items: center; gap: 6px;">
-        <button id="downloadJsonBtn" style="font-size: 30px; cursor: pointer; color: white; background: none; border: none">
-          <i class="fa-solid fa-download"></i>
-        </button>
         <button id="toggleInfoBar" style="padding-left: 0px; font-size: 30px; cursor: pointer; color: white; background: none; border: none">
           <i class="fa-solid fa-circle-info"></i>
         </button>
@@ -77,11 +74,18 @@
     </div>
   </main>
   <footer style="display: flex; justify-content: space-between; align-items: center; padding: 10px">
-    <?php if ($user_role === 'admin'): ?>
-    <form action="/admin" method="post">
-      <button type="submit" title="Adminbereich" style="font-size: 30px; color: inherit; background: none; border: none; cursor: pointer">⚙️</button>
-    </form>
-    <?php endif; ?>
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <?php if ($user_role === 'admin'): ?>
+      <form action="/admin" method="post">
+        <button type="submit" title="Adminbereich" style="font-size: 30px; color: inherit; background: none; border: none; cursor: pointer">⚙️</button>
+      </form>
+      <?php endif; ?>
+      <button id="downloadJsonBtn"
+        title="Aktionen-Backup herunterladen – enthält alle seit dem Login empfangenen Bahnen. Kann im Admin-Bereich unter Aktionen → JSON-Import wieder eingespielt werden."
+        style="font-size: 30px; cursor: pointer; color: inherit; background: none; border: none">
+        <i class="fa-solid fa-download"></i>
+      </button>
+    </div>
     <div style="position: absolute; left: 50%; transform: translateX(-50%)">&copy; 2025 Schwimmen 24h. Alle Rechte vorbehalten.</div>
     <form action="/logout" method="post" style="margin-left: auto">
       <button type="submit" title="Logout" style="font-size: 30px; color: inherit; background: none; border: none; cursor: pointer">
