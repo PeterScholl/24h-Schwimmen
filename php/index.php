@@ -493,6 +493,7 @@ function handle_main_v3_js(): void {
     $js = file_get_contents(__DIR__ . '/../flask_templates/main_v3.js');
     $js = str_replace('{{schwimmerNrLen}}', $config['laenge_schwimmerNr_digits'], $js);
     $js = str_replace('{{maxBahnen}}',      $config['max_bahnen'] ?? 4,            $js);
+    $js = str_replace('{{fadeTime}}',       $config['fade_time_s'] ?? 0,           $js);
     echo $js;
 }
 

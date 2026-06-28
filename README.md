@@ -111,6 +111,12 @@ Ist kein Button aktiv, werden keine Schwimmerkarten angezeigt.
 
 Sobald Schwimmer von anderen Bahnen in der Ansicht sichtbar sind (hellblauer Hintergrund), erscheint rechts neben den Bahnbuttons ein Besen-Symbol. Ein Tipp darauf entfernt alle Schwimmerkarten von Fremdbahnen sofort aus der lokalen Ansicht.
 
+### Automatisches Aufräumen inaktiver Schwimmer (`fade_time_s`)
+
+Ist `fade_time_s` in der `config.json` auf einen Wert größer 0 gesetzt, werden Schwimmerkarten nach dieser Anzahl Sekunden ohne Interaktion automatisch ausgegraut und auf Bahn 0 verschoben. Das Besen-Symbol erscheint daraufhin automatisch. Ein Tipp auf den Besen entfernt alle ausgegrautem Karten aus der Ansicht.
+
+Ein Klick auf eine ausgegrautem Karte (Timer-Start) reaktiviert sie: der Inaktivitätszähler wird zurückgesetzt und die Karte erscheint beim nächsten Zählen wieder normal.
+
 ### Bahn zählen (5-Sekunden-Timer)
 
 Ein Tipp auf eine Schwimmerkarte startet einen 5-Sekunden-Timer. Die Karte färbt sich blau. Nach Ablauf wird die Bahn automatisch an den Server übertragen. Durch erneutes Antippen innerhalb dieser 5 Sekunden wird der Timer abgebrochen — die Karte wird wieder normal dargestellt, ohne dass eine Bahn gezählt wurde.
@@ -147,7 +153,7 @@ Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einst
 | `default_admin_pass` | `"swim24"` | Initiales Passwort für den Admin-Benutzer |
 | `laenge_schwimmerNr_digits` | `3` | Anzahl Stellen der Schwimmernummer (z. B. 3 → 001–999) |
 | `laenge_bahn_m` | `100` | Länge einer Bahn in Metern (für Streckenberechnung) |
-| `fade_time_s` | `600` | **Nur v2-Oberfläche** (`/v2`): Sekunden seit dem letzten Klick, nach denen eine Schwimmerkarte blass dargestellt wird. Beim nächsten Betätigen von „Senden" wird der Schwimmer automatisch von der Bahn entfernt. `0` oder `-1` deaktiviert das Feature. |
+| `fade_time_s` | `600` | Sekunden ohne Interaktion, nach denen eine Schwimmerkarte ausgegraut und auf Bahn 0 verschoben wird (v3) bzw. blass dargestellt und beim nächsten Senden entfernt wird (v2). `0` deaktiviert das Feature. |
 | `mobile_cards_col` | `2` | **Nur v2-Oberfläche**: Anzahl Schwimmerkarten pro Zeile auf kleinen Bildschirmen (≤ 600 px Breite). |
 | `view2_page_interval_s` | `10` | **View2-Seite** (`/view2`): Sekunden pro Seite bei aktiviertem Auto-Weiterblättern (Shift-Lock-Modus). |
 | `startzeit` | `"2025-06-14T08:00:00Z"` | **View- und View2-Seite**: Startzeitpunkt des Schwimmens als UTC-ISO-Timestamp. Legt den Beginn der Spezialzeiten (Tag1, Geisterstunde, Gute Nacht, Frühaufsteher, Tag2) fest. |

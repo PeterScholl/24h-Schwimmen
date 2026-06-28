@@ -3,7 +3,7 @@
     "default_admin_pass": "swim24",
     "laenge_schwimmerNr_digits": 3,
     "laenge_bahn_m": 100,
-    "fade_time_s": 600,
+    "fade_time_s": 300,
     "mobile_cards_col": 2,
     "view2_page_interval_s": 10,
     "startzeit": "2026-06-20T10:00:00Z",

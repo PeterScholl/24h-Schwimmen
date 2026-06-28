@@ -3,6 +3,7 @@ import { schwimmerNummerErfragen, showStatusMessage } from './mymodals.js'
 const schwimmerNrLength = parseInt("{{schwimmerNrLen}}");
 const maxBahnen = parseInt("{{maxBahnen}}");
 const TIMER_DAUER_MS = 5000; // ms bis automatisches Senden nach Klick
+const fadeTime = parseInt("{{fadeTime}}") || 0; // Sekunden bis Schwimmer auf Bahn 0 gesetzt wird (0 = deaktiviert)
 const DEBUG = false;
 
 function logMessage(text, isSuccess = true) {
@@ -57,6 +58,7 @@ function schwimmerHinzufuegen(nummer) {
                 aktiv: true,
                 aufBahn: (!bekannter.auf_bahn || !(bekannter.auf_bahn in verwaltete_bahnen))
                     ? verwaltete_bahnen[0] : bekannter.auf_bahn,
+                prio: 0,
             });
             actions.push({
                 kommando: "ACT",
@@ -72,6 +74,7 @@ function schwimmerHinzufuegen(nummer) {
                 bahnen: 0,
                 aufBahn: verwaltete_bahnen[0],
                 aktiv: 1,
+                prio: 0,
             });
         }
     }
@@ -90,6 +93,7 @@ function fillSchwimmerAusMeinenBahnen() {
                     bahnen: s_neu.bahnanzahl,
                     aktiv: true,
                     aufBahn: s_neu.auf_bahn,
+                    prio: 0,
                 });
             }
         });
@@ -211,7 +215,9 @@ container.addEventListener('click', (event) => {
         clearTimeout(pendingTimers.get(nummer).timerId);
         pendingTimers.delete(nummer);
     } else {
-        // Timer starten
+        // Timer starten, Inaktivitätszähler zurücksetzen
+        const s_data = schwimmer.find(s => s.nummer === nummer);
+        if (s_data) s_data.prio = 0;
         const clickTimestamp = new Date().toISOString();
         const timerId = setTimeout(() => autoSenden(nummer, clickTimestamp), TIMER_DAUER_MS);
         pendingTimers.set(nummer, { timerId, clickTimestamp });
@@ -408,6 +414,7 @@ function render() {
                 <div class="info">
                     <span class="name">${s.vorname}</span>
                     <span class="bahnen">(${s.bahnen})</span>
+                    ${DEBUG ? `<span style="font-size:0.7em;color:#555">Prio: ${Math.round(s.prio ?? 0)}</span>` : ""}
                 </div>
             `;
 
@@ -420,6 +427,9 @@ function render() {
                     div.classList.add('selected');
                     div.style.removeProperty("background-color");
                 }
+            } else if (fadeTime > 0 && (s.prio ?? 0) >= fadeTime) {
+                div.classList.remove('selected');
+                div.style.backgroundColor = "#c8c8c8";
             } else if (!verwaltete_bahnen.includes(s.aufBahn)) {
                 div.classList.remove('selected');
                 div.style.backgroundColor = "#b8d4ea";
@@ -652,6 +662,22 @@ document.getElementById("toggleInfoBar").addEventListener("click", toggleInfoBar
 initBahnButtons();
 
 setInterval(transmitActions, 30000);
+
+if (fadeTime > 0) {
+    const FADE_STEP_S = 10;
+    setInterval(() => {
+        let changed = false;
+        schwimmer.forEach(s => {
+            if (pendingTimers.has(s.nummer)) return; // aktiv in Nutzung
+            s.prio = (s.prio ?? 0) + FADE_STEP_S;
+            if (s.prio >= fadeTime && verwaltete_bahnen.includes(s.aufBahn)) {
+                s.aufBahn = 0; // Besen-Symbol erscheint
+                changed = true;
+            }
+        });
+        if (changed || DEBUG) render();
+    }, FADE_STEP_S * 1000);
+}
 
 fetchSchwimmer().then(() => {
     fillSchwimmerAusMeinenBahnen();
