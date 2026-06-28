@@ -586,6 +586,7 @@ function deleteSwimmer(nummer) {
 // --- Paginierter State für die Actions-Tabelle ---
 let actionsPage  = 1;
 let actionsLimit = 50; // Einträge pro Seite
+let actionsTotal = 0;  // wird nach erstem Laden gesetzt
 
 function showActionsTable() {
     actionsPage = 1; // beim Öffnen immer auf Seite 1 (= neueste Einträge)
@@ -625,6 +626,8 @@ function renderActionsTable({ data, total, page, limit }) {
     const section = document.getElementById('actions');
     section.innerHTML = '';
 
+    actionsTotal = total;
+
     // Überschrift mit Gesamtanzahl
     const heading = document.createElement('h2');
     const totalPages = Math.ceil(total / limit);
@@ -635,25 +638,35 @@ function renderActionsTable({ data, total, page, limit }) {
     const controls = document.createElement('div');
     controls.style.margin = '8px 0';
 
-    const selectLabel = document.createElement('span');
-    selectLabel.textContent = 'Einträge pro Seite: ';
-    controls.appendChild(selectLabel);
+    const alleGeladen = limit >= total;
 
-    const select = document.createElement('select');
-    select.style.marginRight = '16px';
-    [25, 50, 100, 250].forEach(n => {
-        const opt = document.createElement('option');
-        opt.value = n;
-        opt.textContent = n;
-        if (n === actionsLimit) opt.selected = true;
-        select.appendChild(opt);
-    });
-    select.onchange = e => {
-        actionsLimit = parseInt(e.target.value);
-        actionsPage  = 1;
-        fetchActionsPage();
-    };
-    controls.appendChild(select);
+    if (alleGeladen) {
+        const btnPaginierung = document.createElement('button');
+        btnPaginierung.textContent = '← Seitenansicht';
+        btnPaginierung.style.cssText = 'margin-right:16px;';
+        btnPaginierung.onclick = () => { actionsLimit = 50; actionsPage = 1; fetchActionsPage(); };
+        controls.appendChild(btnPaginierung);
+    } else {
+        const selectLabel = document.createElement('span');
+        selectLabel.textContent = 'Einträge pro Seite: ';
+        controls.appendChild(selectLabel);
+
+        const select = document.createElement('select');
+        select.style.marginRight = '16px';
+        [25, 50, 100, 250].forEach(n => {
+            const opt = document.createElement('option');
+            opt.value = n;
+            opt.textContent = n;
+            if (n === actionsLimit) opt.selected = true;
+            select.appendChild(opt);
+        });
+        select.onchange = e => {
+            actionsLimit = parseInt(e.target.value);
+            actionsPage  = 1;
+            fetchActionsPage();
+        };
+        controls.appendChild(select);
+    }
 
     const btnPrev = document.createElement('button');
     btnPrev.textContent = '← Neuer';
@@ -705,7 +718,32 @@ function renderActionsTable({ data, total, page, limit }) {
     };
     controls.appendChild(btnJump);
 
+    const btnAll = document.createElement('button');
+    btnAll.textContent = 'Alle laden';
+    btnAll.style.cssText = 'margin-left:24px;background:#8b2020;color:white;border:none;padding:3px 10px;cursor:pointer;border-radius:3px;';
+    btnAll.onclick = () => {
+        if (confirm(`Alle ${actionsTotal} Einträge laden?\n\nDas kann je nach Datenmenge einige Sekunden dauern und den Browser kurzzeitig verlangsamen. Der Filter arbeitet dann über alle Einträge.`)) {
+            actionsLimit = actionsTotal;
+            actionsPage  = 1;
+            fetchActionsPage();
+        }
+    };
+    controls.appendChild(btnAll);
+
     section.appendChild(controls);
+
+    // Suchfilter
+    const filterWrap = document.createElement('div');
+    filterWrap.style.margin = '6px 0';
+    const filterLabel = document.createElement('label');
+    filterLabel.textContent = 'Suche: ';
+    const filterInput = document.createElement('input');
+    filterInput.type = 'text';
+    filterInput.placeholder = 'z.B. Bahnanzahl reset';
+    filterInput.style.cssText = 'padding:4px;width:220px;margin-left:4px;';
+    filterLabel.appendChild(filterInput);
+    filterWrap.appendChild(filterLabel);
+    section.appendChild(filterWrap);
 
     // Tabelle
     const table = document.createElement('table');
@@ -713,12 +751,17 @@ function renderActionsTable({ data, total, page, limit }) {
     if (data.length === 0) {
         table.innerHTML = '<tr><th>Keine Einträge</th></tr>';
     } else {
+        const hasReset = data.some(e => e.parameter && e.parameter.includes('Bahnanzahl reset'));
         const headerRow = document.createElement('tr');
         Object.keys(data[0]).forEach(key => {
             const th = document.createElement('th');
             th.textContent = key.charAt(0).toUpperCase() + key.slice(1);
             headerRow.appendChild(th);
         });
+        if (hasReset) {
+            const th = document.createElement('th');
+            headerRow.appendChild(th);
+        }
         table.appendChild(headerRow);
         data.forEach(entry => {
             const row = document.createElement('tr');
@@ -728,13 +771,44 @@ function renderActionsTable({ data, total, page, limit }) {
                 td.textContent = key === 'zeitstempel' ? formatZeitstempel(value) : (value ?? '');
                 row.appendChild(td);
             });
+            if (hasReset) {
+                const tdAktion = document.createElement('td');
+                if (entry.parameter && entry.parameter.includes('Bahnanzahl reset')) {
+                    const btn = document.createElement('button');
+                    btn.textContent = 'Korrektureintrag';
+                    btn.style.cssText = 'font-size:0.8em;padding:2px 6px;cursor:pointer;white-space:nowrap;';
+                    btn.addEventListener('click', () => {
+                        try {
+                            const params = JSON.parse(entry.parameter);
+                            showChecksSection({
+                                nummer:      params[0],
+                                anzahl:      -params[1],
+                                bahnnr:      params[2] ?? 0,
+                                kommentar:   'Rücknahme Bahnreset',
+                                zeitstempel: entry.zeitstempel
+                            });
+                        } catch {
+                            showChecksSection({ kommentar: 'Rücknahme Bahnreset', zeitstempel: entry.zeitstempel });
+                        }
+                    });
+                    tdAktion.appendChild(btn);
+                }
+                row.appendChild(tdAktion);
+            }
             table.appendChild(row);
         });
     }
     section.appendChild(table);
+
+    filterInput.addEventListener('input', () => {
+        const term = filterInput.value.toLowerCase();
+        table.querySelectorAll('tr:not(:first-child)').forEach(row => {
+            row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+        });
+    });
 }
 
-function showChecksSection() {
+function showChecksSection(prefill = {}) {
     showSection('checks');
     const checkSection = document.getElementById('checks');
     checkSection.innerHTML = ''; // erst leeren 
@@ -847,20 +921,37 @@ function showChecksSection() {
         return { wrap, inp };
     }
 
-    const { wrap: wNr,   inp: inpNr   } = labeledInput('Schwimmernr.', 'number', '1', '1');
-    const { wrap: wAnz,  inp: inpAnz  } = labeledInput('Anzahl',       'number', '1');
-    const { wrap: wBahn, inp: inpBahn } = labeledInput('Bahnnr.',       'number', '1', '0');
-    const { wrap: wText, inp: inpText } = labeledInput('Kommentar',     'text',   'correction');
+    const { wrap: wNr,   inp: inpNr   } = labeledInput('Schwimmernr.', 'number', prefill.nummer    ?? '1',          '1');
+    const { wrap: wAnz,  inp: inpAnz  } = labeledInput('Anzahl',       'number', prefill.anzahl    ?? '1');
+    const { wrap: wBahn, inp: inpBahn } = labeledInput('Bahnnr.',       'number', prefill.bahnnr   ?? '1',          '0');
+    const { wrap: wText, inp: inpText } = labeledInput('Kommentar',     'text',   prefill.kommentar ?? 'correction');
+    const { wrap: wTs,   inp: inpTs   } = labeledInput('Zeitstempel',   'text',   prefill.zeitstempel ?? '');
     inpText.style.cssText = 'width:12em;padding:4px;margin-top:2px;';
+    inpTs.style.cssText   = 'width:18em;padding:4px;margin-top:2px;';
+
+    // Checkbox "Zeitstempel manuell setzen"
+    const cbWrap = document.createElement('label');
+    cbWrap.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:0.9rem;align-self:flex-end;';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = !!prefill.zeitstempel;
+    wTs.style.display = cb.checked ? '' : 'none';
+    cb.addEventListener('change', () => {
+        wTs.style.display = cb.checked ? '' : 'none';
+        if (cb.checked && !inpTs.value) inpTs.value = new Date().toISOString();
+    });
+    cbWrap.appendChild(cb);
+    cbWrap.appendChild(document.createTextNode('Zeitstempel manuell'));
 
     const sendBtn = document.createElement('button');
     sendBtn.textContent = 'ADD senden';
-    sendBtn.style.cssText = 'padding:6px 14px;cursor:pointer;';
+    sendBtn.style.cssText = 'padding:6px 14px;cursor:pointer;align-self:flex-end;';
     sendBtn.addEventListener('click', async () => {
         const nummer = parseInt(inpNr.value);
         const anzahl = parseInt(inpAnz.value);
         const bahnnr = parseInt(inpBahn.value);
         const kommentar = inpText.value.trim() || 'correction';
+        const timestamp = (cb.checked && inpTs.value.trim()) ? inpTs.value.trim() : new Date().toISOString();
         if (isNaN(nummer) || nummer < 1 || isNaN(anzahl) || isNaN(bahnnr)) {
             showStatusMessage('Ungültige Eingabe', false);
             return;
@@ -872,7 +963,7 @@ function showChecksSection() {
                 body: JSON.stringify([{
                     kommando: 'ADD',
                     parameter: [nummer, anzahl, bahnnr, kommentar],
-                    timestamp: new Date().toISOString()
+                    timestamp
                 }])
             });
             const result = await response.json();
@@ -881,6 +972,8 @@ function showChecksSection() {
         } catch (err) {
             showStatusMessage(`Netzwerkfehler: ${err}`, false);
         }
+        inpNr.focus();
+        inpNr.select();
     });
 
     corrForm.appendChild(wNr);
@@ -889,6 +982,36 @@ function showChecksSection() {
     corrForm.appendChild(wText);
     corrForm.appendChild(sendBtn);
     checkSection.appendChild(corrForm);
+
+    const infoBtn = document.createElement('button');
+    infoBtn.type = 'button';
+    infoBtn.innerHTML = '<i class="fa-solid fa-circle-info"></i>';
+    infoBtn.title = 'Info zu UTC/GMT';
+    infoBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:1rem;color:#555;padding:0;';
+
+    const infoText = document.createElement('span');
+    infoText.style.cssText = 'display:none;font-size:0.8rem;color:#444;background:#f5f5f5;border:1px solid #ccc;border-radius:4px;padding:6px 10px;max-width:340px;line-height:1.5;';
+    infoText.innerHTML = `
+        <strong>UTC</strong> (Coordinated Universal Time)<br>
+        Zeitstempel werden intern immer in UTC gespeichert und enden auf <code>Z</code>.<br>
+        <strong>Deutschland:</strong> UTC+1 im Winter (MEZ/CET) &nbsp;|&nbsp; UTC+2 im Sommer (MESZ/CEST)<br>
+        <em>Beispiel:</em> 14:00 Uhr Ortszeit im Sommer → <code>12:00:00Z</code>
+    `;
+    infoBtn.addEventListener('click', () => {
+        infoText.style.display = infoText.style.display === 'none' ? 'inline-block' : 'none';
+    });
+
+    const tsRow = document.createElement('div');
+    tsRow.style.cssText = 'display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:12px;';
+    tsRow.appendChild(cbWrap);
+    tsRow.appendChild(wTs);
+    tsRow.appendChild(infoBtn);
+    tsRow.appendChild(infoText);
+    checkSection.appendChild(tsRow);
+
+    if (prefill.zeitstempel) {
+        corrForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 
     checkSection.appendChild(document.createElement('hr'));
     heading = document.createElement('h2');

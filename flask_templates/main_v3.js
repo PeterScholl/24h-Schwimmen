@@ -181,7 +181,7 @@ let clickedDiv = null;
 const container = document.getElementById('container');
 
 // Nach TIMER_DAUER_MS automatisch senden
-function autoSenden(nummer, clickTimestamp) {
+function autoSenden(nummer, clickTimestamp, betrag = 1, kommentar = null) {
     pendingTimers.delete(nummer);
     const s_data = schwimmer.find(s => s.nummer == nummer);
     if (s_data) {
@@ -189,13 +189,10 @@ function autoSenden(nummer, clickTimestamp) {
             s_data.aufBahn = verwaltete_bahnen[0];
         }
         s_data.bahnen = Math.max(s_data.bahnen, alleSchwimmer[nummer] ? alleSchwimmer[nummer].bahnanzahl : 0);
-        s_data.bahnen += 1;
-        actions.push({
-            kommando: "ADD",
-            parameter: [nummer, 1, s_data.aufBahn],
-            timestamp: clickTimestamp,
-            transmitted: false
-        });
+        s_data.bahnen = Math.max(0, s_data.bahnen + betrag);
+        const parameter = [nummer, betrag, s_data.aufBahn];
+        if (kommentar) parameter.push(kommentar);
+        actions.push({ kommando: "ADD", parameter, timestamp: clickTimestamp, transmitted: false });
         updateFormIsDirty(true);
         transmitActions();
     }
@@ -240,8 +237,9 @@ document.addEventListener("contextmenu", function (e) {
 
 function showSchwimmerContextMenu(x, y) {
     const s_data = schwimmer.find(s => s.nummer == parseInt(clickedDiv.dataset.nummer));
-    document.getElementById("rundeAbziehenOption").style.display =
-        (!s_data || s_data.bahnen <= 0) ? "none" : "block";
+    const hatBahnen = s_data && s_data.bahnen > 0;
+    document.getElementById("rundeAbziehenOption").style.display = hatBahnen ? "block" : "none";
+    document.getElementById("bahnanzahlReset").style.display = hatBahnen ? "block" : "none";
     contextMenu.style.display = "block";
     contextMenu.style.top = "0px";
     contextMenu.style.left = "0px";
@@ -393,8 +391,14 @@ function render() {
             `;
 
             if (pendingTimers.has(s.nummer)) {
-                div.classList.add('selected');
-                div.style.removeProperty("background-color");
+                const pending = pendingTimers.get(s.nummer);
+                if (pending.type === 'reset') {
+                    div.classList.remove('selected');
+                    div.style.backgroundColor = "#e53935";
+                } else {
+                    div.classList.add('selected');
+                    div.style.removeProperty("background-color");
+                }
             } else if (!verwaltete_bahnen.includes(s.aufBahn)) {
                 div.classList.remove('selected');
                 div.style.backgroundColor = "#b8d4ea";
@@ -602,6 +606,24 @@ document.getElementById("deleteSwimmer").addEventListener("click", function () {
     }
     clickedDiv = null;
     contextMenu.style.display = "none";
+});
+
+document.getElementById("bahnanzahlReset").addEventListener("click", function () {
+    if (!clickedDiv) return;
+    const nummer = parseInt(clickedDiv.dataset.nummer);
+    const s_data = schwimmer.find(s => s.nummer == nummer);
+    contextMenu.style.display = "none";
+    clickedDiv = null;
+    if (!s_data || s_data.bahnen <= 0) return;
+
+    const betrag = -s_data.bahnen;
+    const clickTimestamp = new Date().toISOString();
+    if (pendingTimers.has(nummer)) {
+        clearTimeout(pendingTimers.get(nummer).timerId);
+    }
+    const timerId = setTimeout(() => autoSenden(nummer, clickTimestamp, betrag, "Bahnanzahl reset"), TIMER_DAUER_MS);
+    pendingTimers.set(nummer, { timerId, clickTimestamp, type: 'reset' });
+    render();
 });
 
 

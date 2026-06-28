@@ -309,14 +309,27 @@ Meldet ein Schwimmer, dass eine Bahn fälschlicherweise nicht oder zu oft gezäh
 | Anzahl | Zu addierende Bahnen — positiv zum Hinzufügen, negativ zum Abziehen |
 | Bahnnr. | Bahn, der die Korrektur zugeordnet wird |
 | Kommentar | Freitext zur Nachvollziehbarkeit (Vorbesetzung: `correction`) |
+| Zeitstempel | Nur sichtbar wenn „Zeitstempel manuell" angehakt — ISO-UTC-Zeitstempel der Aktion. Standardmäßig wird der aktuelle Zeitpunkt verwendet. |
 
-1. Klick auf **ADD senden** überträgt den Befehl sofort an den Server.
+1. Klick auf **ADD senden** überträgt den Befehl sofort an den Server. Das Schwimmernr.-Feld erhält danach automatisch den Fokus, um direkt den nächsten Schwimmer eingeben zu können.
 
 ### Hinweise zur Korrektur
 
 * Der Kommentar wird als vierter Eintrag im Parameter-Array der Action gespeichert und ist damit im **SchwimmerLog** sowie in der Actions-Tabelle nachvollziehbar.
 * Korrekturbuchungen erscheinen wie reguläre ADD-Aktionen in der Auswertung und im CSV-Export.
 * Eine versehentlich zu viel gezählte Bahn wird durch `Anzahl = -1` korrigiert, eine fehlende Bahn durch `Anzahl = +1`.
+
+### Bahnanzahl zurücksetzen und Rücknahme
+
+Auf der Erfassungsseite (`/v3`) gibt es im Kontextmenü (langer Druck / Rechtsklick auf eine Schwimmerkarte) den Eintrag **Bahnanzahl zurücksetzen**. Dieser ist nur sichtbar, wenn der Schwimmer mindestens eine Bahn hat. Nach dem Antippen läuft ein 5-Sekunden-Timer — die Kachel färbt sich rot. Innerhalb dieser Zeit kann die Aktion durch erneutes Antippen der Kachel abgebrochen werden. Nach Ablauf wird ein `ADD`-Befehl mit der negativen aktuellen Bahnanzahl und dem Kommentar `Bahnanzahl reset` an den Server geschickt.
+
+**Rücknahme eines versehentlichen Resets:**
+
+1. Admin-Bereich → **Aktionen** öffnen.
+2. Im Suchfeld `Bahnanzahl reset` eingeben — oder **Alle laden** klicken, um seitenübergreifend zu suchen.
+3. Den betreffenden Eintrag identifizieren und auf **Korrektureintrag** klicken.
+4. Das Formular unter **Checks → Korrektur-ADD** öffnet sich vorausgefüllt: Schwimmernr., positive Umkehrmenge, Kommentar `Rücknahme Bahnreset` und der originale Zeitstempel (Checkbox „Zeitstempel manuell" ist bereits gesetzt).
+5. Klick auf **ADD senden** stellt die ursprüngliche Bahnanzahl wieder her.
 
 ## Logging
 

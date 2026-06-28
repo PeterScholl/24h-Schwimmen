@@ -108,7 +108,7 @@
   </div>
 
   <footer style="display: flex; justify-content: space-between; align-items: center; padding: 10px">
-    <form action="/v2" method="get">
+    <form action="/v3" method="get">
       <button type="submit" title="Nutzerbereich" style="font-size: 30px; color: inherit; background: none; border: none; cursor: pointer">⬅️</button>
     </form>
     <div style="position: absolute; left: 50%; transform: translateX(-50%)">&copy; 2025 Schwimmen 24h. Alle Rechte vorbehalten.</div>
