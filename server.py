@@ -394,6 +394,13 @@ def send_mainjs_v2():
     }
     return render_template("main_v2.js", **params), 200, {'Content-Type': 'application/javascript'}
 
+@app.route("/main_v3.js")
+def send_mainjs_v3():
+    params = {
+        'schwimmerNrLen': config["laenge_schwimmerNr_digits"],
+    }
+    return render_template("main_v3.js", **params), 200, {'Content-Type': 'application/javascript'}
+
 @app.route("/view.js")
 def send_viewjs():
     params = {

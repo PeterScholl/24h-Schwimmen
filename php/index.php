@@ -53,6 +53,7 @@ switch ($path) {
     case '/v3':        handle_v3();        break;
     case '/main.js':       handle_main_js();    break;
     case '/main_v2.js':    handle_main_v2_js(); break;
+    case '/main_v3.js':    handle_main_v3_js(); break;
     case '/view.js':       handle_view_js();    break;
     case '/view2.js':      handle_view2_js();   break;
     case '/view':          handle_view();        break;
@@ -476,6 +477,14 @@ function handle_main_v2_js(): void {
     $js = file_get_contents(__DIR__ . '/../flask_templates/main_v2.js');
     $js = str_replace('{{schwimmerNrLen}}', $config['laenge_schwimmerNr_digits'], $js);
     $js = str_replace('{{fadeTime}}',       $config['fade_time_s'] ?? 0,          $js);
+    echo $js;
+}
+
+function handle_main_v3_js(): void {
+    global $config;
+    header('Content-Type: application/javascript; charset=utf-8');
+    $js = file_get_contents(__DIR__ . '/../flask_templates/main_v3.js');
+    $js = str_replace('{{schwimmerNrLen}}', $config['laenge_schwimmerNr_digits'], $js);
     echo $js;
 }
 

@@ -63,11 +63,7 @@
       <!-- Linke Schaltflächen -->
       <div style="display: flex; align-items: center; gap: 6px;">
         <button id="schwimmerHinzufuegen"
-          style="font-size: 30px; cursor: pointer; color: white; background: none; border: none">+</button>
-        <button id="sortModusBtn" title="Sortierung umschalten"
-          style="font-size: 14px; cursor: pointer; background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); border-radius: 6px; padding: 6px 10px;">
-          Zeit
-        </button>
+          style="font-size: 30px; cursor: pointer; color: white; background: none; border: none; padding: 10px 18px;">+</button>
       </div>
 
       <!-- Zentrierter Titel -->
@@ -81,11 +77,6 @@
 
       <!-- Rechte Schaltflächen -->
       <div style="display: flex; align-items: center; gap: 6px;">
-        <button id="sendenBtn" title="Ausgewählte Bahnen senden"
-          style="font-size: 16px; cursor: pointer; background: #2e7d32; color: white; border: none; border-radius: 6px; padding: 6px 12px; opacity: 0.45;">
-          Senden&nbsp;<span id="sendenCount"
-            style="background: white; color: #2e7d32; border-radius: 50%; display: inline-block; min-width: 1.4em; font-weight: bold; line-height: 1.4em;">0</span>
-        </button>
         <button id="downloadJsonBtn"
           style="font-size: 30px; cursor: pointer; color: white; background: none; border: none">
           <i class="fa-solid fa-download"></i>
@@ -132,7 +123,7 @@
       </button>
     </form>
   </footer>
-  <script type="module" src="./main_v2.js"></script>
+  <script type="module" src="./main_v3.js"></script>
 
   {% if debugfunktion %}
   <script>
@@ -175,11 +166,6 @@
       if (schwimmerDivs.length > 0 && Math.random() < DEBUG_CONFIG.klickWahrscheinlichkeit) {
         const randomDiv = schwimmerDivs[Math.floor(Math.random() * schwimmerDivs.length)];
         randomDiv.click();
-      }
-
-      // Senden-Button auslösen
-      if (debugTick % DEBUG_CONFIG.sendenIntervallTicks === 0) {
-        document.getElementById('sendenBtn').click();
       }
 
       // Neuen Zufalls-Schwimmer hinzufügen
