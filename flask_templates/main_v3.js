@@ -253,9 +253,11 @@ function showSchwimmerContextMenu(x, y) {
 
 function addSwipeHandler(div) {
     let startX = 0;
+    let startY = 0;
     let swipedleft = false;
-    let swipedright = false;
+    let direction = null; // 'horizontal' | 'vertical' | null
     const threshold = 70;
+    const dirThreshold = 10; // Pixel bis zur Richtungsentscheidung
 
     function resetDiv() {
         div.style.transition = 'transform 0.2s ease, background-color 0.2s ease';
@@ -269,29 +271,52 @@ function addSwipeHandler(div) {
             showSchwimmerContextMenu(e.touches[0].clientX, e.touches[0].clientY);
         }, 600);
         swipedleft = false;
-        swipedright = false;
+        direction = null;
         div.dataset.swiping = "true";
         startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
         div.style.zIndex = '1000';
         div.style.transition = 'none';
     }, { passive: false });
 
     div.addEventListener('touchmove', e => {
         clearTimeout(longPressTimer);
-        e.preventDefault();
         if (div.dataset.swiping != "true") return;
+
         const deltaX = e.touches[0].clientX - startX;
-        const clamped = Math.max(-220, Math.min(220, deltaX));
+        const deltaY = e.touches[0].clientY - startY;
+
+        // Richtung einmalig festlegen sobald genug Bewegung vorhanden
+        if (direction === null && (Math.abs(deltaX) > dirThreshold || Math.abs(deltaY) > dirThreshold)) {
+            direction = Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical';
+        }
+
+        // Vertikal oder noch unklar: Scroll freigeben, nichts tun
+        if (direction !== 'horizontal') {
+            resetDiv();
+            return;
+        }
+
+        // Horizontal: Scroll sperren
+        e.preventDefault();
+
+        // Rechts: keine Aktion, kein visuelles Feedback
+        if (deltaX > 0) {
+            div.style.transform = 'translateX(0)';
+            div.style.backgroundColor = '';
+            swipedleft = false;
+            return;
+        }
+
+        // Links: Schwimmer entfernen-Geste
+        const clamped = Math.max(-220, deltaX);
         div.style.transform = `translateX(${clamped}px)`;
         if (clamped < -threshold) {
             div.style.backgroundColor = '#ef9a9a';
-            swipedleft = true; swipedright = false;
-        } else if (clamped > threshold) {
-            div.style.backgroundColor = '#a5d6a7';
-            swipedright = true; swipedleft = false;
+            swipedleft = true;
         } else {
             div.style.backgroundColor = '';
-            swipedleft = false; swipedright = false;
+            swipedleft = false;
         }
     }, { passive: false });
 
@@ -305,10 +330,6 @@ function addSwipeHandler(div) {
             div.style.transform = 'translateX(-130%)';
             div.style.opacity = '0';
             setTimeout(() => removeSchwimmerDiv(div), 260);
-        } else if (swipedright) {
-            swipedright = false;
-            resetDiv();
-            setTimeout(() => render(), 220);
         } else {
             resetDiv();
         }
