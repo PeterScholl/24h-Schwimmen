@@ -311,6 +311,22 @@ function handle_admin(): void {
             Logger::info("Tabelle clients wird abgerufen");
             json_response(liste_tabelle('clients'));
             return;
+        } elseif ($action === 'delete_clients_before') {
+            $zeitpunkt = $data['zeitpunkt'] ?? null;
+            if (!$zeitpunkt) { json_response(['error' => 'Kein Zeitpunkt'], 400); return; }
+            $db = getDb();
+            $rows = $db->fetchAll("SELECT id FROM clients WHERE zeitpunkt_letzte_aktion < ?", [$zeitpunkt]);
+            $ids = array_column($rows, 'id');
+            $deleted = 0;
+            if ($ids) {
+                $ph = implode(',', array_fill(0, count($ids), '?'));
+                $db->execute("UPDATE actions SET client_id = NULL WHERE client_id IN ($ph)", $ids);
+                $stmt = $db->execute("DELETE FROM clients WHERE id IN ($ph)", $ids);
+                $deleted = $stmt ? $stmt->rowCount() : 0;
+            }
+            Logger::info("$deleted Clients vor $zeitpunkt gelöscht");
+            json_response(['deleted' => $deleted]);
+            return;
         } elseif ($action === 'get_table_swimmer') {
             Logger::info("Tabelle schwimmer wird abgerufen");
             json_response(liste_tabelle('schwimmer'));

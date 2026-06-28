@@ -502,6 +502,23 @@ def update_client_aktion(client_id):
     params = (datetime.now().isoformat(), client_id)
     _local.instance.execute(query, params)
 
+def delete_clients_before(zeitpunkt):
+    """Löscht alle Clients, deren zeitpunkt_letzte_aktion vor dem angegebenen Zeitpunkt liegt."""
+    ids_rows = _local.instance.fetchall(
+        "SELECT id FROM clients WHERE zeitpunkt_letzte_aktion < ?", (zeitpunkt,)
+    )
+    ids = [r['id'] for r in ids_rows]
+    if not ids:
+        return 0
+    placeholders = ','.join('?' * len(ids))
+    _local.instance.execute(
+        f"UPDATE actions SET client_id = NULL WHERE client_id IN ({placeholders})", ids
+    )
+    _local.instance.execute(
+        f"DELETE FROM clients WHERE id IN ({placeholders})", ids
+    )
+    return len(ids)
+
 #========================
 #    Abschnitt: Benutzer
 #======================== 

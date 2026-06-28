@@ -222,8 +222,14 @@ def admin():
             return jsonify(db.liste_tabelle('benutzer'))
         elif action == 'get_table_clients':
             logging.info("Tabelle clients wird abgerufen")
-            #print(db.liste_tabelle('clients'))
             return jsonify(db.liste_tabelle('clients'))
+        elif action == 'delete_clients_before':
+            zeitpunkt = data.get('zeitpunkt')
+            if not zeitpunkt:
+                return "Kein Zeitpunkt angegeben", 400
+            deleted = db.delete_clients_before(zeitpunkt)
+            logging.info(f"{deleted} Clients vor {zeitpunkt} gelöscht")
+            return jsonify({'deleted': deleted}), 200
         elif action == 'get_table_swimmer':
             logging.info("Tabelle swimmer wird abgerufen")
             #print(db.liste_tabelle('schwimmer'))

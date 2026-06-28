@@ -269,8 +269,126 @@ function delUser(nummer) {
 
 
 // ***************** Render Client Table ***************************
+let clientData     = [];
+let clientSortCol  = 'zeitpunkt_letzte_aktion';
+let clientSortDir  = 'desc';
+let clientDeleteMode = false;
+
 function showClientTable() {
-    fetchAndFillTable('client', 'clientTable', 'get_table_clients', 'Clients');
+    showSection('client');
+    fetch('/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ action: 'get_table_clients' })
+    })
+    .then(r => r.json())
+    .then(data => {
+        clientData = data;
+        clientDeleteMode = false;
+        renderClientTable();
+    });
+}
+
+function renderClientTable() {
+    const section = document.getElementById('client');
+    const titleEl = section.querySelector('h2');
+
+    if (titleEl) {
+        titleEl.style.cssText = 'display:flex; align-items:center; gap:10px; flex-wrap:wrap;';
+        titleEl.innerHTML = '';
+        const titleText = document.createElement('span');
+        titleText.textContent = `Clients (${clientData.length})`;
+        titleEl.appendChild(titleText);
+
+        const deleteBtn = document.createElement('button');
+        if (clientDeleteMode) {
+            deleteBtn.textContent = 'Abbrechen';
+            deleteBtn.style.cssText = 'font-size:0.75em;padding:2px 8px;cursor:pointer;border-radius:3px;';
+            deleteBtn.onclick = () => { clientDeleteMode = false; renderClientTable(); };
+            titleEl.appendChild(deleteBtn);
+            const info = document.createElement('span');
+            info.style.cssText = 'font-size:0.75em;color:#555;font-weight:normal;';
+            info.textContent = 'Klicke auf den Zeitstempel des zuletzt aktiven Clients, der noch behalten werden soll — alle älteren werden gelöscht.';
+            titleEl.appendChild(info);
+        } else {
+            deleteBtn.textContent = 'Inaktive Clients löschen …';
+            deleteBtn.style.cssText = 'font-size:0.75em;background:#8b2020;color:white;border:none;padding:2px 8px;cursor:pointer;border-radius:3px;';
+            deleteBtn.onclick = () => { clientDeleteMode = true; renderClientTable(); };
+            titleEl.appendChild(deleteBtn);
+        }
+    }
+
+    const table = document.getElementById('clientTable');
+    table.innerHTML = '';
+
+    if (clientData.length === 0) {
+        table.innerHTML = '<tr><th>Keine Einträge</th></tr>';
+        return;
+    }
+
+    // Sortieren
+    const sorted = [...clientData].sort((a, b) => {
+        const va = a[clientSortCol] ?? '';
+        const vb = b[clientSortCol] ?? '';
+        const cmp = String(va).localeCompare(String(vb), undefined, { numeric: true });
+        return clientSortDir === 'asc' ? cmp : -cmp;
+    });
+
+    // Header
+    const headerRow = document.createElement('tr');
+    Object.keys(clientData[0]).forEach(key => {
+        const th = document.createElement('th');
+        th.style.cssText = 'cursor:pointer;user-select:none;';
+        const label = key.charAt(0).toUpperCase() + key.slice(1);
+        th.textContent = key === clientSortCol
+            ? label + (clientSortDir === 'asc' ? ' ↑' : ' ↓')
+            : label;
+        th.addEventListener('click', () => {
+            if (clientSortCol === key) {
+                clientSortDir = clientSortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                clientSortCol = key;
+                clientSortDir = 'asc';
+            }
+            renderClientTable();
+        });
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    // Zeilen
+    sorted.forEach(entry => {
+        const row = document.createElement('tr');
+        Object.entries(entry).forEach(([key, value]) => {
+            const td = document.createElement('td');
+            if (!key.includes('zeitpunkt')) td.classList.add('truncated');
+            td.textContent = value ?? '';
+            if (clientDeleteMode && key === 'zeitpunkt_letzte_aktion') {
+                td.style.cssText = 'cursor:pointer;color:#1565c0;text-decoration:underline;white-space:nowrap;';
+                td.title = 'Klicken: diesen Client behalten, alle älteren löschen';
+                td.addEventListener('click', () => {
+                    const ts = value;
+                    const readable = ts ? new Date(ts).toLocaleString('de-DE') : ts;
+                    if (confirm(`Alle Clients löschen, die vor dem ${readable} zuletzt aktiv waren?\n\nClient ${entry.id} (${entry.ip}) und neuere Clients bleiben erhalten.`)) {
+                        fetch('/admin', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'delete_clients_before', zeitpunkt: ts })
+                        })
+                        .then(r => r.json())
+                        .then(result => {
+                            showStatusMessage(`${result.deleted} Client(s) gelöscht`);
+                            clientDeleteMode = false;
+                            showClientTable();
+                        })
+                        .catch(err => showStatusMessage(`Fehler: ${err}`, false));
+                    }
+                });
+            }
+            row.appendChild(td);
+        });
+        table.appendChild(row);
+    });
 }
 
 // ************ Render Swimmer Table *****************
