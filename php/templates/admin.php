@@ -74,6 +74,8 @@
       <table id="actionsTable"></table>
     </section>
 
+    <section id="config" class="admin-section" style="display: none"></section>
+
     <section id="checks" class="admin-section" style="display: none"></section>
     <section id="view"   class="admin-section" style="display: none"></section>
     <section id="qr"     class="admin-section" style="display: none"></section>

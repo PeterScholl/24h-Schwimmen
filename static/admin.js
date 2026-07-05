@@ -75,6 +75,10 @@ function initNav() {
     button.innerText = "SchwimmerLog";
     button.addEventListener('click', () => showSchwimmerLog());
     navbar.appendChild(button);
+    button = document.createElement('button');
+    button.innerText = "Konfiguration";
+    button.addEventListener('click', () => showConfigSection());
+    navbar.appendChild(button);
 }
 
 function initAdminMenu() {
@@ -1379,6 +1383,114 @@ function showQRSection() {
     section.appendChild(btn);
 }
 
+
+// ***************** Konfiguration ***************************
+const CONFIG_SCHEMA = [
+    { key: 'default_admin_pass',            label: 'Admin-Passwort (Standard)',      type: 'text',   group: 'Allgemein', desc: 'Initiales Passwort des admin-Benutzers' },
+    { key: 'laenge_schwimmerNr_digits',     label: 'Schwimmernummer-Stellen',        type: 'number', group: 'Allgemein', desc: 'Anzahl Stellen (z.B. 3 → 001–999)' },
+    { key: 'laenge_bahn_m',                 label: 'Bahnlänge (m)',                  type: 'number', group: 'Allgemein', desc: 'Länge einer Bahn in Metern' },
+    { key: 'startzeit',                     label: 'Startzeit (UTC)',                 type: 'text',   group: 'Allgemein', desc: 'ISO-Timestamp z.B. 2025-06-14T08:00:00Z' },
+    { key: 'fade_time_s',                   label: 'Inaktivität bis grau (s)',        type: 'number', group: 'v2 / v3',   desc: 'Sekunden ohne Klick bis Karte ausgegraut wird — 0 = deaktiviert' },
+    { key: 'max_bahnen',                    label: 'Maximale Bahnen',                 type: 'number', group: 'v3',        desc: 'Anzahl Bahnbuttons im v3-Interface' },
+    { key: 'v3_timer_dauer_ms',             label: 'Klick-Verzögerung (ms)',          type: 'number', group: 'v3',        desc: 'Wartezeit nach Kachelklick bis zur Übertragung' },
+    { key: 'mobile_cards_col',              label: 'Mobil: Spalten pro Zeile',        type: 'number', group: 'v2',        desc: 'Schwimmerkarten nebeneinander auf kleinen Bildschirmen (≤ 600 px)' },
+    { key: 'view2_page_interval_s',         label: 'View2: Seite alle (s)',           type: 'number', group: 'View',      desc: 'Sekunden pro Seite im Kiosk-Modus (Shift-Lock)' },
+    { key: 'swimmer_list_update_interval_s',label: 'View: Aktualisierung (s)',        type: 'number', group: 'View',      desc: 'Intervall für automatischen Schwimmerlisten-Update' },
+    { key: 'db_host',                       label: 'Datenbank-Host',                  type: 'text',   group: 'Datenbank', desc: 'Nur PHP/MySQL-Backend relevant' },
+    { key: 'db_name',                       label: 'Datenbank-Name',                  type: 'text',   group: 'Datenbank', desc: 'Nur PHP/MySQL-Backend relevant' },
+    { key: 'db_user',                       label: 'Datenbank-Benutzer',              type: 'text',   group: 'Datenbank', desc: 'Nur PHP/MySQL-Backend relevant' },
+    { key: 'db_pass',                       label: 'Datenbank-Passwort',              type: 'password', group: 'Datenbank', desc: 'Nur PHP/MySQL-Backend relevant — Auge zum Anzeigen' },
+];
+
+function showConfigSection() {
+    showSection('config');
+    const section = document.getElementById('config');
+    section.innerHTML = '<h2>Konfiguration</h2><p style="color:#555;font-size:0.9em">Änderungen wirken nach dem nächsten Seiten-Reload des v2/v3-Interfaces. Labels mit ? zeigen eine Beschreibung beim Hover.</p>';
+
+    fetch('/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ action: 'get_config' })
+    })
+    .then(r => r.json())
+    .then(current => {
+        const form = document.createElement('form');
+        form.style.cssText = 'max-width:640px;margin-top:10px;';
+        form.onsubmit = e => e.preventDefault();
+
+        const groups = [...new Set(CONFIG_SCHEMA.map(s => s.group))];
+        groups.forEach(group => {
+            const fs = document.createElement('fieldset');
+            fs.style.cssText = 'margin-bottom:14px;border:1px solid #ccc;border-radius:4px;padding:10px 14px;';
+            const legend = document.createElement('legend');
+            legend.textContent = group;
+            legend.style.cssText = 'font-weight:bold;padding:0 6px;';
+            fs.appendChild(legend);
+
+            CONFIG_SCHEMA.filter(s => s.group === group).forEach(field => {
+                const row = document.createElement('div');
+                row.style.cssText = 'margin-bottom:7px;display:grid;grid-template-columns:220px 1fr;align-items:center;gap:8px;';
+
+                const lbl = document.createElement('label');
+                lbl.htmlFor = `cfg_${field.key}`;
+                lbl.title = field.desc;
+                lbl.style.cssText = 'font-size:0.9em;cursor:help;';
+                lbl.textContent = field.label + ' ⓘ';
+
+                const inp = document.createElement('input');
+                inp.type = field.type === 'number' ? 'number' : (field.type === 'password' ? 'password' : 'text');
+                inp.id = `cfg_${field.key}`;
+                inp.dataset.key = field.key;
+                inp.dataset.ftype = field.type;
+                inp.value = current[field.key] ?? '';
+                inp.style.cssText = 'width:100%;box-sizing:border-box;padding:2px 6px;';
+                if (field.type === 'number') inp.step = '1';
+
+                row.appendChild(lbl);
+                if (field.type === 'password') {
+                    const wrap = document.createElement('div');
+                    wrap.style.cssText = 'display:flex;align-items:center;gap:4px;';
+                    inp.style.cssText = 'flex:1;box-sizing:border-box;padding:2px 6px;';
+                    const eye = document.createElement('button');
+                    eye.type = 'button';
+                    eye.innerHTML = '<i class="fa-solid fa-eye"></i>';
+                    eye.title = 'Passwort anzeigen / verbergen';
+                    eye.style.cssText = 'background:none;border:1px solid #ccc;border-radius:3px;cursor:pointer;padding:1px 6px;';
+                    eye.addEventListener('click', () => {
+                        const visible = inp.type === 'text';
+                        inp.type = visible ? 'password' : 'text';
+                        eye.innerHTML = visible ? '<i class="fa-solid fa-eye"></i>' : '<i class="fa-solid fa-eye-slash"></i>';
+                    });
+                    wrap.appendChild(inp);
+                    wrap.appendChild(eye);
+                    row.appendChild(wrap);
+                } else {
+                    row.appendChild(inp);
+                }
+                fs.appendChild(row);
+            });
+            form.appendChild(fs);
+        });
+
+        const saveBtn = document.createElement('button');
+        saveBtn.type = 'button';
+        saveBtn.textContent = 'Konfiguration speichern';
+        saveBtn.addEventListener('click', () => {
+            const payload = { action: 'save_config' };
+            form.querySelectorAll('input[data-key]').forEach(inp => {
+                const val = inp.value.trim();
+                payload[inp.dataset.key] = inp.dataset.ftype === 'number' ? parseFloat(val) : val;
+            });
+            fetch('/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(r => r.text().then(text => showStatusMessage(text, r.ok)));
+        });
+        form.appendChild(saveBtn);
+        section.appendChild(form);
+    });
+}
 
 function downloadCSV(data, customHeaders = null) {
     if (!data.length) return;

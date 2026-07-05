@@ -23,6 +23,19 @@ else:   # Ausgeführt als .py
     base_path = os.path.dirname(os.path.abspath(__file__))
 
 config_path = os.path.join(base_path, 'config.json')
+
+CONFIG_EDITABLE_KEYS = {
+    'default_admin_pass', 'laenge_schwimmerNr_digits', 'laenge_bahn_m',
+    'fade_time_s', 'mobile_cards_col', 'view2_page_interval_s', 'startzeit',
+    'swimmer_list_update_interval_s', 'max_bahnen', 'v3_timer_dauer_ms',
+    'db_host', 'db_name', 'db_user', 'db_pass',
+}
+CONFIG_NUMBER_KEYS = {
+    'laenge_schwimmerNr_digits', 'laenge_bahn_m', 'fade_time_s',
+    'mobile_cards_col', 'view2_page_interval_s', 'swimmer_list_update_interval_s',
+    'max_bahnen', 'v3_timer_dauer_ms',
+}
+
 try:
     with open(config_path, encoding="utf-8") as f:
         config =json.load(f)
@@ -340,6 +353,23 @@ def admin():
                     neu += 1
             logging.info(f"Benutzer-Import: {neu} neu, {aktualisiert} aktualisiert")
             return jsonify({"status": "ok", "importiert": neu + aktualisiert, "neu": neu, "aktualisiert": aktualisiert}), 200
+        elif action == 'get_config':
+            return jsonify({k: config[k] for k in CONFIG_EDITABLE_KEYS if k in config}), 200
+        elif action == 'save_config':
+            updates = {k: v for k, v in data.items() if k in CONFIG_EDITABLE_KEYS}
+            if not updates:
+                return "Keine bekannten Schlüssel übergeben", 400
+            for k in CONFIG_NUMBER_KEYS:
+                if k in updates:
+                    try:
+                        updates[k] = int(float(updates[k]))
+                    except (ValueError, TypeError):
+                        return f"Ungültiger Zahlenwert für {k}", 400
+            config.update(updates)
+            with open(config_path, 'w', encoding='utf-8') as f:
+                json.dump(config, f, ensure_ascii=False, indent=4)
+            logging.info(f"Konfiguration gespeichert: {list(updates.keys())}")
+            return "Konfiguration gespeichert", 200
         elif action:
             return f"Unknown Action {action}", 400
 
@@ -401,6 +431,8 @@ def send_mainjs_v3():
     params = {
         'schwimmerNrLen': config["laenge_schwimmerNr_digits"],
         'maxBahnen': config.get('max_bahnen', 4),
+        'fadeTime': config.get('fade_time_s', 0),
+        'timerDauerMs': config.get('v3_timer_dauer_ms', 5000),
     }
     return render_template("main_v3.js", **params), 200, {'Content-Type': 'application/javascript'}
 

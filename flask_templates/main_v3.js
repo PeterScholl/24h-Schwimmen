@@ -2,7 +2,7 @@ import { schwimmerNummerErfragen, showStatusMessage } from './mymodals.js'
 
 const schwimmerNrLength = parseInt("{{schwimmerNrLen}}");
 const maxBahnen = parseInt("{{maxBahnen}}");
-const TIMER_DAUER_MS = 5000; // ms bis automatisches Senden nach Klick
+const TIMER_DAUER_MS = parseInt("{{timerDauerMs}}") || 5000; // ms bis automatisches Senden nach Klick
 const fadeTime = parseInt("{{fadeTime}}") || 0; // Sekunden bis Schwimmer auf Bahn 0 gesetzt wird (0 = deaktiviert)
 const DEBUG = false;
 
