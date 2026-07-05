@@ -534,10 +534,15 @@ def action():
                     value = int(parameter[1])
                     logging.info(f"ACT ausgeführt: Schwimmer {nummer} erhält Activitätswert {value}")
                     db.erstelle_action(user, client_id=clientid, zeitstempel=str(timestamp), kommando=str(kommando), parameter=json.dumps(parameter))
-                    if (db.update_schwimmer(nummer,aktiv = value)):
+                    if (db.update_schwimmer(nummer, aktiv=value)):
                         results.append({"kommando": kommando, "status": "erfolgreich", "nummer": nummer, "value": value})
                     else:
-                        results.append({"kommando": kommando, "status": "FEHLER", "nummer": nummer, "value": value})
+                        existing = db.lies_schwimmer(nummer)
+                        if existing and existing.get('aktiv') == value:
+                            logging.info(f"ACT: Schwimmer {nummer} hat aktiv={value} bereits – idempotent OK")
+                            results.append({"kommando": kommando, "status": "erfolgreich", "nummer": nummer, "value": value})
+                        else:
+                            results.append({"kommando": kommando, "status": "FEHLER", "nummer": nummer, "value": value})
                 except (ValueError, IndexError) as e:
                     logging.info(f"Fehler bei ACT-Parametern: {e}")
                     results.append({"kommando": kommando, "status": f"ungültige Parameter: {str(e)}"})

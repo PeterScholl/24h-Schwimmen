@@ -635,8 +635,14 @@ function handle_action(): void {
                         Logger::info("ACT: Schwimmer $nummer nicht gefunden – status=$status (value=$value)");
                         $results[] = ['kommando' => 'ACT', 'status' => $status, 'nummer' => $nummer, 'value' => $value];
                     } else {
-                        Logger::error("ACT: Schwimmer $nummer konnte nicht aktualisiert werden");
-                        $results[] = ['kommando' => 'ACT', 'status' => 'FEHLER', 'nummer' => $nummer, 'value' => $value];
+                        $existing = lies_schwimmer($nummer);
+                        if ($existing && (int)$existing['aktiv'] === $value) {
+                            Logger::info("ACT: Schwimmer $nummer hat aktiv=$value bereits – idempotent OK");
+                            $results[] = ['kommando' => 'ACT', 'status' => 'erfolgreich', 'nummer' => $nummer, 'value' => $value];
+                        } else {
+                            Logger::error("ACT: Schwimmer $nummer konnte nicht aktualisiert werden");
+                            $results[] = ['kommando' => 'ACT', 'status' => 'FEHLER', 'nummer' => $nummer, 'value' => $value];
+                        }
                     }
                 } catch (\Throwable $e) {
                     Logger::info("Fehler bei ACT-Parametern: " . $e->getMessage());
