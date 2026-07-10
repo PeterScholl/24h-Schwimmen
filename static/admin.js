@@ -1393,7 +1393,8 @@ const CONFIG_SCHEMA = [
     { key: 'session_lifetime_h',            label: 'Session-Dauer (h)',               type: 'number', group: 'Allgemein', desc: 'Stunden bis zur automatischen Abmeldung — Standard: 24' },
     { key: 'fade_time_s',                   label: 'Inaktivität bis grau (s)',        type: 'number', group: 'v2 / v3',   desc: 'Sekunden ohne Klick bis Karte ausgegraut wird — 0 = deaktiviert' },
     { key: 'max_bahnen',                    label: 'Maximale Bahnen',                 type: 'number', group: 'v3',        desc: 'Anzahl Bahnbuttons im v3-Interface' },
-    { key: 'v3_timer_dauer_ms',             label: 'Klick-Verzögerung (ms)',          type: 'number', group: 'v3',        desc: 'Wartezeit nach Kachelklick bis zur Übertragung' },
+    { key: 'v3_timer_dauer_ms',             label: 'Klick-Verzögerung (ms)',          type: 'number',   group: 'v3',        desc: 'Wartezeit nach Kachelklick bis zur Übertragung' },
+    { key: 'v3_senden_btn',                label: 'Senden-Button anzeigen',          type: 'checkbox', group: 'v3',        desc: 'Zeigt einen Senden-Button an, der alle offenen Kachelklicks sofort überträgt' },
     { key: 'mobile_cards_col',              label: 'Mobil: Spalten pro Zeile',        type: 'number', group: 'v2',        desc: 'Schwimmerkarten nebeneinander auf kleinen Bildschirmen (≤ 600 px)' },
     { key: 'view2_page_interval_s',         label: 'View2: Seite alle (s)',           type: 'number', group: 'View',      desc: 'Sekunden pro Seite im Kiosk-Modus (Shift-Lock)' },
     { key: 'swimmer_list_update_interval_s',label: 'View: Aktualisierung (s)',        type: 'number', group: 'View',      desc: 'Intervall für automatischen Schwimmerlisten-Update' },
@@ -1439,13 +1440,18 @@ function showConfigSection() {
                 lbl.textContent = field.label + ' ⓘ';
 
                 const inp = document.createElement('input');
-                inp.type = field.type === 'number' ? 'number' : (field.type === 'password' ? 'password' : 'text');
                 inp.id = `cfg_${field.key}`;
                 inp.dataset.key = field.key;
                 inp.dataset.ftype = field.type;
-                inp.value = current[field.key] ?? '';
-                inp.style.cssText = 'width:100%;box-sizing:border-box;padding:2px 6px;';
-                if (field.type === 'number') inp.step = '1';
+                if (field.type === 'checkbox') {
+                    inp.type = 'checkbox';
+                    inp.checked = !!current[field.key];
+                } else {
+                    inp.type = field.type === 'number' ? 'number' : (field.type === 'password' ? 'password' : 'text');
+                    inp.value = current[field.key] ?? '';
+                    inp.style.cssText = 'width:100%;box-sizing:border-box;padding:2px 6px;';
+                    if (field.type === 'number') inp.step = '1';
+                }
 
                 row.appendChild(lbl);
                 if (field.type === 'password') {
@@ -1479,8 +1485,12 @@ function showConfigSection() {
         saveBtn.addEventListener('click', () => {
             const payload = { action: 'save_config' };
             form.querySelectorAll('input[data-key]').forEach(inp => {
-                const val = inp.value.trim();
-                payload[inp.dataset.key] = inp.dataset.ftype === 'number' ? parseFloat(val) : val;
+                if (inp.dataset.ftype === 'checkbox') {
+                    payload[inp.dataset.key] = inp.checked ? 1 : 0;
+                } else {
+                    const val = inp.value.trim();
+                    payload[inp.dataset.key] = inp.dataset.ftype === 'number' ? parseFloat(val) : val;
+                }
             });
             fetch('/admin', {
                 method: 'POST',

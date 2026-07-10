@@ -72,6 +72,11 @@
         <div id="bahnButtons" style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 4px;"></div>
       </div>
       <div style="display: flex; align-items: center; gap: 6px;">
+        <button id="sendenBtn" title="Ausstehende Kachelklicks sofort senden"
+          style="display:none; font-size:16px; cursor:pointer; background:#2e7d32; color:white; border:none; border-radius:6px; padding:6px 12px; opacity:0.45">
+          Senden&nbsp;<span id="sendenCount"
+            style="background:white; color:#2e7d32; border-radius:50%; display:inline-block; min-width:1.4em; font-weight:bold; line-height:1.4em; text-align:center">0</span>
+        </button>
         <button id="toggleInfoBar" style="padding-left: 0px; font-size: 30px; cursor: pointer; color: white; background: none; border: none">
           <i class="fa-solid fa-circle-info"></i>
         </button>
@@ -96,6 +101,11 @@
         <button type="submit" title="Adminbereich" style="font-size: 30px; color: inherit; background: none; border: none; cursor: pointer">⚙️</button>
       </form>
       <?php endif; ?>
+      <button id="sendenBtn" title="Ausstehende Kachelklicks sofort senden"
+        style="display:none; font-size:16px; cursor:pointer; background:#2e7d32; color:white; border:none; border-radius:6px; padding:6px 12px; opacity:0.45">
+        Senden&nbsp;<span id="sendenCount"
+          style="background:white; color:#2e7d32; border-radius:50%; display:inline-block; min-width:1.4em; font-weight:bold; line-height:1.4em; text-align:center">0</span>
+      </button>
       <button id="downloadJsonBtn"
         title="Aktionen-Backup herunterladen – enthält alle seit dem Login empfangenen Bahnen. Kann im Admin-Bereich unter Aktionen → JSON-Import wieder eingespielt werden."
         style="font-size: 30px; cursor: pointer; color: inherit; background: none; border: none">

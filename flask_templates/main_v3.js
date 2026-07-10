@@ -4,6 +4,7 @@ const schwimmerNrLength = parseInt("{{schwimmerNrLen}}");
 const maxBahnen = parseInt("{{maxBahnen}}");
 const TIMER_DAUER_MS = parseInt("{{timerDauerMs}}") || 5000; // ms bis automatisches Senden nach Klick
 const fadeTime = parseInt("{{fadeTime}}") || 0; // Sekunden bis Schwimmer auf Bahn 0 gesetzt wird (0 = deaktiviert)
+const v3SendenBtn = parseInt("{{v3SendenBtn}}") === 1;
 const DEBUG = false;
 
 const LS_KEY = '24hschwimmen_v3_state';
@@ -259,7 +260,7 @@ container.addEventListener('click', (event) => {
         if (s_data) s_data.prio = 0;
         const clickTimestamp = new Date().toISOString();
         const timerId = setTimeout(() => autoSenden(nummer, clickTimestamp), TIMER_DAUER_MS);
-        pendingTimers.set(nummer, { timerId, clickTimestamp });
+        pendingTimers.set(nummer, { timerId, clickTimestamp, betrag: 1, kommentar: null });
     }
     render();
 });
@@ -485,6 +486,7 @@ function render() {
     if (broomBtn) {
         broomBtn.style.display = schwimmer.some(s => !verwaltete_bahnen.includes(s.aufBahn)) ? "inline-block" : "none";
     }
+    updateSendenButton();
 
     container.querySelectorAll(".schwimmer").forEach(div => {
         const nummer = div.dataset.nummer;
@@ -694,14 +696,33 @@ document.getElementById("bahnanzahlReset").addEventListener("click", function ()
         clearTimeout(pendingTimers.get(nummer).timerId);
     }
     const timerId = setTimeout(() => autoSenden(nummer, clickTimestamp, betrag, "Bahnanzahl reset"), TIMER_DAUER_MS);
-    pendingTimers.set(nummer, { timerId, clickTimestamp, type: 'reset' });
+    pendingTimers.set(nummer, { timerId, clickTimestamp, betrag, kommentar: "Bahnanzahl reset", type: 'reset' });
     render();
 });
 
 
+function updateSendenButton() {
+    if (!v3SendenBtn) return;
+    const count = pendingTimers.size;
+    document.getElementById('sendenCount').textContent = count;
+    document.getElementById('sendenBtn').style.opacity = count > 0 ? '1' : '0.45';
+}
+
 document.getElementById("toggleInfoBar").addEventListener("click", toggleInfoBar);
 initBahnButtons();
 restoreState();
+
+if (v3SendenBtn) {
+    const sendenBtn = document.getElementById('sendenBtn');
+    sendenBtn.style.display = '';
+    sendenBtn.addEventListener('click', () => {
+        [...pendingTimers.entries()].forEach(([nummer, { timerId, clickTimestamp, betrag, kommentar }]) => {
+            clearTimeout(timerId);
+            autoSenden(nummer, clickTimestamp, betrag ?? 1, kommentar ?? null);
+        });
+        transmitActions();
+    });
+}
 
 setInterval(transmitActions, 30000);
 
