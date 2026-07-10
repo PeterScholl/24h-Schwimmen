@@ -40,6 +40,7 @@ function restoreState() {
             verwaltete_bahnen = aktiveBahnen.size > 0 ? [...aktiveBahnen].sort((a, b) => a - b) : [0];
             updateBahnButtonStyles();
         }
+        updateSendenButton();
     } catch (e) {}
 }
 
@@ -225,7 +226,7 @@ let clickedDiv = null;
 const container = document.getElementById('container');
 
 // Nach TIMER_DAUER_MS automatisch senden
-function autoSenden(nummer, clickTimestamp, betrag = 1, kommentar = null) {
+function autoSenden(nummer, clickTimestamp, betrag = 1, kommentar = null, doTransmit = true) {
     pendingTimers.delete(nummer);
     const s_data = schwimmer.find(s => s.nummer == nummer);
     if (s_data) {
@@ -238,7 +239,7 @@ function autoSenden(nummer, clickTimestamp, betrag = 1, kommentar = null) {
         if (kommentar) parameter.push(kommentar);
         actions.push({ kommando: "ADD", parameter, timestamp: clickTimestamp, transmitted: false });
         updateFormIsDirty(true);
-        transmitActions();
+        if (doTransmit) transmitActions();
     }
     render();
 }
@@ -529,6 +530,7 @@ async function transmitActions() {
         if (response.ok) {
             pending.forEach(a => a.transmitted = true);
             saveState();
+            updateSendenButton();
             const resp = await response.json();
             if (resp["updates"]) parseUpdates(resp);
             if (resp["results"]) showResultErrors(resp["results"]);
@@ -703,7 +705,7 @@ document.getElementById("bahnanzahlReset").addEventListener("click", function ()
 
 function updateSendenButton() {
     if (!v3SendenBtn) return;
-    const count = pendingTimers.size;
+    const count = pendingTimers.size + actions.filter(a => !a.transmitted).length;
     document.getElementById('sendenCount').textContent = count;
     document.getElementById('sendenBtn').style.opacity = count > 0 ? '1' : '0.45';
 }
@@ -718,7 +720,7 @@ if (v3SendenBtn) {
     sendenBtn.addEventListener('click', () => {
         [...pendingTimers.entries()].forEach(([nummer, { timerId, clickTimestamp, betrag, kommentar }]) => {
             clearTimeout(timerId);
-            autoSenden(nummer, clickTimestamp, betrag ?? 1, kommentar ?? null);
+            autoSenden(nummer, clickTimestamp, betrag ?? 1, kommentar ?? null, false);
         });
         transmitActions();
     });

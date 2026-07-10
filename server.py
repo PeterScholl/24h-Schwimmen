@@ -427,7 +427,7 @@ def send_mainjs_v2():
         'schwimmerNrLen': config["laenge_schwimmerNr_digits"],
         'fadeTime': config.get("fade_time_s", 0)
     }
-    return render_template("main_v2.js", **params), 200, {'Content-Type': 'application/javascript'}
+    return render_template("main_v2.js", **params), 200, {'Content-Type': 'application/javascript', 'Cache-Control': 'no-store'}
 
 @app.route("/main_v3.js")
 def send_mainjs_v3():
@@ -438,7 +438,7 @@ def send_mainjs_v3():
         'timerDauerMs': config.get('v3_timer_dauer_ms', 5000),
         'v3SendenBtn': config.get('v3_senden_btn', 0),
     }
-    return render_template("main_v3.js", **params), 200, {'Content-Type': 'application/javascript'}
+    return render_template("main_v3.js", **params), 200, {'Content-Type': 'application/javascript', 'Cache-Control': 'no-store'}
 
 @app.route("/view.js")
 def send_viewjs():
@@ -447,7 +447,7 @@ def send_viewjs():
         'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z'),
         'swimmer_list_interval': config.get('swimmer_list_update_interval_s', 60)
     }
-    return render_template("view.js", **params), 200, {'Content-Type': 'application/javascript'}
+    return render_template("view.js", **params), 200, {'Content-Type': 'application/javascript', 'Cache-Control': 'no-store'}
 
 @app.route("/<path:filename>")
 def static_files(filename):
@@ -469,7 +469,7 @@ def send_view2js():
         'startzeit': config.get('startzeit', '2000-01-01T00:00:00Z'),
         'swimmer_list_interval': config.get('swimmer_list_update_interval_s', 60)
     }
-    return render_template("view2.js", **params), 200, {'Content-Type': 'application/javascript'}
+    return render_template("view2.js", **params), 200, {'Content-Type': 'application/javascript', 'Cache-Control': 'no-store'}
 
 @app.route("/api/ips")
 def api_ips():

@@ -517,6 +517,7 @@ function handle_v3(): void {
 function handle_main_v2_js(): void {
     global $config;
     header('Content-Type: application/javascript; charset=utf-8');
+    header('Cache-Control: no-store');
     $js = file_get_contents(__DIR__ . '/../flask_templates/main_v2.js');
     $js = str_replace('{{schwimmerNrLen}}', $config['laenge_schwimmerNr_digits'], $js);
     $js = str_replace('{{fadeTime}}',       $config['fade_time_s'] ?? 0,          $js);
@@ -526,6 +527,7 @@ function handle_main_v2_js(): void {
 function handle_main_v3_js(): void {
     global $config;
     header('Content-Type: application/javascript; charset=utf-8');
+    header('Cache-Control: no-store');
     $js = file_get_contents(__DIR__ . '/../flask_templates/main_v3.js');
     $js = str_replace('{{schwimmerNrLen}}', $config['laenge_schwimmerNr_digits'],    $js);
     $js = str_replace('{{maxBahnen}}',      $config['max_bahnen'] ?? 4,              $js);
@@ -538,6 +540,7 @@ function handle_main_v3_js(): void {
 function handle_view_js(): void {
     global $config;
     header('Content-Type: application/javascript; charset=utf-8');
+    header('Cache-Control: no-store');
     $js = file_get_contents(__DIR__ . '/../flask_templates/view.js');
     $js = str_replace('{{bahnlaenge}}',           $config['laenge_bahn_m'],                          $js);
     $js = str_replace('{{startzeit}}',            $config['startzeit'] ?? '2000-01-01T00:00:00Z',    $js);
@@ -548,6 +551,7 @@ function handle_view_js(): void {
 function handle_view2_js(): void {
     global $config;
     header('Content-Type: application/javascript; charset=utf-8');
+    header('Cache-Control: no-store');
     $js = file_get_contents(__DIR__ . '/../flask_templates/view2.js');
     $js = str_replace('{{bahnlaenge}}',            $config['laenge_bahn_m'],                          $js);
     $js = str_replace('{{page_interval}}',         $config['view2_page_interval_s'] ?? 10,            $js);
