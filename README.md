@@ -138,6 +138,29 @@ Ein langer Druck (Touch) oder Rechtsklick auf eine Schwimmerkarte öffnet ein Ko
 
 Unten links neben dem ⚙️-Admin-Button befindet sich ein Download-Symbol. Darüber kann jederzeit ein JSON-Backup aller seit dem Login empfangenen Aktionen heruntergeladen werden. Dieses Backup kann im Admin-Bereich unter **Aktionen → JSON-Import** wieder eingespielt werden (siehe auch [Notizen für Notfall-Recovery](#notizen-für-notfall-recovery)).
 
+### Datenpersistenz: localStorage und Session
+
+#### Automatische Zwischenspeicherung (localStorage)
+
+Alle noch nicht erfolgreich an den Server übertragenen Aktionen werden automatisch im `localStorage` des Browsers gesichert. Wird die Seite unbeabsichtigt neu geladen — z. B. durch Verbindungsverlust, versehentlichen Refresh oder Browser-Absturz — stellt die Seite beim nächsten Start diese Aktionen automatisch wieder her und versucht, sie sofort zu übertragen. Eine kurze Statusmeldung (`"X ungesendete Aktion(en) aus lokalem Speicher geladen"`) erscheint, wenn Daten wiederhergestellt wurden.
+
+Zusätzlich wird die aktuell gewählte Bahnauswahl mitgespeichert, so dass nach einem Reload dieselben Bahnen wieder aktiv sind.
+
+Der lokale Zustand verfällt nach **24 Stunden** (gleiche Dauer wie die Session, Konstante `LS_TTL_MS` in `static/main_v3.js`). Ältere Einträge werden beim nächsten Seitenstart automatisch verworfen.
+
+#### Implementierungshinweis (für Entwickler)
+
+Die Persistenzlogik ist in zwei Funktionen in `flask_templates/main_v3.js` gebündelt:
+
+* `saveState()` — serialisiert alle noch nicht übertragenen Actions und `verwaltete_bahnen` als JSON in `localStorage`. Wird aufgerufen, sobald neue Aktionen anfallen (`updateFormIsDirty(true)`), nach erfolgreicher Übertragung (zum Leeren des gespeicherten Zustands) sowie bei jeder Änderung der Bahnauswahl (`toggleBahn()`).
+* `restoreState()` — liest den gespeicherten Zustand beim Seitenstart, prüft den Timestamp gegen die TTL, fügt gefundene Actions in das `actions`-Array ein und stellt die Bahnauswahl wieder her. Wird direkt nach `initBahnButtons()` aufgerufen, bevor der erste Server-Request (`fetchSchwimmer()`) startet.
+
+#### Session-Dauer
+
+Standardmäßig bleibt ein eingeloggter Benutzer **24 Stunden** angemeldet, auch wenn der Browser zwischenzeitlich geschlossen wurde. Die Dauer ist über den Konfigurationsparameter `session_lifetime_h` (in `config.json` oder über den Admin-Bereich → **Konfiguration**) einstellbar.
+
+> **Einschränkung:** Der `localStorage` ist browser- und gerätespezifisch. Wechselt man das Gerät oder den Browser, ist kein lokaler Zustand vorhanden — in diesem Fall hilft der [Backup-Download](#backup-download) als manuelle Sicherung.
+
 ## Wichtiges für den Live-Betrieb
 
 * Der Rechner auf dem der Server läuft, sollte angepasste Energiesparmodi haben, d.h. nicht in den Standby-Wechseln und auch die Festplatte soll nicht abgeschaltet werden. Dazu z.B. unter Windows ``Energiesparplaneinstellungen ändern`` -> ``Erweiterte Einstellungen ändern`` und dort enstprechende Einstellungen vornehmen
@@ -159,6 +182,8 @@ Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einst
 | `startzeit` | `"2025-06-14T08:00:00Z"` | **View- und View2-Seite**: Startzeitpunkt des Schwimmens als UTC-ISO-Timestamp. Legt den Beginn der Spezialzeiten (Tag1, Geisterstunde, Gute Nacht, Frühaufsteher, Tag2) fest. |
 | `swimmer_list_update_interval_s` | `600` | **View- und View2-Seite**: Intervall in Sekunden, in dem die Schwimmerliste neu vom Server abgefragt wird. Stellt sicher, dass während des Wettkampfs neu angelegte Schwimmer automatisch in der Anzeige erscheinen, ohne manuellen Reload. `0` deaktiviert das automatische Neuladen; ein manuelles Laden der Schwimmerliste ist jederzeit per `Shift+S` möglich. |
 | `max_bahnen` | `4` | **Erfassungsseite v3** (`/v3`): Anzahl der Bahnen, die auf der Erfassungsseite als runde Toggle-Buttons angezeigt werden (Buttons 1 bis `max_bahnen`). |
+| `v3_timer_dauer_ms` | `5000` | **Erfassungsseite v3**: Wartezeit in Millisekunden nach einem Kachelklick, bevor die Aktion automatisch an den Server übertragen wird. In dieser Zeit kann der Klick durch einen zweiten Klick auf dieselbe Kachel rückgängig gemacht werden. |
+| `session_lifetime_h` | `24` | Dauer einer Anmelde-Session in Stunden. Nach Ablauf dieser Zeit wird beim nächsten Seitenaufruf erneut nach dem Passwort gefragt. Änderung erfordert Neustart des Flask-Servers; beim PHP-Backend wirkt sie sofort beim nächsten Login. |
 
 Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
 
@@ -280,7 +305,9 @@ Lädt die vollständige SQLite-Datenbank als `backup.sql` herunter (nur für Adm
 
 Fällt der Server während des Wettkampfs aus, können die Erfassungsgeräte (`/v2`) weiter lokal klicken — die Actions werden im Browser zwischengespeichert und beim nächsten erfolgreichen Senden automatisch nachübertragen. Sobald der Server wieder erreichbar ist, ist in der Regel keine manuelle Aktion nötig.
 
-Sollte ein Endgerät nach dem Server-Ausfall neu geladen oder der Browser geschlossen worden sein, gehen die noch nicht übertragenen lokalen Actions verloren — **außer** es wurde vorher ein Backup erstellt (siehe unten).
+Auf der **Erfassungsseite v3** (`/v3`) werden noch nicht übertragene Actions zusätzlich im `localStorage` des Browsers gespeichert. Wird die Seite neu geladen, stellt sie diese Actions automatisch wieder her und überträgt sie sofort. Einzelheiten dazu unter [Datenpersistenz: localStorage und Session](#datenpersistenz-localstorage-und-session).
+
+Sollte ein Endgerät nach dem Server-Ausfall neu geladen oder der Browser geschlossen worden sein und der `localStorage` nicht ausreichen (anderer Browser, anderes Gerät, TTL abgelaufen), gehen die noch nicht übertragenen lokalen Actions verloren — **außer** es wurde vorher ein Backup erstellt (siehe unten).
 
 ### Actions von einem Endgerät sichern und wiederherstellen
 

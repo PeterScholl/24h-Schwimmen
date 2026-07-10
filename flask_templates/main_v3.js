@@ -6,6 +6,42 @@ const TIMER_DAUER_MS = parseInt("{{timerDauerMs}}") || 5000; // ms bis automatis
 const fadeTime = parseInt("{{fadeTime}}") || 0; // Sekunden bis Schwimmer auf Bahn 0 gesetzt wird (0 = deaktiviert)
 const DEBUG = false;
 
+const LS_KEY = '24hschwimmen_v3_state';
+const LS_TTL_MS = 24 * 60 * 60 * 1000;
+
+function saveState() {
+    try {
+        localStorage.setItem(LS_KEY, JSON.stringify({
+            actions: actions.filter(a => !a.transmitted),
+            verwaltete_bahnen,
+            ts: Date.now()
+        }));
+    } catch (e) {}
+}
+
+function restoreState() {
+    try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        if (!state || Date.now() - state.ts > LS_TTL_MS) {
+            localStorage.removeItem(LS_KEY);
+            return;
+        }
+        if (Array.isArray(state.actions) && state.actions.length > 0) {
+            state.actions.forEach(a => { a.transmitted = false; actions.push(a); });
+            updateFormIsDirty(true);
+            showStatusMessage(`${state.actions.length} ungesendete Aktion(en) aus lokalem Speicher geladen`, true, 5000);
+        }
+        if (Array.isArray(state.verwaltete_bahnen)) {
+            aktiveBahnen.clear();
+            state.verwaltete_bahnen.forEach(b => { if (b > 0) aktiveBahnen.add(b); });
+            verwaltete_bahnen = aktiveBahnen.size > 0 ? [...aktiveBahnen].sort((a, b) => a - b) : [0];
+            updateBahnButtonStyles();
+        }
+    } catch (e) {}
+}
+
 function logMessage(text, isSuccess = true) {
     statMessages.push({ message: text, success: isSuccess, timestamp: new Date().toISOString() });
 }
@@ -66,6 +102,8 @@ function schwimmerHinzufuegen(nummer) {
                 timestamp: new Date().toISOString(),
                 transmitted: false
             });
+            updateFormIsDirty(true);
+            transmitActions();
         } else {
             schwimmer.push({
                 nummer: parseInt(nummer),
@@ -175,6 +213,7 @@ function toggleBahn(bahn) {
     }
     verwaltete_bahnen = aktiveBahnen.size > 0 ? [...aktiveBahnen].sort((a, b) => a - b) : [0];
     updateBahnButtonStyles();
+    saveState();
     fetchSchwimmerVonBahnen();
     fillSchwimmerAusMeinenBahnen();
     render();
@@ -487,6 +526,7 @@ async function transmitActions() {
         clearTimeout(timeoutId);
         if (response.ok) {
             pending.forEach(a => a.transmitted = true);
+            saveState();
             const resp = await response.json();
             if (resp["updates"]) parseUpdates(resp);
             if (resp["results"]) showResultErrors(resp["results"]);
@@ -530,6 +570,7 @@ function updateFormIsDirty(neu) {
         formIsDirty = neu;
         redrawStatusBar();
     }
+    if (neu) saveState();
 }
 
 async function fetchSchwimmer(id = -1) {
@@ -660,6 +701,7 @@ document.getElementById("bahnanzahlReset").addEventListener("click", function ()
 
 document.getElementById("toggleInfoBar").addEventListener("click", toggleInfoBar);
 initBahnButtons();
+restoreState();
 
 setInterval(transmitActions, 30000);
 

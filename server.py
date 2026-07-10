@@ -2,7 +2,7 @@ import os, sys
 import re #Regular Expressions
 import json
 import db
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from flask import g, Flask, Response, request, jsonify, send_from_directory, redirect, url_for, session, render_template_string, render_template
 from logging_config import configure_logging
@@ -28,12 +28,13 @@ CONFIG_EDITABLE_KEYS = {
     'default_admin_pass', 'laenge_schwimmerNr_digits', 'laenge_bahn_m',
     'fade_time_s', 'mobile_cards_col', 'view2_page_interval_s', 'startzeit',
     'swimmer_list_update_interval_s', 'max_bahnen', 'v3_timer_dauer_ms',
+    'session_lifetime_h',
     'db_host', 'db_name', 'db_user', 'db_pass',
 }
 CONFIG_NUMBER_KEYS = {
     'laenge_schwimmerNr_digits', 'laenge_bahn_m', 'fade_time_s',
     'mobile_cards_col', 'view2_page_interval_s', 'swimmer_list_update_interval_s',
-    'max_bahnen', 'v3_timer_dauer_ms',
+    'max_bahnen', 'v3_timer_dauer_ms', 'session_lifetime_h',
 }
 
 try:
@@ -58,6 +59,7 @@ if not app.secret_key:
     sys.exit(1)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['DEBUG'] = True
+app.permanent_session_lifetime = timedelta(hours=int(config.get('session_lifetime_h', 24)))
 
 def get_db():
     if 'db' not in g:
@@ -108,6 +110,7 @@ def login():
         
         if benutzer and check_password_hash(benutzer['passwort'], passwort):  # Passwort prüfen (angenommen, es ist gehasht)
             # Erfolgreich eingeloggt, Benutzer zur Hauptseite weiterleiten
+            session.permanent = True
             session['user'] = benutzername  # Benutzername in der Session speichern
             session['realname'] = benutzer['name']
             session['clientID'] = db.erstelle_client(request.remote_addr,benutzer['id']) #Speichere die ClientID in der Session

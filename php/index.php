@@ -1,14 +1,17 @@
 <?php
-session_start();
-
 if (php_sapi_name() === 'cli-server') {
     error_reporting(E_ALL);
     ini_set('log_errors', '1');
     ini_set('display_errors', '0');
 }
 
-require_once __DIR__ . '/logger.php';
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/logger.php';
+
+$_session_lifetime_s = (int)(($config['session_lifetime_h'] ?? 24) * 3600);
+ini_set('session.gc_maxlifetime', $_session_lifetime_s);
+session_set_cookie_params(['lifetime' => $_session_lifetime_s, 'samesite' => 'Lax']);
+session_start();
 require_once __DIR__ . '/db.php';
 
 Logger::init(__DIR__ . '/../data/serverlog_php.log');
@@ -439,6 +442,7 @@ function handle_admin(): void {
             $editable = ['default_admin_pass','laenge_schwimmerNr_digits','laenge_bahn_m',
                          'fade_time_s','mobile_cards_col','view2_page_interval_s','startzeit',
                          'swimmer_list_update_interval_s','max_bahnen','v3_timer_dauer_ms',
+                         'session_lifetime_h',
                          'db_host','db_name','db_user','db_pass'];
             $result = [];
             foreach ($editable as $k) { if (array_key_exists($k, $config)) $result[$k] = $config[$k]; }
@@ -449,10 +453,11 @@ function handle_admin(): void {
             $editable = ['default_admin_pass','laenge_schwimmerNr_digits','laenge_bahn_m',
                          'fade_time_s','mobile_cards_col','view2_page_interval_s','startzeit',
                          'swimmer_list_update_interval_s','max_bahnen','v3_timer_dauer_ms',
+                         'session_lifetime_h',
                          'db_host','db_name','db_user','db_pass'];
             $numberKeys = ['laenge_schwimmerNr_digits','laenge_bahn_m','fade_time_s',
                            'mobile_cards_col','view2_page_interval_s','swimmer_list_update_interval_s',
-                           'max_bahnen','v3_timer_dauer_ms'];
+                           'max_bahnen','v3_timer_dauer_ms','session_lifetime_h'];
             $updates = array_intersect_key($data, array_flip($editable));
             if (empty($updates)) { http_response_code(400); echo 'Keine bekannten Schlüssel übergeben'; return; }
             foreach ($numberKeys as $k) {

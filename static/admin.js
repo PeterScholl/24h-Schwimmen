@@ -1390,6 +1390,7 @@ const CONFIG_SCHEMA = [
     { key: 'laenge_schwimmerNr_digits',     label: 'Schwimmernummer-Stellen',        type: 'number', group: 'Allgemein', desc: 'Anzahl Stellen (z.B. 3 → 001–999)' },
     { key: 'laenge_bahn_m',                 label: 'Bahnlänge (m)',                  type: 'number', group: 'Allgemein', desc: 'Länge einer Bahn in Metern' },
     { key: 'startzeit',                     label: 'Startzeit (UTC)',                 type: 'text',   group: 'Allgemein', desc: 'ISO-Timestamp z.B. 2025-06-14T08:00:00Z' },
+    { key: 'session_lifetime_h',            label: 'Session-Dauer (h)',               type: 'number', group: 'Allgemein', desc: 'Stunden bis zur automatischen Abmeldung — Standard: 24' },
     { key: 'fade_time_s',                   label: 'Inaktivität bis grau (s)',        type: 'number', group: 'v2 / v3',   desc: 'Sekunden ohne Klick bis Karte ausgegraut wird — 0 = deaktiviert' },
     { key: 'max_bahnen',                    label: 'Maximale Bahnen',                 type: 'number', group: 'v3',        desc: 'Anzahl Bahnbuttons im v3-Interface' },
     { key: 'v3_timer_dauer_ms',             label: 'Klick-Verzögerung (ms)',          type: 'number', group: 'v3',        desc: 'Wartezeit nach Kachelklick bis zur Übertragung' },

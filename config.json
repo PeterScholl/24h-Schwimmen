@@ -10,6 +10,7 @@
     "swimmer_list_update_interval_s": 600,
     "max_bahnen": 4,
     "v3_timer_dauer_ms": 5000,
+    "session_lifetime_h": 24,
 
     "db_host": "localhost",
     "db_name": "24h_schwimmen",
