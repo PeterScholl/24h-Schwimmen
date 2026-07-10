@@ -117,9 +117,13 @@ Ist `fade_time_s` in der `config.json` auf einen Wert größer 0 gesetzt, werden
 
 Ein Klick auf eine ausgegrautem Karte (Timer-Start) reaktiviert sie: der Inaktivitätszähler wird zurückgesetzt und die Karte erscheint beim nächsten Zählen wieder normal.
 
-### Bahn zählen (5-Sekunden-Timer)
+### Bahn zählen (Timer)
 
-Ein Tipp auf eine Schwimmerkarte startet einen 5-Sekunden-Timer. Die Karte färbt sich blau. Nach Ablauf wird die Bahn automatisch an den Server übertragen. Durch erneutes Antippen innerhalb dieser 5 Sekunden wird der Timer abgebrochen — die Karte wird wieder normal dargestellt, ohne dass eine Bahn gezählt wurde.
+Ein Tipp auf eine Schwimmerkarte startet einen Timer (Standard: 5 Sekunden, einstellbar über `v3_timer_dauer_ms`). Die Karte färbt sich blau. Nach Ablauf wird die Bahn automatisch an den Server übertragen. Durch erneutes Antippen innerhalb dieser Zeit wird der Timer abgebrochen — die Karte wird wieder normal dargestellt, ohne dass eine Bahn gezählt wurde.
+
+### Senden-Button (optional)
+
+Ist `v3_senden_btn` in der Konfiguration aktiviert, erscheint oben rechts neben dem ⓘ-Button ein grüner **Senden**-Button mit einem Zähler für ausstehende Kachelklicks. Ein Tipp darauf feuert alle laufenden Timer sofort ab und überträgt die Actions unmittelbar an den Server — ohne auf den automatischen Timer zu warten.
 
 ### Schwimmer hinzufügen
 
@@ -132,6 +136,7 @@ Ein langer Druck (Touch) oder Rechtsklick auf eine Schwimmerkarte öffnet ein Ko
 | Option | Funktion |
 | --- | --- |
 | Runde abziehen | Zieht eine bereits gezählte Bahn wieder ab |
+| Bahnanzahl zurücksetzen | Setzt die Bahnanzahl auf 0 (Timer läuft 5 s, während dieser Zeit abbrechbar) |
 | Schwimmer\*innen entfernen | Setzt den Schwimmer auf inaktiv (verschwindet aus der Ansicht) |
 
 ### Backup-Download
@@ -183,6 +188,7 @@ Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einst
 | `swimmer_list_update_interval_s` | `600` | **View- und View2-Seite**: Intervall in Sekunden, in dem die Schwimmerliste neu vom Server abgefragt wird. Stellt sicher, dass während des Wettkampfs neu angelegte Schwimmer automatisch in der Anzeige erscheinen, ohne manuellen Reload. `0` deaktiviert das automatische Neuladen; ein manuelles Laden der Schwimmerliste ist jederzeit per `Shift+S` möglich. |
 | `max_bahnen` | `4` | **Erfassungsseite v3** (`/v3`): Anzahl der Bahnen, die auf der Erfassungsseite als runde Toggle-Buttons angezeigt werden (Buttons 1 bis `max_bahnen`). |
 | `v3_timer_dauer_ms` | `5000` | **Erfassungsseite v3**: Wartezeit in Millisekunden nach einem Kachelklick, bevor die Aktion automatisch an den Server übertragen wird. In dieser Zeit kann der Klick durch einen zweiten Klick auf dieselbe Kachel rückgängig gemacht werden. |
+| `v3_senden_btn` | `0` | **Erfassungsseite v3**: `1` = Senden-Button oben rechts einblenden. Der Button überträgt alle ausstehenden Kachelklicks sofort, ohne den automatischen Timer abzuwarten. `0` = Button ausgeblendet. |
 | `session_lifetime_h` | `24` | Dauer einer Anmelde-Session in Stunden. Nach Ablauf dieser Zeit wird beim nächsten Seitenaufruf erneut nach dem Passwort gefragt. Änderung erfordert Neustart des Flask-Servers; beim PHP-Backend wirkt sie sofort beim nächsten Login. |
 
 Änderungen an `config.json` werden erst nach einem Neustart des Servers wirksam.
@@ -303,9 +309,7 @@ Lädt die vollständige SQLite-Datenbank als `backup.sql` herunter (nur für Adm
 
 ### Szenario: Server ausgefallen, Erfassungsgeräte laufen noch
 
-Fällt der Server während des Wettkampfs aus, können die Erfassungsgeräte (`/v2`) weiter lokal klicken — die Actions werden im Browser zwischengespeichert und beim nächsten erfolgreichen Senden automatisch nachübertragen. Sobald der Server wieder erreichbar ist, ist in der Regel keine manuelle Aktion nötig.
-
-Auf der **Erfassungsseite v3** (`/v3`) werden noch nicht übertragene Actions zusätzlich im `localStorage` des Browsers gespeichert. Wird die Seite neu geladen, stellt sie diese Actions automatisch wieder her und überträgt sie sofort. Einzelheiten dazu unter [Datenpersistenz: localStorage und Session](#datenpersistenz-localstorage-und-session).
+Fällt der Server während des Wettkampfs aus, können die Erfassungsgeräte weiter lokal klicken. Die v3-Oberfläche speichert alle noch nicht übertragenen Actions automatisch im `localStorage` des Browsers. Wird die Seite neu geladen, stellt sie diese Actions automatisch wieder her und überträgt sie sofort. Sobald der Server wieder erreichbar ist, ist in der Regel keine manuelle Aktion nötig. Einzelheiten dazu unter [Datenpersistenz: localStorage und Session](#datenpersistenz-localstorage-und-session).
 
 Sollte ein Endgerät nach dem Server-Ausfall neu geladen oder der Browser geschlossen worden sein und der `localStorage` nicht ausreichen (anderer Browser, anderes Gerät, TTL abgelaufen), gehen die noch nicht übertragenen lokalen Actions verloren — **außer** es wurde vorher ein Backup erstellt (siehe unten).
 
