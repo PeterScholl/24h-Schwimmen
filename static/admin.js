@@ -1318,18 +1318,96 @@ function showQRSection() {
     heading.textContent = 'QR-Code';
     section.appendChild(heading);
 
-    // Checkbox + Zahlenfeld für size-Parameter
-    const rowSize = document.createElement('div');
-    rowSize.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 10px;';
+    const rowStyle = 'display: flex; align-items: center; gap: 10px; margin-bottom: 10px;';
 
+    // --- Adresse ---
+    const addrHeading = document.createElement('h3');
+    addrHeading.textContent = 'Adresse';
+    addrHeading.style.cssText = 'margin: 12px 0 6px;';
+    section.appendChild(addrHeading);
+
+    const addrGroup = document.createElement('div');
+    addrGroup.id = 'qrAddrGroup';
+    section.appendChild(addrGroup);
+
+    fetch('/api/ips')
+        .then(r => r.json())
+        .then(ips => {
+            const port = window.location.port ? ':' + window.location.port : '';
+            const proto = window.location.protocol + '//';
+            const fqdn = window.location.hostname;
+            const isFqdn = /[a-zA-Z]/.test(fqdn);
+
+            // Alle Optionen: IPs aus API + ggf. FQDN aus Browser-URL
+            const options = [...ips];
+            if (isFqdn && !options.includes(fqdn)) options.unshift(fqdn);
+
+            options.forEach((host, idx) => {
+                const row = document.createElement('div');
+                row.style.cssText = rowStyle;
+
+                const rb = document.createElement('input');
+                rb.type = 'radio';
+                rb.name = 'qrAddr';
+                rb.id = 'qrAddr_' + idx;
+                rb.value = proto + host + port;
+                // FQDN vorauswählen wenn vorhanden, sonst erste IP
+                if ((isFqdn && host === fqdn) || (!isFqdn && idx === 0)) rb.checked = true;
+
+                const lbl = document.createElement('label');
+                lbl.htmlFor = rb.id;
+                lbl.textContent = proto + host + port;
+                if (isFqdn && host === fqdn) {
+                    const badge = document.createElement('span');
+                    badge.textContent = ' (FQDN)';
+                    badge.style.cssText = 'font-size:0.8em; color:#555;';
+                    lbl.appendChild(badge);
+                }
+
+                row.appendChild(rb);
+                row.appendChild(lbl);
+                addrGroup.appendChild(row);
+            });
+        });
+
+    // --- Version ---
+    const verHeading = document.createElement('h3');
+    verHeading.textContent = 'Version';
+    verHeading.style.cssText = 'margin: 12px 0 6px;';
+    section.appendChild(verHeading);
+
+    [['v3', 'v3 (Standard)'], ['v2', 'v2 (Legacy)']].forEach(([val, lbl], idx) => {
+        const row = document.createElement('div');
+        row.style.cssText = rowStyle;
+        const rb = document.createElement('input');
+        rb.type = 'radio';
+        rb.name = 'qrVersion';
+        rb.id = 'qrVer_' + val;
+        rb.value = val;
+        if (idx === 0) rb.checked = true;
+        const label = document.createElement('label');
+        label.htmlFor = rb.id;
+        label.textContent = lbl;
+        row.appendChild(rb);
+        row.appendChild(label);
+        section.appendChild(row);
+    });
+
+    // --- Optionen ---
+    const optHeading = document.createElement('h3');
+    optHeading.textContent = 'Optionen';
+    optHeading.style.cssText = 'margin: 12px 0 6px;';
+    section.appendChild(optHeading);
+
+    // size-Parameter
+    const rowSize = document.createElement('div');
+    rowSize.style.cssText = rowStyle + ' margin-bottom: 10px;';
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.id = 'qrSizeCheck';
-
     const label = document.createElement('label');
     label.htmlFor = 'qrSizeCheck';
     label.textContent = 'size-Parameter setzen:';
-
     const input = document.createElement('input');
     input.type = 'number';
     input.id = 'qrSizeInput';
@@ -1338,47 +1416,39 @@ function showQRSection() {
     input.max = '20';
     input.style.cssText = 'width: 4em; padding: 4px;';
     input.disabled = true;
-
     checkbox.addEventListener('change', () => { input.disabled = !checkbox.checked; });
-
     rowSize.appendChild(checkbox);
     rowSize.appendChild(label);
     rowSize.appendChild(input);
     section.appendChild(rowSize);
 
-    // Checkbox für dbgfkt-Parameter
+    // Debug-Funktion
     const rowDbg = document.createElement('div');
-    rowDbg.style.cssText = 'display: flex; align-items: center; gap: 10px; margin-bottom: 16px;';
-
+    rowDbg.style.cssText = rowStyle + ' margin-bottom: 16px;';
     const checkboxDbg = document.createElement('input');
     checkboxDbg.type = 'checkbox';
     checkboxDbg.id = 'qrDbgCheck';
-
     const labelDbg = document.createElement('label');
     labelDbg.htmlFor = 'qrDbgCheck';
     labelDbg.textContent = 'Debug-Funktion aktivieren (dbgfkt=true)';
-
     rowDbg.appendChild(checkboxDbg);
     rowDbg.appendChild(labelDbg);
     section.appendChild(rowDbg);
 
+    // --- Button ---
     const btn = document.createElement('button');
     btn.textContent = 'QR-Code öffnen';
     btn.style.cssText = 'font-size: 1rem; padding: 8px 16px; cursor: pointer;';
     btn.addEventListener('click', () => {
+        const base = document.querySelector('input[name="qrAddr"]:checked')?.value
+            || window.location.protocol + '//' + window.location.host;
+        const version = document.querySelector('input[name="qrVersion"]:checked')?.value || 'v3';
         const params = new URLSearchParams();
         if (checkbox.checked && input.value) params.set('size', input.value);
         if (checkboxDbg.checked) params.set('dbgfkt', 'true');
         const query = params.toString();
-        fetch('/api/ips')
-            .then(r => r.json())
-            .then(ips => {
-                const host = (ips && ips.length > 0) ? ips[0] : window.location.hostname;
-                const port = window.location.port ? ':' + window.location.port : '';
-                const base = window.location.protocol + '//' + host + port;
-                const url = base + '/v2' + (query ? '?' + query : '');
-                window.open('/show_qr?ip=' + encodeURIComponent(url), '_blank');
-            });
+        const url = base + '/' + version + (query ? '?' + query : '');
+        window.open('/show_qr?ip=' + encodeURIComponent(url), '_blank');
     });
     section.appendChild(btn);
 }

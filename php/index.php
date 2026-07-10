@@ -72,6 +72,7 @@ switch ($path) {
 // ===================================================
 
 function render_template(string $name, array $vars = []): void {
+    header('Content-Type: text/html; charset=utf-8');
     extract($vars, EXTR_SKIP);
     include __DIR__ . '/templates/' . $name . '.php';
 }
