@@ -1001,7 +1001,16 @@ function renderActionsTable({ data, total, page, limit }) {
 function showChecksSection(prefill = {}) {
     showSection('checks');
     const checkSection = document.getElementById('checks');
-    checkSection.innerHTML = ''; // erst leeren 
+    checkSection.innerHTML = ''; // erst leeren
+
+    const logLink = document.createElement('a');
+    logLink.href = '/tail.php';
+    logLink.target = '_blank';
+    logLink.rel = 'noopener';
+    logLink.textContent = '📋 Log-Viewer';
+    logLink.style.cssText = 'display:inline-block;margin-bottom:16px;padding:5px 12px;border:1px solid #ccc;border-radius:6px;font-size:0.9rem;text-decoration:none;';
+    checkSection.appendChild(logLink);
+
     let button = document.createElement('button');
     button.innerText = "Anzahlen Prüfen";
     button.addEventListener('click', () => {
