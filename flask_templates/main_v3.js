@@ -534,7 +534,7 @@ async function transmitActions() {
             const resp = await response.json();
             if (resp["updates"]) parseUpdates(resp);
             if (resp["results"]) showResultErrors(resp["results"]);
-            updateFormIsDirty(false);
+            updateFormIsDirty(actions.some(a => !a.transmitted) || pendingTimers.size > 0);
             updateServerStatus(true);
         } else {
             updateServerStatus(false);
