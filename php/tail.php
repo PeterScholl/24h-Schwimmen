@@ -25,7 +25,7 @@ $fileKey = (isset($_GET['file']) && array_key_exists($_GET['file'], $logFiles))
     ? (string)$_GET['file']
     : 'php';
 $logPath = $logFiles[$fileKey];
-$lines   = max(10, min(1000, (int)($_GET['lines'] ?? 200)));
+$lines   = max(10, (int)($_GET['lines'] ?? 200));
 
 // ── Poll-Modus: neue Zeilen seit offset ──────────────────────────────────────
 if (isset($_GET['poll'])) {
@@ -205,12 +205,12 @@ $scriptUrl = strtok($_SERVER['REQUEST_URI'] ?? '/tail.php', '?');
       <?php endforeach; ?>
     </select>
     <label>Zeilen:
-      <input type="number" name="lines" value="<?= $lines ?>" min="10" max="1000" style="width:62px;" onchange="this.form.submit()">
+      <input type="number" name="lines" value="<?= $lines ?>" min="10" step="50" style="width:72px;" onchange="this.form.submit()">
     </label>
   </form>
 
   <button id="btnPause">⏸ Pause</button>
-  <button id="btnClear">🗑 Leeren</button>
+  <button id="btnClear">🗑 Anzeige leeren</button>
   <span style="display:flex;align-items:center;gap:4px;">
     <button id="btnSmaller"   title="Schrift verkleinern"      style="font-weight:600;padding:4px 9px;">A−</button>
     <button id="btnBigger"    title="Schrift vergrößern"       style="font-weight:600;padding:4px 9px;">A+</button>
@@ -252,7 +252,9 @@ $scriptUrl = strtok($_SERVER['REQUEST_URI'] ?? '/tail.php', '?');
   var base    = <?= json_encode($scriptUrl) ?>;
   var paused  = false;
   var allLines = [];                         // alle Rohzeilen (ungefiltert)
-  var activeLevels = new Set(['err','warn','info','dbg','other']);
+  var ALL_LEVELS = ['err','warn','info','dbg','other'];
+  var storedLevels = localStorage.getItem('tailActiveLevels');
+  var activeLevels = new Set(storedLevels ? JSON.parse(storedLevels) : ALL_LEVELS);
   var searchTerm = '';
   var debounceTimer = null;
 
@@ -342,7 +344,11 @@ $scriptUrl = strtok($_SERVER['REQUEST_URI'] ?? '/tail.php', '?');
   }
 
   // ── Filter-Controls ──────────────────────────────────────────────────────
+  // Buttons initial entsprechend localStorage-Zustand setzen
   document.querySelectorAll('.lvl-btn').forEach(function (btn) {
+    if (!activeLevels.has(btn.dataset.lvl)) {
+      btn.classList.remove('active');
+    }
     btn.addEventListener('click', function () {
       var lvl = btn.dataset.lvl;
       if (activeLevels.has(lvl)) {
@@ -352,6 +358,7 @@ $scriptUrl = strtok($_SERVER['REQUEST_URI'] ?? '/tail.php', '?');
         activeLevels.add(lvl);
         btn.classList.add('active');
       }
+      localStorage.setItem('tailActiveLevels', JSON.stringify(Array.from(activeLevels)));
       renderView();
     });
   });
