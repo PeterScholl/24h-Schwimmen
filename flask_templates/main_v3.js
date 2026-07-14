@@ -226,7 +226,7 @@ let clickedDiv = null;
 const container = document.getElementById('container');
 
 // Nach TIMER_DAUER_MS automatisch senden
-function autoSenden(nummer, clickTimestamp, betrag = 1, kommentar = null, doTransmit = true) {
+function autoSenden(nummer, clickTimestamp, betrag = 1, kommentar = null, doTransmit = false) {
     pendingTimers.delete(nummer);
     const s_data = schwimmer.find(s => s.nummer == nummer);
     if (s_data) {
@@ -726,7 +726,7 @@ if (v3SendenBtn) {
     });
 }
 
-setInterval(transmitActions, 30000);
+setInterval(transmitActions, parseInt("{{v3SendeIntervallMs}}") || 30000);
 
 if (fadeTime > 0) {
     const FADE_STEP_S = 10;

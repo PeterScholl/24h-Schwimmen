@@ -119,7 +119,7 @@ Ein Klick auf eine ausgegrautem Karte (Timer-Start) reaktiviert sie: der Inaktiv
 
 ### Bahn zählen (Timer)
 
-Ein Tipp auf eine Schwimmerkarte startet einen Timer (Standard: 5 Sekunden, einstellbar über `v3_timer_dauer_ms`). Die Karte färbt sich blau. Nach Ablauf wird die Bahn automatisch an den Server übertragen. Durch erneutes Antippen innerhalb dieser Zeit wird der Timer abgebrochen — die Karte wird wieder normal dargestellt, ohne dass eine Bahn gezählt wurde.
+Ein Tipp auf eine Schwimmerkarte startet einen Timer (Standard: 5 Sekunden, einstellbar über `v3_timer_dauer_ms`). Die Karte färbt sich blau. Nach Ablauf landet die Aktion in der Warteschlange — der eigentliche Sendevorgang erfolgt dann gebündelt im konfigurierbaren Intervall (`v3_sende_intervall_ms`, Standard: 30 Sekunden). Durch erneutes Antippen innerhalb der Timer-Zeit wird der Klick abgebrochen — die Karte wird wieder normal dargestellt, ohne dass eine Bahn gezählt wurde.
 
 ### Senden-Button (optional)
 
@@ -187,7 +187,8 @@ Die Datei `config.json` im Projektverzeichnis enthält alle serverseitigen Einst
 | `startzeit` | `"2025-06-14T08:00:00Z"` | **View- und View2-Seite**: Startzeitpunkt des Schwimmens als UTC-ISO-Timestamp. Legt den Beginn der Spezialzeiten (Tag1, Geisterstunde, Gute Nacht, Frühaufsteher, Tag2) fest. |
 | `swimmer_list_update_interval_s` | `600` | **View- und View2-Seite**: Intervall in Sekunden, in dem die Schwimmerliste neu vom Server abgefragt wird. Stellt sicher, dass während des Wettkampfs neu angelegte Schwimmer automatisch in der Anzeige erscheinen, ohne manuellen Reload. `0` deaktiviert das automatische Neuladen; ein manuelles Laden der Schwimmerliste ist jederzeit per `Shift+S` möglich. |
 | `max_bahnen` | `4` | **Erfassungsseite v3** (`/v3`): Anzahl der Bahnen, die auf der Erfassungsseite als runde Toggle-Buttons angezeigt werden (Buttons 1 bis `max_bahnen`). |
-| `v3_timer_dauer_ms` | `5000` | **Erfassungsseite v3**: Wartezeit in Millisekunden nach einem Kachelklick, bevor die Aktion automatisch an den Server übertragen wird. In dieser Zeit kann der Klick durch einen zweiten Klick auf dieselbe Kachel rückgängig gemacht werden. |
+| `v3_timer_dauer_ms` | `5000` | **Erfassungsseite v3**: Wartezeit in Millisekunden nach einem Kachelklick, bevor die Aktion in die Warteschlange eingereiht wird. In dieser Zeit kann der Klick durch einen zweiten Klick auf dieselbe Kachel rückgängig gemacht werden. |
+| `v3_sende_intervall_ms` | `30000` | **Erfassungsseite v3**: Intervall in Millisekunden, in dem alle ausstehenden Aktionen gebündelt an den Server übertragen werden. Aktionen landen zunächst in einer Warteschlange (nach Ablauf von `v3_timer_dauer_ms`) und werden erst in diesem Rhythmus gesendet. |
 | `v3_senden_btn` | `0` | **Erfassungsseite v3**: `1` = Senden-Button oben rechts einblenden. Der Button überträgt alle ausstehenden Kachelklicks sofort, ohne den automatischen Timer abzuwarten. `0` = Button ausgeblendet. |
 | `session_lifetime_h` | `24` | Dauer einer Anmelde-Session in Stunden. Nach Ablauf dieser Zeit wird beim nächsten Seitenaufruf erneut nach dem Passwort gefragt. Änderung erfordert Neustart des Flask-Servers; beim PHP-Backend wirkt sie sofort beim nächsten Login. |
 

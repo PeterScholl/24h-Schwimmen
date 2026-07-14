@@ -28,13 +28,13 @@ CONFIG_EDITABLE_KEYS = {
     'default_admin_pass', 'laenge_schwimmerNr_digits', 'laenge_bahn_m',
     'fade_time_s', 'mobile_cards_col', 'view2_page_interval_s', 'startzeit',
     'swimmer_list_update_interval_s', 'max_bahnen', 'v3_timer_dauer_ms', 'v3_senden_btn',
-    'session_lifetime_h',
+    'v3_sende_intervall_ms', 'session_lifetime_h',
     'db_host', 'db_name', 'db_user', 'db_pass',
 }
 CONFIG_NUMBER_KEYS = {
     'laenge_schwimmerNr_digits', 'laenge_bahn_m', 'fade_time_s',
     'mobile_cards_col', 'view2_page_interval_s', 'swimmer_list_update_interval_s',
-    'max_bahnen', 'v3_timer_dauer_ms', 'v3_senden_btn', 'session_lifetime_h',
+    'max_bahnen', 'v3_timer_dauer_ms', 'v3_senden_btn', 'v3_sende_intervall_ms', 'session_lifetime_h',
 }
 
 try:
@@ -437,6 +437,7 @@ def send_mainjs_v3():
         'fadeTime': config.get('fade_time_s', 0),
         'timerDauerMs': config.get('v3_timer_dauer_ms', 5000),
         'v3SendenBtn': config.get('v3_senden_btn', 0),
+        'v3SendeIntervallMs': config.get('v3_sende_intervall_ms', 30000),
     }
     return render_template("main_v3.js", **params), 200, {'Content-Type': 'application/javascript', 'Cache-Control': 'no-store'}
 

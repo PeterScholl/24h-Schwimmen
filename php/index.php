@@ -443,7 +443,7 @@ function handle_admin(): void {
             $editable = ['default_admin_pass','laenge_schwimmerNr_digits','laenge_bahn_m',
                          'fade_time_s','mobile_cards_col','view2_page_interval_s','startzeit',
                          'swimmer_list_update_interval_s','max_bahnen','v3_timer_dauer_ms','v3_senden_btn',
-                         'session_lifetime_h',
+                         'v3_sende_intervall_ms','session_lifetime_h',
                          'db_host','db_name','db_user','db_pass'];
             $result = [];
             foreach ($editable as $k) { if (array_key_exists($k, $config)) $result[$k] = $config[$k]; }
@@ -454,11 +454,11 @@ function handle_admin(): void {
             $editable = ['default_admin_pass','laenge_schwimmerNr_digits','laenge_bahn_m',
                          'fade_time_s','mobile_cards_col','view2_page_interval_s','startzeit',
                          'swimmer_list_update_interval_s','max_bahnen','v3_timer_dauer_ms','v3_senden_btn',
-                         'session_lifetime_h',
+                         'v3_sende_intervall_ms','session_lifetime_h',
                          'db_host','db_name','db_user','db_pass'];
             $numberKeys = ['laenge_schwimmerNr_digits','laenge_bahn_m','fade_time_s',
                            'mobile_cards_col','view2_page_interval_s','swimmer_list_update_interval_s',
-                           'max_bahnen','v3_timer_dauer_ms','v3_senden_btn','session_lifetime_h'];
+                           'max_bahnen','v3_timer_dauer_ms','v3_senden_btn','v3_sende_intervall_ms','session_lifetime_h'];
             $updates = array_intersect_key($data, array_flip($editable));
             if (empty($updates)) { http_response_code(400); echo 'Keine bekannten Schlüssel übergeben'; return; }
             foreach ($numberKeys as $k) {
@@ -533,7 +533,8 @@ function handle_main_v3_js(): void {
     $js = str_replace('{{maxBahnen}}',      $config['max_bahnen'] ?? 4,              $js);
     $js = str_replace('{{fadeTime}}',       $config['fade_time_s'] ?? 0,             $js);
     $js = str_replace('{{timerDauerMs}}',   $config['v3_timer_dauer_ms'] ?? 5000,   $js);
-    $js = str_replace('{{v3SendenBtn}}',    $config['v3_senden_btn'] ?? 0,          $js);
+    $js = str_replace('{{v3SendenBtn}}',       $config['v3_senden_btn'] ?? 0,          $js);
+    $js = str_replace('{{v3SendeIntervallMs}}', $config['v3_sende_intervall_ms'] ?? 30000, $js);
     echo $js;
 }
 
